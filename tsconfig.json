@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "es2017",
+        "lib": ["es2017"],
+        "strict": true,
+        "noEmitOnError": true,
+        "types": ["node"],
+        "sourceMap": true
+    },
+    "include": [
+        "src/**/*",
+        "configs/**/*",
+        "ts/**/*"
+    ]
+}
