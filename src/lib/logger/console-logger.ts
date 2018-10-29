@@ -1,7 +1,7 @@
 import * as debug from 'debug';
-import env from './env';
 
-type DebugType = 'error' | 'info';
+export type LevelType = 'error' | 'info';
+
 type DebugFunction = (msg: string) => {};
 
 interface IDebugTarget {
@@ -13,13 +13,7 @@ interface IDebugTarget {
  * Console debug logger
  */
 const proxy = new Proxy<IDebugTarget>({} as IDebugTarget, {
-    get(target: IDebugTarget, prop: DebugType) {
-        if (env !== 'development') {
-            return function () {
-                // do nothing.
-            };
-        }
-
+    get(target: IDebugTarget, prop: LevelType) {
         return prop in target ? target[prop] : target[prop] = debug(`dbservice:${prop}`);
     }
 });

@@ -1,5 +1,5 @@
 import * as express from 'express';
-import consoleLogger from './lib/console-logger';
+import logger from './lib/logger/logger';
 import userController from './controllers/UserController';
 
 const app = express()
@@ -17,6 +17,6 @@ if (!module.parent) {
     const envPort = Number(process.env.NODEJS_PORT);
     const port: number = isNaN(envPort) ? 8080 : envPort;
     app.listen(port, () => {
-        consoleLogger['info'](`Application started on port ${port}`);
+        logger('info', 'app', `Application started on port ${port}`);
     });
 }
