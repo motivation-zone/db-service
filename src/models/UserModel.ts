@@ -1,3 +1,19 @@
+interface IUserModel {
+    id?: number;
+    login?: string;
+    password?: string;
+    email?: string;
+    country?: string;
+    selfInfo?: string;
+    name?: string;
+    isAthlete?: boolean;
+    isBanned?: boolean;
+    weight?: number;
+    growth?: number;
+    birthDate?: Date;
+    registered?: Date;
+}
+
 export default class UserModel {
     public id?: number;
     public login?: string;
@@ -13,10 +29,23 @@ export default class UserModel {
     public birthDate?: Date;
     public registered?: Date;
 
-    constructor(
-        id?: number, login?: string, password?: string, email?: string, country?: string,
-        selfInfo?: string, name?: string, isAthlete?: boolean, isBanned?: boolean, weight?: number,
-        growth?: number, birthDate?: Date, registered?: Date) {
+    constructor(data: IUserModel) {
+        const {
+            id,
+            login,
+            password,
+            email,
+            country,
+            selfInfo,
+            name,
+            isAthlete,
+            isBanned,
+            weight,
+            growth,
+            birthDate,
+            registered
+        } = data;
+
         this.id = id;
         this.login = login;
         this.password = password;
@@ -30,5 +59,10 @@ export default class UserModel {
         this.growth = growth;
         this.birthDate = birthDate;
         this.registered = registered;
+    }
+
+    setBirthDateFromString(birthDate: string): Date {
+        const parts = birthDate.split('-');
+        return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
     }
 };

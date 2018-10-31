@@ -9,12 +9,22 @@ interface IQuery {
     values: any[];
 }
 
+interface IResultError {
+    status: 'error';
+    data: string;
+}
+
+interface IResultSuccess {
+    status: 'ok';
+    data: any;
+}
+
 const dbErrorHandler = (err: string) => {
     logger('error', 'db', err);
 }
 
 const yamlDbConfig = fs.readFileSync(getAbsolutePath(`./configs/db/db.yaml`), 'utf8');
-const dbConfig = yaml.parseDocument(yamlDbConfig);
+const dbConfig = yaml.parse(yamlDbConfig);
 const {Pool} = pg;
 
 const config = {
@@ -30,20 +40,29 @@ const config = {
 const pool = new Pool(config);
 pool.on('error', dbErrorHandler);
 
-export const query = async (queryData: IQuery) => {
+export const query = async (queryData: IQuery): Promise<IResultError | IResultSuccess> => {
     let client;
-    let result;
+    let result = {} as IResultSuccess | IResultError;
 
     try {
         client = await pool.connect();
-        result = await client.query(queryData);
+        const data = await client.query(queryData);
+        result = {
+            status: 'ok',
+            data: data.rows || []
+        };
     } catch (e) {
+        result = {
+            status: 'error',
+            data: e.detail
+        };
         logger('error', 'db', e.message);
     } finally {
         if (client) {
             client.release();
         }
     }
+
     return result;
 };
 
