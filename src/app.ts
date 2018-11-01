@@ -9,7 +9,7 @@ const app = express()
     .use(bodyParser.json())
     .get('/ping', (req, res) => res.end())
     .use('/api/user/', userController)
-    .use((req, res, next) => res.status(404).send('Not found'))
+    .use((req, res, next) => res.status(404).json({error: 'endpoint not found'}))
     .use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
         res.status(500).send('Server error');
     });

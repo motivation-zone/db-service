@@ -9,6 +9,8 @@ import {
 } from '../query-creators/user-query-creators';
 import {query, IResultError, IResultSuccess} from '../lib/db/client';
 import {translateNodeToPostgresqlName} from '../utils/db';
+import {OrderType} from '../query-creators/base';
+import {prepareResult} from './base';
 
 export default class UserService {
     static async createUser(user: UserModel): Promise<IResultError | IResultSuccess> {
@@ -23,13 +25,19 @@ export default class UserService {
             values
         });
 
-        return result;
+        return prepareResult(result);
     }
 
     static async updateUser(user: UserModel) {
         const notUpdateFields = ['id', 'login', 'registered'];
         const fields = (Object.keys(user) as (keyof UserModel)[]).filter((field) => {
-            return !notUpdateFields.includes(field) || Boolean(user[field]);
+            return !notUpdateFields.includes(field);
+        }).filter((field) => {
+            if (typeof user[field] === 'boolean') {
+                return true;
+            }
+
+            return Boolean(user[field])
         });
 
         const result = await query({
@@ -40,34 +48,42 @@ export default class UserService {
             ]
         });
 
-        return result;
+        return prepareResult(result);
     }
 
     static async getUserById(id: number): Promise<IResultError | IResultSuccess> {
-        return await query({
+        const result = await query({
             text: getUserByIdQuery(),
             values: [id]
         });
+
+        return prepareResult(result);
     }
 
-    static async getUserByLogin(login: string): Promise<IResultError | IResultSuccess> {
-        return await query({
-            text: getUserByLoginQuery(),
+    static async getUserByLogin(login: string, isStrict: boolean): Promise<IResultError | IResultSuccess> {
+        const result = await query({
+            text: getUserByLoginQuery(isStrict),
             values: [login]
         });
+
+        return prepareResult(result);
     }
 
-    static async getUsers(limit: number, skip: number, isDesc: boolean): Promise<IResultError | IResultSuccess> {
-        return await query({
-            text: getUsersQuery(isDesc),
+    static async getUsers(limit: number, skip: number, order: OrderType): Promise<IResultError | IResultSuccess> {
+        const result = await query({
+            text: getUsersQuery(order),
             values: [limit, skip]
         });
+
+        return prepareResult(result);
     }
 
     static async deleteUser(id: number) {
-        return await query({
+        const result = await query({
             text: deleteUserQuery(),
             values: [id]
         });
+
+        return prepareResult(result);
     }
 };

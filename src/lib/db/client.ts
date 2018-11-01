@@ -9,9 +9,14 @@ interface IQuery {
     values: any[];
 }
 
+interface IErrorData {
+    detail: string;
+    error: string;
+}
+
 export interface IResultError {
     status: 'error';
-    data: string;
+    data: IErrorData;
 }
 
 export interface IResultSuccess {
@@ -54,7 +59,10 @@ export const query = async (queryData: IQuery): Promise<IResultError | IResultSu
     } catch (e) {
         result = {
             status: 'error',
-            data: e.detail
+            data: {
+                detail: e.detail,
+                error: e.message
+            }
         };
         logger('error', 'db', e.message);
     } finally {

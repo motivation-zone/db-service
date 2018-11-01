@@ -1,3 +1,5 @@
+import {OrderType} from './base';
+
 const returningFields = [
     'id', 'name', 'email', 'country',
     'is_athlete', 'self_info', 'weight', 'growth',
@@ -24,12 +26,12 @@ export const getUserByLogin = (isStrict: boolean = true) => {
     if (isStrict) {
         return `SELECT * FROM users WHERE login = $1`;
     } else {
-        return `SELECT * FROM users WHERE login LIKE $1`;
+        return `SELECT * FROM users WHERE login LIKE '%' || $1 || '%' LIMIT 10`;
     }
 };
 
-export const getUsers = (isDesc: boolean = false) => {
-    return `SELECT * FROM users ORDER BY registered ${isDesc ? ' DESC' : 'ASC'} LIMIT $1 OFFSET $2`
+export const getUsers = (order: OrderType = 'ASC') => {
+    return `SELECT * FROM users ORDER BY registered ${order} LIMIT $1 OFFSET $2`
 };
 
 export const deleteUser = () => {
