@@ -1,13 +1,19 @@
+const returningFields = [
+    'id', 'name', 'email', 'country',
+    'is_athlete', 'self_info', 'weight', 'growth',
+    'birth_date', 'is_banned', 'registered'
+].join(', ');
+
 export const createUser = () => {
     return `INSERT INTO users (
         login, name, password, email, country, self_info, weight, growth, birth_date
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING ${returningFields}`;
 };
 
-export const updateUser = (fieldNames: string[]) => {
+export const updateUser = (fields: string[]) => {
     return `UPDATE users SET (
-        ${fieldNames.join(', ')}
-        ) = (${fieldNames.map((i) => `$${i}`).join(', ')}) WHERE id = $1`;
+        ${fields.join(', ')}
+        ) = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING ${returningFields}`;
 };
 
 export const getUserById = () => {
@@ -22,10 +28,10 @@ export const getUserByLogin = (isStrict: boolean = true) => {
     }
 };
 
-export const getUser = (isDesc: boolean = false) => {
-    return `SELECT * FROM users LIMIT $1 OFFSET $2 ORDER BY registered ${isDesc ? ' DESC' : ''}`;
+export const getUsers = (isDesc: boolean = false) => {
+    return `SELECT * FROM users ORDER BY registered ${isDesc ? ' DESC' : 'ASC'} LIMIT $1 OFFSET $2`
 };
 
 export const deleteUser = () => {
-    return `DELETE FROM users WHERE id = $1`;
+    return `DELETE FROM users WHERE id = $1 RETURNING ${returningFields}`;
 };

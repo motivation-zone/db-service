@@ -22,6 +22,7 @@ lint:
 .PHONY: dev
 dev:
 	DEBUG=dbservice:* \
+	TZ=UTC \
 	node_modules/.bin/supervisor \
 		--non-interactive \
 		--quiet \

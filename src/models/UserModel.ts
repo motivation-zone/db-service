@@ -1,18 +1,4 @@
-interface IUserModel {
-    id?: number;
-    login?: string;
-    password?: string;
-    email?: string;
-    country?: string;
-    selfInfo?: string;
-    name?: string;
-    isAthlete?: boolean;
-    isBanned?: boolean;
-    weight?: number;
-    growth?: number;
-    birthDate?: Date;
-    registered?: Date;
-}
+import {checkCountry} from '../lib/countries-iso';
 
 export default class UserModel {
     public id?: number;
@@ -29,40 +15,46 @@ export default class UserModel {
     public birthDate?: Date;
     public registered?: Date;
 
-    constructor(data: IUserModel) {
+    constructor() {
+
+    }
+
+    private checkNecessaryFields(fields: (keyof UserModel)[]): boolean {
+        return fields.every((field) => {
+            return Boolean(this[field]);
+        });
+    }
+
+    formUserForCreate(data: any) {
         const {
-            id,
-            login,
-            password,
-            email,
-            country,
-            selfInfo,
-            name,
-            isAthlete,
-            isBanned,
-            weight,
-            growth,
-            birthDate,
-            registered
+            login, name, password, email, country,
+            selfInfo, weight, growth, birthDate
         } = data;
 
-        this.id = id;
         this.login = login;
+        this.name = name;
         this.password = password;
         this.email = email;
         this.country = country;
         this.selfInfo = selfInfo;
-        this.name = name;
-        this.isAthlete = isAthlete;
-        this.isBanned = isBanned;
         this.weight = weight;
         this.growth = growth;
-        this.birthDate = birthDate;
-        this.registered = registered;
+        this.birthDate = this.parseDate(birthDate);
+
+        const necessaryFields = ['login', 'name', 'password', 'email'] as (keyof UserModel)[];
+        const checkNecessaryFieldsResult = this.checkNecessaryFields(necessaryFields);
+        const checkCountryResult = checkCountry(this.country);
+
+        return checkNecessaryFieldsResult && checkCountryResult;
     }
 
-    setBirthDateFromString(birthDate: string): Date {
-        const parts = birthDate.split('-');
-        return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    parseDate(date: Date | string): Date | undefined {
+        if (date instanceof Date) {
+            return date;
+        }
+
+        if (typeof date === 'string') {
+            return new Date(Date.parse(date));
+        }
     }
 };

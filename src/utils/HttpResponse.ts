@@ -2,8 +2,7 @@ import * as express from 'express';
 
 export default class HttpResponse {
 
-    static send(res: express.Response, status: 'error' | 'ok', data: any) {
-        const result = {status, data};
-        res.json(result);
+    static send(res: express.Response, status: number, data: any = {}) {
+        res.status(status).json(data);
     }
 }

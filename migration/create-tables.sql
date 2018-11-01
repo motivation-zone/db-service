@@ -1,3 +1,4 @@
+
 -- ########################### Kind of sport ###########################
 CREATE TABLE IF NOT EXISTS kind_of_sport (
   id BIGSERIAL PRIMARY KEY,
@@ -9,32 +10,11 @@ INSERT INTO kind_of_sport (name) VALUES ('calisthenic') ON CONFLICT DO NOTHING;
 INSERT INTO kind_of_sport (name) VALUES ('swimming') ON CONFLICT DO NOTHING;
 -- ######################################################
 
-
-CREATE TABLE IF NOT EXISTS users (
-  id BIGSERIAL PRIMARY KEY,
-  login TEXT NOT NULL UNIQUE,
-  name TEXT NOT NULL,
-  password TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE,
-  country TEXT,
-  is_athlete BOOLEAN DEFAULT FALSE,
-  self_info TEXT,
-  weight REAL,
-  growth REAL,
-  birth_date DATE,
-  is_banned BOOLEAN DEFAULT FALSE,
-  registered TIMESTAMP WITH TIME ZONE DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS user_sport_link (
   id BIGSERIAL PRIMARY KEY,
   user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
   sport_id BIGINT REFERENCES kind_of_sport(id) ON DELETE CASCADE
 );
-
-
-
-
 
 CREATE TABLE IF NOT EXISTS exercise_template (
   id BIGSERIAL PRIMARY KEY, -- this id for video in fs too

@@ -9,14 +9,14 @@ interface IQuery {
     values: any[];
 }
 
-interface IResultError {
+export interface IResultError {
     status: 'error';
     data: string;
 }
 
-interface IResultSuccess {
+export interface IResultSuccess {
     status: 'ok';
-    data: any;
+    data: any[];
 }
 
 const dbErrorHandler = (err: string) => {
