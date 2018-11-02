@@ -12,6 +12,7 @@ interface IQuery {
 interface IErrorData {
     detail: string;
     error: string;
+    common: string;
 }
 
 export interface IResultError {
@@ -61,7 +62,8 @@ export const query = async (queryData: IQuery): Promise<IResultError | IResultSu
             status: 'error',
             data: {
                 detail: e.detail,
-                error: e.message
+                error: e.message,
+                common: `${e.detail} ${e.message}`
             }
         };
         logger('error', 'db', e.message);

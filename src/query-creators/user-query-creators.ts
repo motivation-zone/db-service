@@ -22,8 +22,8 @@ export const getUserById = () => {
     return `SELECT * FROM users WHERE id = $1`;
 };
 
-export const getUserByLogin = (isStrict: boolean = true) => {
-    if (isStrict) {
+export const getUserByLogin = (strict: boolean = true) => {
+    if (strict) {
         return `SELECT * FROM users WHERE login = $1`;
     } else {
         return `SELECT * FROM users WHERE login LIKE '%' || $1 || '%' LIMIT 10`;

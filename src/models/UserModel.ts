@@ -1,4 +1,5 @@
 import {checkCountry} from '../lib/countries-iso';
+import {ErrorCode} from '../utils/HttpResponse';
 
 export default class UserModel {
     public id?: number;
@@ -47,7 +48,9 @@ export default class UserModel {
 
         const checkCountryResult = checkCountry(this.country);
 
-        return checkCountryResult;
+        if (!checkCountryResult) {
+            return ErrorCode.UNSUPPORTED_FIELD_VALUE;
+        }
     }
 
     formUserForCreate(data: any) {
@@ -70,7 +73,13 @@ export default class UserModel {
         const checkNecessaryFieldsResult = this.checkNecessaryFields(necessaryFields);
         const checkCountryResult = checkCountry(this.country);
 
-        return checkNecessaryFieldsResult && checkCountryResult;
+        if (!checkNecessaryFieldsResult) {
+            return ErrorCode.REQUIRED_FIELDS;
+        }
+
+        if (!checkCountryResult) {
+            return ErrorCode.UNSUPPORTED_FIELD_VALUE;
+        }
     }
 
     parseDate(date: Date | string): Date | undefined {

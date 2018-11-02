@@ -60,9 +60,9 @@ export default class UserService {
         return prepareResult(result);
     }
 
-    static async getUserByLogin(login: string, isStrict: boolean): Promise<IResultError | IResultSuccess> {
+    static async getUserByLogin(login: string, strict?: boolean): Promise<IResultError | IResultSuccess> {
         const result = await query({
-            text: getUserByLoginQuery(isStrict),
+            text: getUserByLoginQuery(strict),
             values: [login]
         });
 
