@@ -1,6 +1,16 @@
 OUT_DIR := build
+NODE ?= node
+NPM ?= npm
 
 build = node_modules/.bin/tsc --outDir $(OUT_DIR) --rootDir $(CURDIR) $(1)
+
+.PHONY: install
+install:
+	$(NPM) install
+
+.PHONY: prune
+prune:
+	$(NPM) prune --production
 
 .PHONY: build
 build:
