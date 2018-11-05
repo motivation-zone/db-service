@@ -39,3 +39,15 @@ dev:
 		--no-restart-on exit \
 		--watch $(OUT_DIR)/configs,$(OUT_DIR)/src \
 		-- $(OUT_DIR)/src/app.js
+
+
+VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
+DOCKER_HUB := motivationzone/dbservice
+.PHONY: docker.build
+docker.build:
+	docker build -t $(DOCKER_HUB):$(VERSION) .
+
+.PHONY: docker.push
+docker.push:
+	docker login -u=$(MZ_DB_SERVICE_DOCKER_USER) -p=$(MZ_DB_SERVICE_DOCKER_PASS) && \
+	docker push $(DOCKER_HUB)

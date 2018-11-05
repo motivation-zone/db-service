@@ -11,6 +11,8 @@ envsubst \
     > /etc/nginx/sites-available/nginx.default.conf
 
 ln -snf /etc/nginx/sites-available/nginx.default.conf /etc/nginx/sites-enabled/nginx.default.conf
+rm -rf /etc/nginx/sites-enabled/default
+rm -rf /etc/nginx/sites-available/default
 
 envsubst \
     '\$NODEJS_APP \$NODEJS_OPTIONS \$ENVIRONMENT' \
