@@ -40,12 +40,6 @@ dev:
 		--watch $(OUT_DIR)/configs,$(OUT_DIR)/src \
 		-- $(OUT_DIR)/src/app.js
 
-.PHONY: db.make.config
-db.make.config:
-	# TODO create symlink from server special path to configs/db/db.yaml
-	# I think we need to create special folder like (usr/share/motivation_zone)
-	# to save different special files there
-
 
 VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
 DOCKER_HUB := motivationzone/dbservice
@@ -65,5 +59,9 @@ docker.pull:
 
 .PHONY: docker.run
 docker.run:
+	# before start container we must to include symlink on file(configs/db/db.yaml) in
+	# file save on real machine
+	# I think we need to create special folder like (usr/share/motivation_zone)
+	# to save different special files there
 	docker run -d -p 127.0.0.1:80:80
 
