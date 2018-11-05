@@ -40,6 +40,12 @@ dev:
 		--watch $(OUT_DIR)/configs,$(OUT_DIR)/src \
 		-- $(OUT_DIR)/src/app.js
 
+.PHONY: db.make.config
+db.make.config:
+	# TODO create symlink from server special path to configs/db/db.yaml
+	# I think we need to create special folder like (usr/share/motivation_zone)
+	# to save different special files there
+
 
 VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
 DOCKER_HUB := motivationzone/dbservice
@@ -51,3 +57,13 @@ docker.build:
 docker.push:
 	docker login -u=$(MZ_DB_SERVICE_DOCKER_USER) -p=$(MZ_DB_SERVICE_DOCKER_PASS) && \
 	docker push $(DOCKER_HUB)
+
+.PHONY: docker.pull
+docker.pull:
+	docker login -u=$(MZ_DB_SERVICE_DOCKER_USER) -p=$(MZ_DB_SERVICE_DOCKER_PASS) && \
+	docker pull $(DOCKER_HUB)
+
+.PHONY: docker.run
+docker.run:
+	docker run -d -p 127.0.0.1:80:80
+
