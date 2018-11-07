@@ -41,33 +41,27 @@ dev:
 		-- $(OUT_DIR)/src/app.js
 
 
-VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
-DOCKER_HUB := motivationzone/dbservice
-.PHONY: docker.build
-docker.build:
-	docker build -t $(DOCKER_HUB):$(VERSION) .
+# VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
+# DOCKER_HUB := motivationzone/dbservice
+# .PHONY: docker.build
+# docker.build:
+# 	docker build -t $(DOCKER_HUB):$(VERSION) .
 
-.PHONY: docker.push
-docker.push:
-	docker login -u=$(MZ_DB_SERVICE_DOCKER_USER) -p=$(MZ_DB_SERVICE_DOCKER_PASS) && \
-	docker push $(DOCKER_HUB)
+# .PHONY: docker.push
+# docker.push:
+# 	docker login -u=$(MZ_DB_SERVICE_DOCKER_USER) -p=$(MZ_DB_SERVICE_DOCKER_PASS) && \
+# 	docker push $(DOCKER_HUB)
 
-.PHONY: docker.pull
-docker.pull:
-	docker login -u=$(MZ_DB_SERVICE_DOCKER_USER) -p=$(MZ_DB_SERVICE_DOCKER_PASS) && \
-	docker pull $(DOCKER_HUB)
+# .PHONY: docker.pull
+# docker.pull:
+# 	docker login -u=$(MZ_DB_SERVICE_DOCKER_USER) -p=$(MZ_DB_SERVICE_DOCKER_PASS) && \
+# 	docker pull $(DOCKER_HUB)
 
-.PHONY: docker.run.testing
-docker.run.testing:
-	# before start container we must to include symlink on file(configs/db/db.yaml) in
-	# file save on real machine
-	# I think we need to create special folder like (usr/share/motivation_zone)
-	# to save different special files there
-	# THE BEST practice to force paramteres, virtual environments from machine to docker
-	# EX: testing mushine -> testing env in containers
-	docker run -d -p -e "ENVIRONMENT=testing" 127.0.0.1:80:80
+# .PHONY: docker.run.testing
+# docker.run.testing:
+# 	docker run -d -p -e "ENVIRONMENT=testing" 127.0.0.1:80:80
 
-.PHONY: docker.run.production
-docker.run.production:
-	docker run -d -p -e "ENVIRONMENT=production" 127.0.0.1:80:80
+# .PHONY: docker.run.production
+# docker.run.production:
+# 	docker run -d -p -e "ENVIRONMENT=production" 127.0.0.1:80:80
 
