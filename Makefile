@@ -63,5 +63,7 @@ docker.run:
 	# file save on real machine
 	# I think we need to create special folder like (usr/share/motivation_zone)
 	# to save different special files there
+	# THE BEST practice to force paramteres, virtual environments from machine to docker
+	# EX: testing mushine -> testing env in containers
 	docker run -d -p 127.0.0.1:80:80
 
