@@ -57,13 +57,17 @@ docker.pull:
 	docker login -u=$(MZ_DB_SERVICE_DOCKER_USER) -p=$(MZ_DB_SERVICE_DOCKER_PASS) && \
 	docker pull $(DOCKER_HUB)
 
-.PHONY: docker.run
-docker.run:
+.PHONY: docker.run.testing
+docker.run.testing:
 	# before start container we must to include symlink on file(configs/db/db.yaml) in
 	# file save on real machine
 	# I think we need to create special folder like (usr/share/motivation_zone)
 	# to save different special files there
 	# THE BEST practice to force paramteres, virtual environments from machine to docker
 	# EX: testing mushine -> testing env in containers
-	docker run -d -p 127.0.0.1:80:80
+	docker run -d -p -e "ENVIRONMENT=testing" 127.0.0.1:80:80
+
+.PHONY: docker.run.production
+docker.run.production:
+	docker run -d -p -e "ENVIRONMENT=production" 127.0.0.1:80:80
 

@@ -3,7 +3,7 @@
 export NGINX_PORT=80
 export NODEJS_PORT=8080
 export NODEJS_APP=${NODEJS_APP:-/usr/local/www/server/app.js}
-export ENVIRONMENT=${GLOBAL_ENVIRONMENT:-"development"}
+export ENVIRONMENT=${ENVIRONMENT:-"development"}
 
 envsubst \
     '\$NGINX_PORT \$NODEJS_PORT' \

@@ -27,6 +27,3 @@ RUN make prune
 RUN mkdir $WORKDIR/logs
 
 CMD NODEJS_APP=$WORKDIR/build/src/app.js ./deploy/start.sh
-
-# CREATE USER ${username} WITH SUPERUSER CREATEDB CREATEROLE REPLICATION BYPASSRLS PASSWORD '${password}';
-# CREATE DATABASE ${dbname} WITH ENCODING 'UTF8' OWNER ${rolename};
