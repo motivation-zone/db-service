@@ -41,11 +41,11 @@ dev:
 		-- $(OUT_DIR)/src/app.js
 
 
-# VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
-# DOCKER_HUB := motivationzone/dbservice
-# .PHONY: docker.build
-# docker.build:
-# 	docker build -t $(DOCKER_HUB):$(VERSION) .
+VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
+DOCKER_HUB := motivationzone/dbservice
+.PHONY: docker.build
+docker.build:
+	docker build -t $(DOCKER_HUB):$(VERSION) .
 
 # .PHONY: docker.push
 # docker.push:
