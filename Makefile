@@ -47,10 +47,6 @@ DOCKER_HUB := motivationzone/dbservice
 docker.build:
 	docker build -t $(DOCKER_HUB):$(VERSION) .
 
-.PHONY: docker.run.testing
-docker.run.testing:
-	docker run -d -p -e "ENVIRONMENT=testing" 127.0.0.1:5000:80
-
 
 # .PHONY: docker.push
 # docker.push:
