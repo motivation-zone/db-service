@@ -20,9 +20,6 @@ RUN make install
 
 COPY . .
 
-ADD /usr/share/motivation_zone /usr/share/motivation_zone
-COPY /usr/share/motivation_zone/db/db.yaml ./configs/db/
-
 RUN make build
 RUN cp $WORKDIR/deploy/nginx.template.conf /config_templates/nginx.template.conf
 RUN cp $WORKDIR/deploy/supervisord.template.conf /config_templates/supervisord.template.conf
