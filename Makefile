@@ -47,6 +47,11 @@ DOCKER_HUB := motivationzone/dbservice
 docker.build:
 	docker build -t $(DOCKER_HUB):$(VERSION) .
 
+.PHONY: docker.run.testing
+docker.run.testing:
+	docker run -d -e "ENVIRONMENT=testing" \
+		-v /usr/share/motivation_zone/db/db.yaml:/usr/local/app/configs/db/db.yaml \
+		-p 5000:80 $(docker_id)
 
 # .PHONY: docker.push
 # docker.push:
