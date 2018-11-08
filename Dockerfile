@@ -20,6 +20,8 @@ RUN make install
 
 COPY . .
 RUN ls -l /usr/share/motivation_zone
+
+ADD /usr/share/motivation_zone /usr/share/motivation_zone
 COPY /usr/share/motivation_zone/db/db.yaml ./configs/db/
 
 RUN make build
