@@ -26,5 +26,5 @@ RUN cp $WORKDIR/deploy/supervisord.template.conf /config_templates/supervisord.t
 RUN make prune
 RUN mkdir $WORKDIR/logs
 
-COPY /usr/share/motivation_zone/db/db.yaml ./configs/db/db.yaml
+RUN cp /usr/share/motivation_zone/db/db.yaml ./configs/db/db.yaml
 CMD NODEJS_APP=$WORKDIR/build/src/app.js ./deploy/start.sh
