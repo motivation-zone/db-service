@@ -3,7 +3,7 @@ import UserModel, {REQUIRED_FIELDS} from '../models/UserModel';
 import UserService from '../services/UserService';
 import HttpResponse from '../utils/HttpResponse';
 import {OrderType} from '../query-creators/base';
-import {stringToBoolean, checkNecessaryFields} from '../utils/utils';
+import {stringToBoolean, checkNecessaryFields, checkGetLimitParameters} from '../utils/utils';
 
 const userController = express();
 
@@ -26,14 +26,13 @@ userController.post('/create', async (req: express.Request, res: express.Respons
 });
 
 userController.get('/get', async (req: express.Request, res: express.Response) => {
-    const {limit, skip, order} = req.query;
-    const orderTypes: OrderType[] = ['DESC', 'ASC'];
-    if (!limit || !skip || order && !orderTypes.includes(order.toUpperCase())) {
+    const limitParameters = checkGetLimitParameters(req.query);
+    if (!limitParameters) {
         HttpResponse[400](res);
         return;
     }
 
-    const result = await UserService.getUsers(limit, skip, order);
+    const result = await UserService.getUsers(limitParameters);
 
     if (result.status === 'error') {
         HttpResponse[409](res, result.data.common);

@@ -1,5 +1,12 @@
 import {IResultSuccess, IResultError} from '../lib/db/client';
 import {translatePostgresqlNameToNode} from '../utils/db';
+import {OrderType} from '../query-creators/base';
+
+export interface IGetLimit {
+    limit: number;
+    skip: number;
+    order: OrderType;
+}
 
 export const prepareResult = (result: IResultError | IResultSuccess) => {
     if (result.status === 'error') {

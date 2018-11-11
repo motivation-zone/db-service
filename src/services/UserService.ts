@@ -9,8 +9,7 @@ import {
 } from '../query-creators/user-query-creators';
 import {query, IResultError, IResultSuccess} from '../lib/db/client';
 import {translateNodeToPostgresqlName} from '../utils/db';
-import {OrderType} from '../query-creators/base';
-import {prepareResult} from './base';
+import {prepareResult, IGetLimit} from './base';
 
 export default class UserService {
     static async createUser(user: UserModel): Promise<IResultError | IResultSuccess> {
@@ -68,10 +67,10 @@ export default class UserService {
         return prepareResult(result);
     }
 
-    static async getUsers(limit: number, skip: number, order: OrderType): Promise<IResultError | IResultSuccess> {
+    static async getUsers(data: IGetLimit): Promise<IResultError | IResultSuccess> {
         const result = await query({
-            text: getUsersQuery(order),
-            values: [limit, skip]
+            text: getUsersQuery(data.order),
+            values: [data.limit, data.skip]
         });
 
         return prepareResult(result);
