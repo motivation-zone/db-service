@@ -1,23 +1,19 @@
 import * as express from 'express';
 
-export enum ErrorCode {
-    REQUIRED_FIELDS='REQUIRED_FIELDS',
-    UNSUPPORTED_FIELD_VALUE='UNSUPPORTED_FIELD_VALUE',
-    DB_LEVEL_ERROR='DB_LEVEL_ERROR'
-}
-
-interface IError {
-    code: ErrorCode;
-    message?: string;
-}
-
-interface ISuccess {
-    data: any[];
-}
-
 export default class HttpResponse {
+    static 409(res: express.Response, message: string) {
+        res.status(409).json({message});
+    }
 
-    static send(res: express.Response, status: number, data: ISuccess | IError) {
-        res.status(status).json(data);
+    static 400(res: express.Response) {
+        res.status(400).json({});
+    }
+
+    static 200(res: express.Response, data: any) {
+        res.status(200).json({data});
+    }
+
+    static 201(res: express.Response, data: any) {
+        res.status(201).json({data});
     }
 }

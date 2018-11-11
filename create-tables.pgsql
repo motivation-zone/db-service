@@ -1,21 +1,3 @@
-
--- ########################### Kind of sport ###########################
-CREATE TABLE IF NOT EXISTS kind_of_sport (
-  id BIGSERIAL PRIMARY KEY,
-  name TEXT UNIQUE
-);
-
--- нужно заполнять автоматически
-INSERT INTO kind_of_sport (name) VALUES ('calisthenic') ON CONFLICT DO NOTHING;
-INSERT INTO kind_of_sport (name) VALUES ('swimming') ON CONFLICT DO NOTHING;
--- ######################################################
-
-CREATE TABLE IF NOT EXISTS user_sport_link (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
-  sport_id BIGINT REFERENCES kind_of_sport(id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS exercise_template (
   id BIGSERIAL PRIMARY KEY, -- this id for video in fs too
   title TEXT NOT NULL,

@@ -16,8 +16,7 @@ export default class UserService {
     static async createUser(user: UserModel): Promise<IResultError | IResultSuccess> {
         const values = [
             user.login, user.name, user.password, user.email,
-            user.country, user.selfInfo, user.weight,
-            user.growth, user.birthDate
+            user.selfInfo, user.weight, user.growth, user.birthDate
         ];
 
         const result = await query({
@@ -37,7 +36,7 @@ export default class UserService {
                 return true;
             }
 
-            return Boolean(user[field])
+            return Boolean(user[field]);
         });
 
         const result = await query({

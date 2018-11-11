@@ -1,15 +1,15 @@
 import {OrderType} from './base';
 
 const returningFields = [
-    'id', 'name', 'email', 'country',
-    'is_athlete', 'self_info', 'weight', 'growth',
+    'id', 'login', 'name', 'email', 'is_athlete',
+    'self_info', 'weight', 'growth',
     'birth_date', 'is_banned', 'registered'
 ].join(', ');
 
 export const createUser = () => {
     return `INSERT INTO users (
-        login, name, password, email, country, self_info, weight, growth, birth_date
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING ${returningFields}`;
+        login, name, password, email, self_info, weight, growth, birth_date
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING ${returningFields}`;
 };
 
 export const updateUser = (fields: string[]) => {
@@ -31,7 +31,7 @@ export const getUserByLogin = (strict: boolean = true) => {
 };
 
 export const getUsers = (order: OrderType = 'ASC') => {
-    return `SELECT * FROM users ORDER BY registered ${order} LIMIT $1 OFFSET $2`
+    return `SELECT * FROM users ORDER BY registered ${order} LIMIT $1 OFFSET $2`;
 };
 
 export const deleteUser = () => {

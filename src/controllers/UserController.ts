@@ -1,58 +1,46 @@
 import * as express from 'express';
-import UserModel from '../models/UserModel';
+import UserModel, {REQUIRED_FIELDS} from '../models/UserModel';
 import UserService from '../services/UserService';
-import HttpResponse, { ErrorCode } from '../utils/HttpResponse';
+import HttpResponse from '../utils/HttpResponse';
 import {OrderType} from '../query-creators/base';
-import {stringToBoolean} from '../utils/utils';
+import {stringToBoolean, checkNecessaryFields} from '../utils/utils';
+
 const userController = express();
 
 userController.post('/create', async (req: express.Request, res: express.Response) => {
-    const user = new UserModel();
-    const errMessage = user.formUserForCreate(req.body);
-    if (errMessage) {
-        HttpResponse.send(res, 400, {
-            code: errMessage
-        });
+    const user = new UserModel(req.body);
+    const isOk = checkNecessaryFields(REQUIRED_FIELDS, user);
+
+    if (!isOk) {
+        HttpResponse[400](res);
         return;
     }
 
     const result = await UserService.createUser(user);
     if (result.status === 'error') {
-        HttpResponse.send(res, 409, {
-            code: ErrorCode.DB_LEVEL_ERROR,
-            message: result.data.common
-        });
+        HttpResponse[409](res, result.data.common);
         return;
     }
 
-    HttpResponse.send(res, 201, {
-        data: result.data
-    });
+    HttpResponse[201](res, result.data);
 });
 
 userController.get('/get', async (req: express.Request, res: express.Response) => {
     const {limit, skip, order} = req.query;
     const orderTypes: OrderType[] = ['DESC', 'ASC'];
     if (!limit || !skip || order && !orderTypes.includes(order.toUpperCase())) {
-        HttpResponse.send(res, 400, {
-            code: ErrorCode.REQUIRED_FIELDS
-        });
+        HttpResponse[400](res);
         return;
     }
 
     const result = await UserService.getUsers(limit, skip, order);
 
     if (result.status === 'error') {
-        HttpResponse.send(res, 409, {
-            code: ErrorCode.DB_LEVEL_ERROR,
-            message: result.data.common
-        });
+        HttpResponse[409](res, result.data.common);
         return;
     }
 
-    HttpResponse.send(res, 200, {
-        data: result.data
-    });
+    HttpResponse[200](res, result.data);
 });
 
 userController.get('/get/id/:id', async (req: express.Request, res: express.Response) => {
@@ -60,16 +48,11 @@ userController.get('/get/id/:id', async (req: express.Request, res: express.Resp
     const result = await UserService.getUserById(id);
 
     if (result.status === 'error') {
-        HttpResponse.send(res, 409, {
-            code: ErrorCode.DB_LEVEL_ERROR,
-            message: result.data.common
-        });
+        HttpResponse[409](res, result.data.common);
         return;
     }
 
-    HttpResponse.send(res, 200, {
-        data: result.data
-    });
+    HttpResponse[200](res, result.data);
 });
 
 userController.get('/get/login/:login', async (req: express.Request, res: express.Response) => {
@@ -78,43 +61,25 @@ userController.get('/get/login/:login', async (req: express.Request, res: expres
     const result = await UserService.getUserByLogin(login, stringToBoolean(strict));
 
     if (result.status === 'error') {
-        HttpResponse.send(res, 409, {
-            code: ErrorCode.DB_LEVEL_ERROR,
-            message: result.data.common
-        });
+        HttpResponse[409](res, result.data.common);
         return;
     }
 
-    HttpResponse.send(res, 200, {
-        data: result.data
-    });
+    HttpResponse[200](res, result.data);
 });
 
 userController.post('/update/:id', async (req: express.Request, res: express.Response) => {
     const {id} = req.params;
-    const user = new UserModel();
-
-    const errMessage = user.formUser(req.body);
-    if (errMessage) {
-        HttpResponse.send(res, 400, {
-            code: errMessage
-        });
-        return;
-    }
-
+    const user = new UserModel(req.body);
     user.id = id;
+
     const result = await UserService.updateUser(user);
     if (result.status === 'error') {
-        HttpResponse.send(res, 409, {
-            code: ErrorCode.DB_LEVEL_ERROR,
-            message: result.data.common
-        });
+        HttpResponse[409](res, result.data.common);
         return;
     }
 
-    HttpResponse.send(res, 201, {
-        data: result.data
-    });
+    HttpResponse[200](res, result.data);
 });
 
 userController.delete('/delete/:id', async (req: express.Request, res: express.Response) => {
@@ -122,16 +87,11 @@ userController.delete('/delete/:id', async (req: express.Request, res: express.R
 
     const result = await UserService.deleteUser(id);
     if (result.status === 'error') {
-        HttpResponse.send(res, 409, {
-            code: ErrorCode.DB_LEVEL_ERROR,
-            message: result.data.common
-        });
+        HttpResponse[409](res, result.data.common);
         return;
     }
 
-    HttpResponse.send(res, 200, {
-        data: result.data
-    });
+    HttpResponse[200](res, result.data);
 });
 
 export default userController;
