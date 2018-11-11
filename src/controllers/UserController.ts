@@ -25,7 +25,7 @@ userController.post('/create', async (req: express.Request, res: express.Respons
         return;
     }
 
-    HttpResponse.send(res, 200, {
+    HttpResponse.send(res, 201, {
         data: result.data
     });
 });
@@ -112,7 +112,7 @@ userController.post('/update/:id', async (req: express.Request, res: express.Res
         return;
     }
 
-    HttpResponse.send(res, 200, {
+    HttpResponse.send(res, 201, {
         data: result.data
     });
 });
