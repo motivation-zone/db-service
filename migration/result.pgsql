@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS training_type (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE
+);
+
+INSERT INTO training_type (name) VALUES ('fat burning') ON CONFLICT DO NOTHING;
+INSERT INTO training_type (name) VALUES ('rep building') ON CONFLICT DO NOTHING;
+INSERT INTO training_type (name) VALUES ('strength building') ON CONFLICT DO NOTHING;
 CREATE TABLE IF NOT EXISTS country (
   id BIGSERIAL PRIMARY KEY,
   name TEXT UNIQUE,
@@ -254,3 +262,134 @@ INSERT INTO country (name, alpha2, alpha3, un_code) VALUES ('Western Sahara', 'E
 INSERT INTO country (name, alpha2, alpha3, un_code) VALUES ('Yemen', 'YE', 'YEM', '887') ON CONFLICT DO NOTHING;
 INSERT INTO country (name, alpha2, alpha3, un_code) VALUES ('Zambia', 'ZM', 'ZMB', '894') ON CONFLICT DO NOTHING;
 INSERT INTO country (name, alpha2, alpha3, un_code) VALUES ('Zimbabwe', 'ZW', 'ZWE', '716') ON CONFLICT DO NOTHING;
+CREATE TABLE IF NOT EXISTS sport (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT UNIQUE
+);
+
+INSERT INTO sport (name) VALUES ('calisthenic') ON CONFLICT DO NOTHING;
+INSERT INTO sport (name) VALUES ('swimming') ON CONFLICT DO NOTHING;
+CREATE TABLE IF NOT EXISTS difficulty_level (
+  id BIGSERIAL PRIMARY KEY,
+  level INTEGER NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE
+);
+
+INSERT INTO difficulty_level (level, name) VALUES (1, 'beginner') ON CONFLICT DO NOTHING;
+INSERT INTO difficulty_level (level, name) VALUES (2, 'intermediate') ON CONFLICT DO NOTHING;
+INSERT INTO difficulty_level (level, name) VALUES (3, 'advance') ON CONFLICT DO NOTHING;
+INSERT INTO difficulty_level (level, name) VALUES (4, 'monster') ON CONFLICT DO NOTHING;
+CREATE TABLE IF NOT EXISTS users (
+  id BIGSERIAL PRIMARY KEY,
+  login TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  password TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  is_athlete BOOLEAN DEFAULT FALSE,
+  self_info TEXT,
+  weight REAL,
+  growth REAL,
+  birth_date TIMESTAMP WITH TIME ZONE,
+  is_banned BOOLEAN DEFAULT FALSE,
+  instagram_link TEXT,
+  phone TEXT,
+  registered_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS user_sport_link (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  sport_id BIGINT REFERENCES sport(id) ON DELETE CASCADE,
+  UNIQUE (user_id, sport_id)
+);
+CREATE TABLE IF NOT EXISTS user_country_link (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  country_id BIGINT REFERENCES country(id) ON DELETE CASCADE,
+  UNIQUE (user_id, country_id)
+);
+CREATE TABLE IF NOT EXISTS exercise_template (
+  id BIGSERIAL PRIMARY KEY, -- this id for video in fs too
+  title TEXT NOT NULL,
+  description TEXT,
+  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
+  created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS exercise (
+  id BIGSERIAL PRIMARY KEY,
+  exercise_template_id BIGINT REFERENCES exercise_template(id) ON DELETE RESTRICT,
+  duration INTEGER DEFAULT 0, -- by seconds
+  reps INTEGER DEFAULT 0
+);
+
+-- Программа тренировок создается по выбору на кол-во дней (max 30 дней за раз, minimum 1 день)
+CREATE TABLE IF NOT EXISTS program (
+  id BIGSERIAL PRIMARY KEY, -- identification for image
+  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
+  price DECIMAL(19,2) DEFAULT 0,
+  difficulty_level INTEGER REFERENCES difficulty_level(level) ON DELETE RESTRICT, -- automatic on server aggregate all trainings difficulties
+  modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+
+CREATE OR REPLACE FUNCTION update_program_modified_date() RETURNS TRIGGER AS
+  $BODY$
+    BEGIN
+      UPDATE program SET modified_date=now();
+      RETURN new;
+    END;
+  $BODY$
+  LANGUAGE plpgsql;
+
+CREATE TRIGGER programUpdate AFTER UPDATE ON program FOR EACH ROW EXECUTE PROCEDURE update_program_modified_date();
+CREATE TABLE IF NOT EXISTS training (
+  id BIGSERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  difficulty_level INTEGER REFERENCES difficulty_level(level) ON DELETE RESTRICT,
+  is_daily BOOLEAN DEFAULT FALSE,
+  is_hidden BOOLEAN DEFAULT TRUE,
+  type_id INTEGER REFERENCES training_type(id) ON DELETE RESTRICT,
+  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
+  duration INTEGER NOT NULL,
+  modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS training_round (
+  id BIGSERIAL PRIMARY KEY,
+  training_id BIGINT REFERENCES training(id) ON DELETE CASCADE,
+  sets INTEGER DEFAULT 1,
+  position INTEGER NOT NULL,
+  exercises BIGINT[]
+);
+
+CREATE TABLE IF NOT EXISTS training_program_link (
+  id BIGSERIAL PRIMARY KEY,
+  program_id BIGINT REFERENCES program(id) ON DELETE CASCADE,
+  training_id BIGINT REFERENCES training(id) ON DELETE RESTRICT,
+  day INTEGER NOT NULL
+);
+
+
+CREATE OR REPLACE FUNCTION update_training_modified_date() RETURNS TRIGGER AS
+  $BODY$
+    BEGIN
+      UPDATE training SET modified_date=now();
+      RETURN new;
+    END;
+  $BODY$
+  LANGUAGE plpgsql;
+
+CREATE TRIGGER trainingUpdate AFTER UPDATE ON training FOR EACH ROW EXECUTE PROCEDURE update_training_modified_date();
+CREATE TABLE IF NOT EXISTS bought_program (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  program_id BIGINT REFERENCES program(id) ON DELETE RESTRICT,
+  transaction TEXT NOT NULL,
+  bought_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+);

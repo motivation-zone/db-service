@@ -10,5 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   growth REAL,
   birth_date TIMESTAMP WITH TIME ZONE,
   is_banned BOOLEAN DEFAULT FALSE,
-  registered TIMESTAMP WITH TIME ZONE DEFAULT now()
+  instagram_link TEXT,
+  phone TEXT,
+  registered_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
