@@ -13,5 +13,5 @@ export const getUsers = (order: OrderType = 'ASC') => {
         INNER JOIN user_country_link ON users.id = user_country_link.user_id
         INNER JOIN country ON user_country_link.country_id = country.id
         WHERE country.id = $3
-        ORDER BY registered ${order} LIMIT $1 OFFSET $2`;
+        ORDER BY registered_date ${order} LIMIT $1 OFFSET $2`;
 };

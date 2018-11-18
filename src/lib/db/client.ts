@@ -3,26 +3,11 @@ import * as fs from 'fs';
 import * as yaml from 'yaml';
 import logger from '../logger/logger';
 import {getAbsolutePath} from '../../utils/fs';
+import DBError from '../../utils/db/DBError';
 
 interface IQuery {
     text: string;
     values: any[];
-}
-
-interface IErrorData {
-    detail: string;
-    error: string;
-    common: string;
-}
-
-export interface IResultError {
-    status: 'error';
-    data: IErrorData;
-}
-
-export interface IResultSuccess {
-    status: 'ok';
-    data: any[];
 }
 
 const dbErrorHandler = (err: string) => {
@@ -46,34 +31,22 @@ const config = {
 const pool = new Pool(config);
 pool.on('error', dbErrorHandler);
 
-export const query = async (queryData: IQuery): Promise<IResultError | IResultSuccess> => {
+export const query = async (queryData: IQuery) => {
     let client;
-    let result = {} as IResultSuccess | IResultError;
+    let data;
 
     try {
         client = await pool.connect();
-        const data = await client.query(queryData);
-        result = {
-            status: 'ok',
-            data: data.rows || []
-        };
+        data = await client.query(queryData);
     } catch (e) {
-        result = {
-            status: 'error',
-            data: {
-                detail: e.detail,
-                error: e.message,
-                common: `${e.detail} ${e.message}`
-            }
-        };
         logger('error', 'db', e.message);
+        throw new DBError(e.detail, e.message);
     } finally {
         if (client) {
             client.release();
         }
     }
-
-    return result;
+    return data && data.rows || [];
 };
 
 export const forceCloseConnection = async () => {

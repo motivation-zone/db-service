@@ -1,19 +1,17 @@
 import * as express from 'express';
 import SportService from '../services/SportService';
-import HttpResponse from '../utils/HttpResponse';
+import HttpResponse from '../utils/http/HttpResponse';
 import {checkGetLimitParameters} from '../utils/utils';
 
 const sportController = express();
 
 sportController.get('/get', async (req: express.Request, res: express.Response) => {
-    const result = await SportService.getSports();
-
-    if (result.status === 'error') {
-        HttpResponse[409](res, result.data.common);
-        return;
+    try {
+        const result = await SportService.getSports();
+        HttpResponse[200](res, result);
+    } catch (e) {
+        HttpResponse[409](res, e.message);
     }
-
-    HttpResponse[200](res, result.data);
 });
 
 sportController.get('/get-users/:id', async (req: express.Request, res: express.Response) => {
@@ -25,13 +23,12 @@ sportController.get('/get-users/:id', async (req: express.Request, res: express.
         return;
     }
 
-    const result = await SportService.getUsers(limitParameters, id);
-    if (result.status === 'error') {
-        HttpResponse[409](res, result.data.common);
-        return;
+    try {
+        const result = await SportService.getUsers(limitParameters, id);
+        HttpResponse[200](res, result);
+    } catch (e) {
+        HttpResponse[409](res, e.message);
     }
-
-    HttpResponse[200](res, result.data);
 });
 
 sportController.post('/add-user', async (req: express.Request, res: express.Response) => {
@@ -41,14 +38,12 @@ sportController.post('/add-user', async (req: express.Request, res: express.Resp
         return;
     }
 
-    const result = await SportService.addUser(userId, sportId);
-
-    if (result.status === 'error') {
-        HttpResponse[409](res, result.data.common);
-        return;
+    try {
+        const result = await SportService.addUser(userId, sportId);
+        HttpResponse[200](res, result);
+    } catch (e) {
+        HttpResponse[409](res, e.message);
     }
-
-    HttpResponse[200](res, result.data);
 });
 
 export default sportController;

@@ -1,0 +1,41 @@
+import {OrderType} from './base';
+
+export const createProgram = () => {
+    return `INSERT INTO program (
+        user_id, sport_id, price, difficulty_level
+    ) VALUES ($1, $2, $3, $4) RETURNING *`;
+};
+
+export const updateProgram = (fields: string[]) => {
+    return `UPDATE program SET (
+        ${fields.join(', ')}
+    ) = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING *`;
+};
+
+export const deleteProgram = () => {
+    return `DELETE FROM program WHERE id = $1 RETURNING *`;
+};
+
+export const getProgramById = () => {
+    return `SELECT * FROM program WHERE id = $1`;
+};
+
+// user_id sport_id price difficulty_level
+export const getPrograms = (order: OrderType = 'ASC', fields: string[]) => {
+    return `SELECT * FROM program
+    WHERE ${fields.map((field, i) => `${field} = ${i += 3}`).join(' AND ')}
+    ORDER BY created_date ${order} LIMIT $1 OFFSET $2`;
+};
+
+export const buyProgram = () => {
+    return `INSERT INTO bought_program (
+        user_id, program_id, transaction
+    ) VALUES ($1, $2, $3) RETURNING *`;
+};
+
+export const getUserBoughtPrograms = (order: OrderType = 'ASC') => {
+    return `SELECT * FROM program
+    INNER JOIN bought_program ON bought_program.program_id = program.id
+    WHERE bought_program.user_id = $1
+    ORDER BY bought_date ${order} LIMIT $2 OFFSET $3`;
+};

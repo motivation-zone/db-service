@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS exercise (
   id BIGSERIAL PRIMARY KEY,
   exercise_template_id BIGINT REFERENCES exercise_template(id) ON DELETE RESTRICT,
   duration INTEGER DEFAULT 0, -- by seconds
-  reps INTEGER DEFAULT 0
+  reps INTEGER DEFAULT 0,
+  created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 

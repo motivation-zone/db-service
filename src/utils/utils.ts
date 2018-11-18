@@ -25,3 +25,15 @@ export const checkGetLimitParameters = (data: any): IGetLimit | undefined => {
 
     return {limit, skip, order};
 }
+
+export const getNotEmptyFields = (obj: any, notUpdateFields: any[]) => {
+    return Object.keys(obj).filter((field) => {
+        return !notUpdateFields.includes(field);
+    }).filter((field) => {
+        if (typeof obj[field] === 'boolean') {
+            return true;
+        }
+
+        return Boolean(obj[field]);
+    });
+};

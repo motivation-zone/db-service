@@ -11,14 +11,16 @@ export default class UserModel {
     public isBanned?: boolean;
     public weight?: number;
     public growth?: number;
+    public instagramLink?: string;
+    public phone?: string;
     public birthDate?: Date;
-    public registered?: Date;
+    public registeredDate?: Date;
 
     constructor(data: any) {
         const {
             id, login, name, password, email, selfInfo,
             isAthlete, isBanned, weight, growth, birthDate,
-            registered
+            instagramLink, phone, registeredDate
         } = data;
 
         this.id = id;
@@ -30,9 +32,11 @@ export default class UserModel {
         this.isAthlete = isAthlete;
         this.weight = weight;
         this.growth = growth;
+        this.instagramLink = instagramLink;
+        this.phone = phone;
         this.birthDate = this.parseDate(birthDate);
         this.isBanned = isBanned;
-        this.registered = this.parseDate(registered);
+        this.registeredDate = this.parseDate(registeredDate);
     }
 
     parseDate(date: Date | string): Date | undefined {

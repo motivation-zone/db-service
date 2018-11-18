@@ -3,19 +3,21 @@ import {OrderType} from './base';
 const returningFields = [
     'id', 'login', 'name', 'email', 'is_athlete',
     'self_info', 'weight', 'growth',
-    'birth_date', 'is_banned', 'registered'
+    'birth_date', 'is_banned', 'instagram_link',
+    'phone', 'registered_date'
 ].join(', ');
 
 export const createUser = () => {
     return `INSERT INTO users (
-        login, name, password, email, self_info, weight, growth, birth_date
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING ${returningFields}`;
+        login, name, password, email, self_info, weight,
+        growth, birth_date, instagram_link, phone
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING ${returningFields}`;
 };
 
 export const updateUser = (fields: string[]) => {
     return `UPDATE users SET (
         ${fields.join(', ')}
-        ) = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING ${returningFields}`;
+    ) = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING ${returningFields}`;
 };
 
 export const getUserById = () => {
@@ -24,14 +26,14 @@ export const getUserById = () => {
 
 export const getUserByLogin = (strict: boolean = true) => {
     if (strict) {
-        return `SELECT * FROM users WHERE login = $1`;
+        return `SELECT ${returningFields} FROM users WHERE login = $1`;
     } else {
-        return `SELECT * FROM users WHERE login LIKE '%' || $1 || '%' LIMIT 10`;
+        return `SELECT ${returningFields} FROM users WHERE login LIKE '%' || $1 || '%' LIMIT 10`;
     }
 };
 
 export const getUsers = (order: OrderType = 'ASC') => {
-    return `SELECT * FROM users ORDER BY registered ${order} LIMIT $1 OFFSET $2`;
+    return `SELECT ${returningFields} FROM users ORDER BY registered_date ${order} LIMIT $1 OFFSET $2`;
 };
 
 export const deleteUser = () => {

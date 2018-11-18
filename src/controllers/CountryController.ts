@@ -1,19 +1,17 @@
 import * as express from 'express';
 import CountryService from '../services/CountryService';
-import HttpResponse from '../utils/HttpResponse';
+import HttpResponse from '../utils/http/HttpResponse';
 import {checkGetLimitParameters} from '../utils/utils';
 
 const countryController = express();
 
 countryController.get('/get', async (req: express.Request, res: express.Response) => {
-    const result = await CountryService.getCountries();
-
-    if (result.status === 'error') {
-        HttpResponse[409](res, result.data.common);
-        return;
+    try {
+        const result = await CountryService.getCountries();
+        HttpResponse[200](res, result);
+    } catch (e) {
+        HttpResponse[409](res, e.message);
     }
-
-    HttpResponse[200](res, result.data);
 });
 
 countryController.get('/get-users/:id', async (req: express.Request, res: express.Response) => {
@@ -25,13 +23,12 @@ countryController.get('/get-users/:id', async (req: express.Request, res: expres
         return;
     }
 
-    const result = await CountryService.getUsers(limitParameters, id);
-    if (result.status === 'error') {
-        HttpResponse[409](res, result.data.common);
-        return;
+    try {
+        const result = await CountryService.getUsers(limitParameters, id);
+        HttpResponse[200](res, result);
+    } catch (e) {
+        HttpResponse[409](res, e.message);
     }
-
-    HttpResponse[200](res, result.data);
 });
 
 countryController.post('/add-user', async (req: express.Request, res: express.Response) => {
@@ -41,14 +38,12 @@ countryController.post('/add-user', async (req: express.Request, res: express.Re
         return;
     }
 
-    const result = await CountryService.addUser(userId, countryId);
-
-    if (result.status === 'error') {
-        HttpResponse[409](res, result.data.common);
-        return;
+    try {
+        const result = await CountryService.addUser(userId, countryId);
+        HttpResponse[200](res, result);
+    } catch (e) {
+        HttpResponse[409](res, e.message);
     }
-
-    HttpResponse[200](res, result.data);
 });
 
 export default countryController;
