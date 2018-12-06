@@ -8,7 +8,7 @@ try {
 const fileNames = [
     'training-type', 'country', 'sport', 'difficulty-level',
     'user', 'user-sport-link', 'user-country-link', 'exercise',
-    'program', 'training', 'bought-program'
+    'program', 'training', 'bought-program', 'user-program-saved'
 ];
 
 fileNames.forEach((name) => {
