@@ -279,6 +279,22 @@ INSERT INTO difficulty_level (level, name) VALUES (1, 'beginner') ON CONFLICT DO
 INSERT INTO difficulty_level (level, name) VALUES (2, 'intermediate') ON CONFLICT DO NOTHING;
 INSERT INTO difficulty_level (level, name) VALUES (3, 'advance') ON CONFLICT DO NOTHING;
 INSERT INTO difficulty_level (level, name) VALUES (4, 'monster') ON CONFLICT DO NOTHING;
+CREATE TABLE IF NOT EXISTS training_duration (
+  id SERIAL PRIMARY KEY,
+  time INTEGER NOT NULL UNIQUE
+);
+
+INSERT INTO training_duration (time) VALUES (30) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (45) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (60) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (75) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (90) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (105) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (120) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (135) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (150) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (165) ON CONFLICT DO NOTHING;
+INSERT INTO training_duration (time) VALUES (180) ON CONFLICT DO NOTHING;
 CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY,
   login TEXT NOT NULL UNIQUE,
@@ -320,7 +336,8 @@ CREATE TABLE IF NOT EXISTS exercise (
   id BIGSERIAL PRIMARY KEY,
   exercise_template_id BIGINT REFERENCES exercise_template(id) ON DELETE RESTRICT,
   duration INTEGER DEFAULT 0, -- by seconds
-  reps INTEGER DEFAULT 0
+  reps INTEGER DEFAULT 0,
+  created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- Программа тренировок создается по выбору на кол-во дней (max 30 дней за раз, minimum 1 день)
@@ -355,7 +372,7 @@ CREATE TABLE IF NOT EXISTS training (
   type_id INTEGER REFERENCES training_type(id) ON DELETE RESTRICT,
   user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
   sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
-  duration INTEGER NOT NULL,
+  duration INTEGER REFERENCES training_duration(id) ON DELETE RESTRICT,
   modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
   created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
@@ -393,3 +410,17 @@ CREATE TABLE IF NOT EXISTS bought_program (
   transaction TEXT NOT NULL,
   bought_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
+CREATE TABLE IF NOT EXISTS user_program_saved (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  program_id BIGINT REFERENCES program(id) ON DELETE CASCADE,
+  UNIQUE (user_id, program_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_training_saved (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  training_id BIGINT REFERENCES training(id) ON DELETE CASCADE,
+  UNIQUE (user_id, training_id)
+);
+

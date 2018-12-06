@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS training (
   type_id INTEGER REFERENCES training_type(id) ON DELETE RESTRICT,
   user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
   sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
-  duration INTEGER NOT NULL,
+  duration INTEGER REFERENCES training_duration(id) ON DELETE RESTRICT,
   modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
   created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
