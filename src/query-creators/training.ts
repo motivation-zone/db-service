@@ -71,3 +71,20 @@ export const getTrainingRoundsByTraining = () => {
     return `SELECT * FROM training_round WHERE training_id = $1`;
 };
 
+// TODO create ignores in db if is_hidden = true
+export const saveTraining = () => {
+    return `INSERT INTO user_training_saved (
+        user_id, training_id
+    ) VALUES ($1, $2) RETURNING *`;
+};
+
+export const unsafeTraining = () => {
+    return `DELETE FROM user_training_saved WHERE user_id = $1 AND training_id = $2 RETURNING *`;
+};
+
+export const getUserSavedTrainings = (order: OrderType = 'ASC') => {
+    return `SELECT * FROM training
+    INNER JOIN user_training_saved ON user_training_saved.training_id = training.id
+    WHERE user_training_saved.user_id = $1
+    ORDER BY save_date ${order} LIMIT $2 OFFSET $3`;
+};

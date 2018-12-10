@@ -39,3 +39,21 @@ export const getUserBoughtPrograms = (order: OrderType = 'ASC') => {
     WHERE bought_program.user_id = $1
     ORDER BY bought_date ${order} LIMIT $2 OFFSET $3`;
 };
+
+// TODO create ignores in db if price != 0
+export const saveProgram = () => {
+    return `INSERT INTO user_program_saved (
+        user_id, program_id
+    ) VALUES ($1, $2) RETURNING *`;
+};
+
+export const unsafeProgram = () => {
+    return `DELETE FROM user_program_saved WHERE user_id = $1 AND program_id = $2 RETURNING *`;
+};
+
+export const getUserSavedPrograms = (order: OrderType = 'ASC') => {
+    return `SELECT * FROM program
+    INNER JOIN user_program_saved ON user_program_saved.program_id = program.id
+    WHERE user_program_saved.user_id = $1
+    ORDER BY save_date ${order} LIMIT $2 OFFSET $3`;
+};
