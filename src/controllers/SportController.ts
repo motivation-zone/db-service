@@ -1,5 +1,5 @@
 import * as express from 'express';
-import SportService from '../services/SportService';
+import SportService, { SPORT_USER_ACTION_TYPES } from '../services/SportService';
 import HttpResponse from '../utils/http/HttpResponse';
 import {checkGetLimitParameters} from '../utils/utils';
 
@@ -31,15 +31,17 @@ sportController.get('/get-users/:id', async (req: express.Request, res: express.
     }
 });
 
-sportController.post('/add-user', async (req: express.Request, res: express.Response) => {
+sportController.post('/update-user/:type', async (req: express.Request, res: express.Response) => {
     const {userId, sportId} = req.body;
-    if (!userId || !sportId) {
+    const {type} = req.params;
+
+    if (!userId || !sportId || SPORT_USER_ACTION_TYPES.indexOf(type) === -1) {
         HttpResponse[400](res);
         return;
     }
 
     try {
-        const result = await SportService.addUser(userId, sportId);
+        const result = await SportService.updateUser(type, userId, sportId);
         HttpResponse[200](res, result);
     } catch (e) {
         HttpResponse[409](res, e.message);

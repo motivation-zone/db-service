@@ -1,10 +1,14 @@
 import {
     getSports as getSportsQuery,
     addUser as addUserQuery,
+    deleteUser as deleteUserQuery,
     getUsers as getUsersQuery
 } from '../query-creators/sport';
 import {query} from '../lib/db/client';
 import {prepareDBResult, IGetLimit} from './base';
+
+type SportUserActionTypes = 'delete' | 'add';
+export const SPORT_USER_ACTION_TYPES: SportUserActionTypes[] = ['delete', 'add'];
 
 export default class SportService {
     static async getSports() {
@@ -25,9 +29,10 @@ export default class SportService {
         return prepareDBResult(result);
     }
 
-    static async addUser(userId: number, sportId: number) {
+    static async updateUser(type: SportUserActionTypes, userId: number, sportId: number) {
+        const text = type === 'delete' ? deleteUserQuery() : addUserQuery();
         const result = await query({
-            text: addUserQuery(),
+            text,
             values: [userId, sportId]
         });
 
