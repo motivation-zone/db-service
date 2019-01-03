@@ -16,7 +16,10 @@ countryController.get('/get', async (req: express.Request, res: express.Response
 
 countryController.get('/get-users/:id', async (req: express.Request, res: express.Response) => {
     const limitParameters = checkGetLimitParameters(req.query);
-    const {id} = req.params;
+    let {id} = req.params;
+    if (id === 'null') {
+        id = null;
+    }
 
     if (!limitParameters) {
         HttpResponse[400](res);
@@ -25,21 +28,6 @@ countryController.get('/get-users/:id', async (req: express.Request, res: expres
 
     try {
         const result = await CountryService.getUsers(limitParameters, id);
-        HttpResponse[200](res, result);
-    } catch (e) {
-        HttpResponse[409](res, e.message);
-    }
-});
-
-countryController.post('/add-user', async (req: express.Request, res: express.Response) => {
-    const {userId, countryId} = req.body;
-    if (!userId || !countryId) {
-        HttpResponse[400](res);
-        return;
-    }
-
-    try {
-        const result = await CountryService.addUser(userId, countryId);
         HttpResponse[200](res, result);
     } catch (e) {
         HttpResponse[409](res, e.message);

@@ -1,7 +1,7 @@
 import {
     getCountries as getCountriesQuery,
-    addUser as addUserQuery,
-    getUsers as getUsersQuery
+    getUsers as getUsersQuery,
+    getUsersWithoutCountry as getUsersWithoutCountryQuery
 } from '../query-creators/country';
 import {query} from '../lib/db/client';
 import {prepareDBResult, IGetLimit} from './base';
@@ -15,19 +15,10 @@ export default class CountryService {
         return prepareDBResult(result);
     }
 
-    static async getUsers(data: IGetLimit, id: number) {
+    static async getUsers(data: IGetLimit, id?: number) {
         const result = await query({
-            text: getUsersQuery(data.order),
-            values: [data.limit, data.skip, id]
-        });
-
-        return prepareDBResult(result);
-    }
-
-    static async addUser(userId: number, countryId: number) {
-        const result = await query({
-            text: addUserQuery(),
-            values: [userId, countryId]
+            text: id ? getUsersQuery(data.order) : getUsersWithoutCountryQuery(data.order),
+            values: [data.limit, data.skip].concat(id ? [id] : [])
         });
 
         return prepareDBResult(result);
