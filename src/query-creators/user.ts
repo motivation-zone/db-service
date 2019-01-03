@@ -2,26 +2,31 @@ import {OrderType} from './base';
 
 const returningFields = [
     'id', 'login', 'name', 'email', 'is_athlete',
-    'self_info', 'weight', 'growth',
-    'birth_date', 'is_banned', 'instagram_link',
+    'self_info', 'weight', 'growth', 'country_id',
+    'birth_date', 'is_banned', 'instagram',
     'phone', 'registered_date'
 ].join(', ');
 
 export const createUser = () => {
     return `INSERT INTO users (
-        login, name, password, email, self_info, weight,
-        growth, birth_date, instagram_link, phone
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING ${returningFields}`;
+        login, name, password, email, self_info,
+        weight, growth, country_id, birth_date,
+        instagram, phone
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING ${returningFields}`;
 };
 
 export const updateUser = (fields: string[]) => {
     return `UPDATE users SET (
         ${fields.join(', ')}
-    ) = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING ${returningFields}`;
+    ) = (${fields.map((field, i) => `$${i += 2}`).join(', ')}) WHERE id = $1 RETURNING ${returningFields}`;
 };
 
 export const getUserById = () => {
     return `SELECT * FROM users WHERE id = $1`;
+};
+
+export const checkUser = () => {
+    return `SELECT id FROM users WHERE login = $1 AND password = $2`;
 };
 
 export const getUserByLogin = (strict: boolean = true) => {

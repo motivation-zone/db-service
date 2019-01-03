@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS exercise_template (
-  id BIGSERIAL PRIMARY KEY, -- this id for video in fs too
+  id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
   user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
@@ -9,9 +9,8 @@ CREATE TABLE IF NOT EXISTS exercise_template (
 
 CREATE TABLE IF NOT EXISTS exercise (
   id BIGSERIAL PRIMARY KEY,
-  exercise_template_id BIGINT REFERENCES exercise_template(id) ON DELETE RESTRICT,
-  duration INTEGER DEFAULT 0, -- by seconds
+  exercise_template_id BIGINT REFERENCES exercise_template(id) ON DELETE CASCADE,
+  duration INTEGER DEFAULT 0,
   reps INTEGER DEFAULT 0,
   created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
-

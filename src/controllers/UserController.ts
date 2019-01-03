@@ -40,7 +40,6 @@ userController.get('/get', async (req: express.Request, res: express.Response) =
 
 userController.get('/get/id/:id', async (req: express.Request, res: express.Response) => {
     const {id} = req.params;
-    const result = await UserService.getUserById(id);
 
     try {
         const result = await UserService.getUserById(id);
@@ -69,6 +68,17 @@ userController.post('/update/:id', async (req: express.Request, res: express.Res
 
     try {
         const result = await UserService.updateUser(user);
+        HttpResponse[200](res, result);
+    } catch (e) {
+        HttpResponse[409](res, e.message);
+    }
+});
+
+userController.post('/check/password', async (req: express.Request, res: express.Response) => {
+    const {login, password} = req.body;
+
+    try {
+        const result = await UserService.checkUserPassword(login, password);
         HttpResponse[200](res, result);
     } catch (e) {
         HttpResponse[409](res, e.message);

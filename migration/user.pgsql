@@ -8,9 +8,10 @@ CREATE TABLE IF NOT EXISTS users (
   self_info TEXT,
   weight REAL,
   growth REAL,
+  country_id BIGINT REFERENCES country(id) ON DELETE RESTRICT,
   birth_date TIMESTAMP WITH TIME ZONE,
   is_banned BOOLEAN DEFAULT FALSE,
-  instagram_link TEXT,
+  instagram TEXT,
   phone TEXT,
   registered_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );

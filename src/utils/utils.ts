@@ -9,7 +9,7 @@ export const stringToBoolean = (value: string): boolean | undefined => {
     return value === 'true' ? true : value === 'false' ? false : undefined;
 };
 
-export const checkNecessaryFields = (fields: any[], obj: any): boolean => {
+export const checkNecessaryFields = (fields: string[], obj: any): boolean => {
     return fields.every((field) => {
         return Boolean(obj[field]);
     });

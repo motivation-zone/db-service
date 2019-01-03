@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS training (
   type_id INTEGER REFERENCES training_type(id) ON DELETE RESTRICT,
   user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
   sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
-  duration INTEGER REFERENCES training_duration(id) ON DELETE RESTRICT,
+  duration INTEGER NOT NULL,
   modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
   created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
@@ -16,18 +16,21 @@ CREATE TABLE IF NOT EXISTS training (
 CREATE TABLE IF NOT EXISTS training_round (
   id BIGSERIAL PRIMARY KEY,
   training_id BIGINT REFERENCES training(id) ON DELETE CASCADE,
+  exercise_id BIGINT REFERENCES exercise(id) ON DELETE RESTRICT,
   sets INTEGER DEFAULT 1,
-  position INTEGER NOT NULL,
-  exercises BIGINT[]
+  round_position_in_training INTEGER NOT NULL,
+  exercise_position_in_round INTEGER NOT NULL,
+  UNIQUE(training_id, exercise_id, round_position_in_training, exercise_position_in_round),
+  UNIQUE(training_id, exercise_id, round_position_in_training)
 );
 
-CREATE TABLE IF NOT EXISTS training_program_link (
+CREATE TABLE IF NOT EXISTS training_program (
   id BIGSERIAL PRIMARY KEY,
   program_id BIGINT REFERENCES program(id) ON DELETE CASCADE,
   training_id BIGINT REFERENCES training(id) ON DELETE RESTRICT,
-  day INTEGER NOT NULL
+  day INTEGER NOT NULL,
+  UNIQUE(program_id, training_id, day)
 );
-
 
 CREATE OR REPLACE FUNCTION update_training_modified_date() RETURNS TRIGGER AS
   $BODY$

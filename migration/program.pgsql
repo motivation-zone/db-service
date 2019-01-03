@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS program (
   user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
   sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
   price DECIMAL(19,2) DEFAULT 0,
-  difficulty_level INTEGER REFERENCES difficulty_level(level) ON DELETE RESTRICT, -- automatic on server aggregate all trainings difficulties
+  difficulty_level INTEGER REFERENCES difficulty_level(level) ON DELETE RESTRICT,
   modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
   created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );

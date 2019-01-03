@@ -1,11 +1,12 @@
-import UserModel from '../models/UserModel';
+import UserModel, {NOT_UPDATED_FIELDS} from '../models/UserModel';
 import {
     createUser as createUserQuery,
     getUserByLogin as getUserByLoginQuery,
     getUserById as getUserByIdQuery,
     getUsers as getUsersQuery,
     updateUser as updateUserQuery,
-    deleteUser as deleteUserQuery
+    deleteUser as deleteUserQuery,
+    checkUser as checkUserQuery
 } from '../query-creators/user';
 import {query} from '../lib/db/client';
 import {translateNodeToPostgresqlName} from '../utils/db/helper';
@@ -16,8 +17,8 @@ export default class UserService {
     static async createUser(user: UserModel) {
         const values = [
             user.login, user.name, user.password, user.email,
-            user.selfInfo, user.weight, user.growth, user.birthDate,
-            user.instagramLink, user.phone
+            user.selfInfo, user.weight, user.growth, user.countryId,
+            user.birthDate, user.instagram, user.phone
         ];
 
         const result = await query({
@@ -29,9 +30,7 @@ export default class UserService {
     }
 
     static async updateUser(user: UserModel) {
-        const notUpdateFields = ['id', 'login', 'registered'];
-        const fields = getNotEmptyFields(user, notUpdateFields) as (keyof UserModel)[];
-
+        const fields = getNotEmptyFields(user, NOT_UPDATED_FIELDS) as (keyof UserModel)[];
         const result = await query({
             text: updateUserQuery(fields.map(translateNodeToPostgresqlName)),
             values: [
@@ -74,6 +73,15 @@ export default class UserService {
         const result = await query({
             text: deleteUserQuery(),
             values: [id]
+        });
+
+        return prepareDBResult(result);
+    }
+
+    static async checkUserPassword(login: string, password: string) {
+        const result = await query({
+            text: checkUserQuery(),
+            values: [login, password]
         });
 
         return prepareDBResult(result);
