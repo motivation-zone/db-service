@@ -16,17 +16,17 @@ export const checkNecessaryFields = (fields: string[], obj: any): boolean => {
 }
 
 export const checkGetLimitParameters = (data: any): IGetLimit | undefined => {
-    const {limit, skip, order} = data;
+    const { limit, skip, order } = data;
     const orderTypes: OrderType[] = ['DESC', 'ASC'];
 
     if (!limit || !skip || order && !orderTypes.includes(order.toUpperCase())) {
         return;
     }
 
-    return {limit, skip, order};
+    return { limit, skip, order };
 }
 
-export const getNotEmptyFields = (obj: any, notUpdateFields: any[]) => {
+export const getNotEmptyFields = (obj: any, notUpdateFields: any[] = []) => {
     return Object.keys(obj).filter((field) => {
         return !notUpdateFields.includes(field);
     }).filter((field) => {
@@ -36,4 +36,13 @@ export const getNotEmptyFields = (obj: any, notUpdateFields: any[]) => {
 
         return Boolean(obj[field]);
     });
+};
+
+export const filterMapData = (nameFields: string[], valueFields: any[]) => {
+    return nameFields.map((name, i) => {
+        return {
+            name,
+            value: valueFields[i]
+        };
+    }).filter((el) => el.value);
 };

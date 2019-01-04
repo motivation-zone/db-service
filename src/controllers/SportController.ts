@@ -19,8 +19,7 @@ sportController.get('/get-users/:id', async (req: express.Request, res: express.
     const {id} = req.params;
 
     if (!limitParameters) {
-        HttpResponse[400](res);
-        return;
+        return HttpResponse[400](res);
     }
 
     try {
@@ -36,8 +35,7 @@ sportController.post('/update-user/:type', async (req: express.Request, res: exp
     const {type} = req.params;
 
     if (!userId || !sportId || SPORT_USER_ACTION_TYPES.indexOf(type) === -1) {
-        HttpResponse[400](res);
-        return;
+        return HttpResponse[400](res);
     }
 
     try {

@@ -1,4 +1,4 @@
-import {OrderType} from './base';
+import {OrderType, updateQuery} from './base';
 
 export const createProgram = () => {
     return `INSERT INTO program (
@@ -6,11 +6,7 @@ export const createProgram = () => {
     ) VALUES ($1, $2, $3, $4) RETURNING *`;
 };
 
-export const updateProgram = (fields: string[]) => {
-    return `UPDATE program SET (
-        ${fields.join(', ')}
-    ) = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING *`;
-};
+export const updateProgram = (fields: string[]) => updateQuery(fields, 'program');
 
 export const deleteProgram = () => {
     return `DELETE FROM program WHERE id = $1 RETURNING *`;

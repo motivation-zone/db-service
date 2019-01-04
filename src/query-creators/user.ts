@@ -1,4 +1,4 @@
-import {OrderType} from './base';
+import {OrderType, updateQuery} from './base';
 
 export const USER_RETURNING_FIELDS = [
     'id', 'login', 'name', 'email', 'is_athlete',
@@ -15,11 +15,7 @@ export const createUser = () => {
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING ${USER_RETURNING_FIELDS}`;
 };
 
-export const updateUser = (fields: string[]) => {
-    return `UPDATE users SET (
-        ${fields.join(', ')}
-    ) = (${fields.map((field, i) => `$${i += 2}`).join(', ')}) WHERE id = $1 RETURNING ${USER_RETURNING_FIELDS}`;
-};
+export const updateUser = (fields: string[]) => updateQuery(fields, 'users', USER_RETURNING_FIELDS);
 
 export const getUserById = () => {
     return `SELECT * FROM users WHERE id = $1`;

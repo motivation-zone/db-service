@@ -1,4 +1,5 @@
-import {OrderType} from './base';
+import {OrderType, updateQuery} from './base';
+
 
 export const createExerciseTemplate = () => {
     return `INSERT INTO exercise_template (
@@ -6,11 +7,7 @@ export const createExerciseTemplate = () => {
     ) VALUES ($1, $2, $3, $4) RETURNING *`;
 };
 
-export const updateExerciseTemplate = (fields: string[]) => {
-    return `UPDATE exercise_template SET (
-        ${fields.join(', ')}
-    ) = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING *`;
-};
+export const updateExerciseTemplate = (fields: string[]) => updateQuery(fields, 'exercise_template');
 
 export const deleteExerciseTemplate = () => {
     return `DELETE FROM exercise_template WHERE id = $1 RETURNING *`;
@@ -20,40 +17,47 @@ export const getExerciseTemplateById = () => {
     return `SELECT * FROM exercise_template WHERE id = $1`;
 };
 
-export const getUserExerciseTemplates = (order: OrderType = 'ASC') => {
+export const getUserExerciseTemplatesBySport = (order: OrderType = 'ASC') => {
     return `
         SELECT * FROM exercise_template WHERE user_id = $1 AND sport_id = $2
         ORDER BY created_date ${order} LIMIT $3 OFFSET $4
     `;
 };
 
-export const createExercise = () => {
+export const getAllUserExerciseTemplates = (order: OrderType = 'ASC') => {
+    return `
+        SELECT * FROM exercise_template WHERE user_id = $1
+        ORDER BY created_date ${order} LIMIT $2 OFFSET $3
+    `;
+};
+
+export const createExercise = (fields: string[]) => {
+    const f = ['exercise_template_id'].concat(fields);
     return `INSERT INTO exercise (
-        exercise_template_id, duration, reps
-    ) VALUES ($1, $2, $3)`;
+       ${f.join(', ')}
+    ) VALUES (${f.map((_, i) => `$${i += 1}`).join(', ')}) RETURNING *`;
 };
 
-export const updateExercise = (fields: string[]) => {
-    return `UPDATE exercise SET (
-        ${fields.join(', ')}
-    ) = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING *`;
+export const updateExercise = (fields: string[]) => updateQuery(fields, 'exercise');
+
+export const getExerciseById = () => {
+    return `SELECT * FROM exercise WHERE id = $1`;
 };
 
-export const getExercisesByIds = (idsCount: number) => {
-    const ids = [];
-    for (let i = 1; i < idsCount + 1; i++) {
-        ids.push(`id = ${i}`);
-    }
-    return `SELECT * FROM exercise WHERE ${ids.join(' OR ')}`;
-};
-
-export const getUserExercises = (order: OrderType = 'ASC') => {
+export const getUserExercisesBySport = (order: OrderType = 'ASC') => {
     return `
         SELECT * FROM exercise
-        INNER JOIN exercise_template ON exercise.exercise_template_id = exercise_template.id
-        WHERE exercise_template.user_id = $1 AND sport_id = $2
-        ORDER BY exercise.created_date ${order} LIMIT $3 OFFSET $4
-    `;
+            INNER JOIN exercise_template ON exercise.exercise_template_id = exercise_template.id
+            WHERE exercise_template.user_id = $1 AND exercise_template.sport_id = $2
+            ORDER BY exercise.created_date ${order} LIMIT $3 OFFSET $4`;
+};
+
+export const getAllUserExercises = (order: OrderType = 'ASC') => {
+    return `
+        SELECT * FROM exercise
+            INNER JOIN exercise_template ON exercise.exercise_template_id = exercise_template.id
+            WHERE exercise_template.user_id = $1
+            ORDER BY exercise.created_date ${order} LIMIT $2 OFFSET $3`;
 };
 
 export const deleteExercise = () => {

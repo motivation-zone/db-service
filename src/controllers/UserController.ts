@@ -11,8 +11,7 @@ userController.post('/create', async (req: express.Request, res: express.Respons
     const isOk = checkNecessaryFields(REQUIRED_FIELDS, user);
 
     if (!isOk) {
-        HttpResponse[400](res);
-        return;
+        return HttpResponse[400](res);
     }
 
     try {
@@ -26,8 +25,7 @@ userController.post('/create', async (req: express.Request, res: express.Respons
 userController.get('/get', async (req: express.Request, res: express.Response) => {
     const limitParameters = checkGetLimitParameters(req.query);
     if (!limitParameters) {
-        HttpResponse[400](res);
-        return;
+        return HttpResponse[400](res);
     }
 
     try {

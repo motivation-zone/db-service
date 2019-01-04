@@ -1,4 +1,4 @@
-import {OrderType} from './base';
+import {OrderType, updateQuery} from './base';
 
 export const addTrainingToProgram = () => {
     return `INSERT INTO training_program_link (
@@ -7,12 +7,7 @@ export const addTrainingToProgram = () => {
 };
 
 // training_id, day
-export const updateTrainingInProgram = (fields: string[]) => {
-    return `UPDATE training_program_link SET (
-        ${fields.join(', ')}
-    ) VALUES (${fields.map((field, i) => `$${i+=2}`).join(', ')}
-    WHERE id = $1 RETURNING *`;
-};
+export const updateTrainingInProgram = (fields: string[]) => updateQuery(fields, 'training_program_link');
 
 export const deleteTrainingFromProgram = () => {
     return `DELETE FROM training_program_link WHERE id = $1 RETURNING *`;
@@ -25,11 +20,7 @@ export const createTraining = () => {
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`;
 };
 
-export const updateTraining = (fields: string[]) => {
-    return `UPDATE training SET (
-        ${fields.join(', ')}
-    ) = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING *`;
-};
+export const updateTraining = (fields: string[]) => updateQuery(fields, 'training');
 
 export const deleteTraining = () => {
     return `DELETE FROM training WHERE id = $1 RETURNING *`;
@@ -61,11 +52,7 @@ export const deleteTrainingRound = () => {
 };
 
 // sets, positions, exercises
-export const updateTrainingRound = (fields: string[]) => {
-    return `UPDATE training_round SET (
-        ${fields.join(', ')}
-    } = (${fields.map((field, i) => `$${i+=2}`).join(', ')}) WHERE id = $1 RETURNING *`;
-};
+export const updateTrainingRound = (fields: string[]) => updateQuery(fields, 'training_round');
 
 export const getTrainingRoundsByTraining = () => {
     return `SELECT * FROM training_round WHERE training_id = $1`;

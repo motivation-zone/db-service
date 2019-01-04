@@ -41,4 +41,5 @@ class Logger {
         this._logger.info(msg);
     }
 }
+
 export default new Logger();

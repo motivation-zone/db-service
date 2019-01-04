@@ -22,8 +22,7 @@ countryController.get('/get-users/:id', async (req: express.Request, res: expres
     }
 
     if (!limitParameters) {
-        HttpResponse[400](res);
-        return;
+        return HttpResponse[400](res);
     }
 
     try {
