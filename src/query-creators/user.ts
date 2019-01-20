@@ -2,17 +2,17 @@ import {OrderType, updateQuery} from './base';
 
 export const USER_RETURNING_FIELDS = [
     'id', 'login', 'name', 'email', 'is_athlete',
-    'self_info', 'weight', 'growth', 'country_id',
+    'self_info', 'gender', 'weight', 'growth', 'country_id',
     'birth_date', 'is_banned', 'instagram',
     'phone', 'registered_date'
 ].join(', ');
 
 export const createUser = () => {
     return `INSERT INTO users (
-        login, name, password, email, self_info,
+        login, name, password, email, self_info, gender,
         weight, growth, country_id, birth_date,
         instagram, phone
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING ${USER_RETURNING_FIELDS}`;
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING ${USER_RETURNING_FIELDS}`;
 };
 
 export const updateUser = (fields: string[]) => updateQuery(fields, 'users', USER_RETURNING_FIELDS);

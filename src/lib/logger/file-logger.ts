@@ -26,7 +26,12 @@ const createLogger = (): winston.Logger => {
     });
 };
 
-class Logger {
+export interface ILogger {
+    error: (msg: string) => void,
+    info: (msg: string) => void
+}
+
+class Logger implements ILogger {
     private _logger: winston.Logger;
 
     constructor() {

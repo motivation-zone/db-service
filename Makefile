@@ -16,7 +16,7 @@ prune:
 build:
 	$(call build)
 
-.PHONY: build-watch
+.PHONY: build.watch
 build.watch:
 	$(call build,--watch)
 
@@ -53,3 +53,7 @@ docker.run.testing:
 		-v /usr/share/motivation_zone/db/db.yaml:/usr/local/app/configs/db/db.yaml \
 		-p 5000:80 $(image_id)
 
+
+.PHONY: test.func
+test.func:
+	node_modules/.bin/mocha build/tests/**/*.test.js --exit

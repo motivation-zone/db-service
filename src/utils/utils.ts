@@ -11,6 +11,10 @@ export const stringToBoolean = (value: string): boolean | undefined => {
 
 export const checkNecessaryFields = (fields: string[], obj: any): boolean => {
     return fields.every((field) => {
+        if (typeof obj[field] === 'boolean') {
+            return true;
+        }
+
         return Boolean(obj[field]);
     });
 }

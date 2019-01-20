@@ -1,10 +1,11 @@
-interface UserInterface {
+export interface IUserModel {
     id?: number;
     login?: string;
     name?: string;
     password?: string;
     email?: string;
     selfInfo?: string;
+    gender?: boolean;
     countryId?: number;
     isAthlete?: boolean;
     isBanned?: boolean;
@@ -16,16 +17,16 @@ interface UserInterface {
     registeredDate?: Date;
 }
 
-export const REQUIRED_FIELDS = ['login', 'name', 'password', 'email'];
+export const REQUIRED_FIELDS: (keyof IUserModel)[] = ['login', 'name', 'password', 'email', 'gender'];
 export const NOT_UPDATED_FIELDS = ['id', 'login', 'registered'];
 
-
-export default class UserModel implements UserInterface {
+export default class UserModel implements IUserModel {
     public id?: number;
     public login?: string;
     public name?: string;
     public password?: string;
     public email?: string;
+    public gender?: boolean;
     public selfInfo?: string;
     public countryId?: number;
     public isAthlete?: boolean;
@@ -39,7 +40,7 @@ export default class UserModel implements UserInterface {
 
     constructor(data: any) {
         const {
-            id, login, name, password, email, selfInfo,
+            id, login, name, password, email, selfInfo, gender,
             isAthlete, isBanned, weight, growth, birthDate,
             countryId, instagram, phone, registeredDate
         } = data;
@@ -50,6 +51,7 @@ export default class UserModel implements UserInterface {
         this.password = password;
         this.email = email;
         this.selfInfo = selfInfo;
+        this.gender = gender;
         this.isAthlete = isAthlete;
         this.weight = weight;
         this.growth = growth;
@@ -57,11 +59,11 @@ export default class UserModel implements UserInterface {
         this.phone = phone;
         this.isBanned = isBanned;
         this.countryId = countryId;
-        this.birthDate = this.parseDate(birthDate);
-        this.registeredDate = this.parseDate(registeredDate);
+        this.birthDate = UserModel.parseDate(birthDate);
+        this.registeredDate = UserModel.parseDate(registeredDate);
     }
 
-    parseDate(date: Date | string): Date | undefined {
+    static parseDate(date: Date | string): Date | undefined {
         if (date instanceof Date) {
             return date;
         }

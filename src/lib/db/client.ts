@@ -10,8 +10,8 @@ interface IQuery {
     values: any[];
 }
 
-const dbErrorHandler = (err: string) => {
-    logger('error', 'db', err);
+const dbErrorHandler = (err: Error, client: pg.PoolClient) => {
+    logger('error', 'db', err.stack || '');
 }
 
 const yamlDbConfig = fs.readFileSync(getAbsolutePath(`./configs/db/db.yaml`), 'utf8');

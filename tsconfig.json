@@ -3,15 +3,21 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "target": "es2017",
-        "lib": ["es2017"],
+        "lib": ["es2017", "dom"],
         "strict": true,
         "noEmitOnError": true,
-        "types": ["node"],
+        "types": [
+            "node",
+            "chai",
+            "mocha",
+            "supertest"
+        ],
         "sourceMap": true
     },
     "include": [
         "src/**/*",
         "configs/**/*",
-        "ts/**/*"
+        "ts/**/*",
+        "tests/**/*"
     ]
 }

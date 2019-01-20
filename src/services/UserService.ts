@@ -17,8 +17,8 @@ export default class UserService {
     static async createUser(user: UserModel) {
         const values = [
             user.login, user.name, user.password, user.email,
-            user.selfInfo, user.weight, user.growth, user.countryId,
-            user.birthDate, user.instagram, user.phone
+            user.selfInfo, user.gender, user.weight, user.growth,
+            user.countryId, user.birthDate, user.instagram, user.phone
         ];
 
         const result = await query({

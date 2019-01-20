@@ -22,8 +22,6 @@ const app = express()
         res.status(500).send('Server error');
     });
 
-export default app;
-
 if (!module.parent) {
     const envPort = Number(process.env.NODEJS_PORT);
     const port: number = isNaN(envPort) ? 8080 : envPort;
@@ -31,3 +29,5 @@ if (!module.parent) {
         logger('info', 'app', `Application started on port ${port}`);
     });
 }
+
+export default app;
