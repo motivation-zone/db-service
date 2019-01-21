@@ -6,7 +6,7 @@ build = node_modules/.bin/tsc --outDir $(OUT_DIR) --rootDir $(CURDIR) $(1)
 
 .PHONY: install
 install:
-	$(NPM) install
+	$(NPM) install --no-save
 
 .PHONY: prune
 prune:

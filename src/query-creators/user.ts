@@ -15,7 +15,9 @@ export const createUser = () => {
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING ${USER_RETURNING_FIELDS}`;
 };
 
-export const updateUser = (fields: string[]) => updateQuery(fields, 'users', USER_RETURNING_FIELDS);
+export const updateUser = (fields: string[]) => updateQuery(
+    fields, 'users', `${USER_RETURNING_FIELDS}, password`
+);
 
 export const getUserById = () => {
     return `SELECT * FROM users WHERE id = $1`;

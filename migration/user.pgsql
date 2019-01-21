@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
   password TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   is_athlete BOOLEAN DEFAULT FALSE,
-  gender BOOLEAN,
+  gender BOOLEAN NOT NULL,
   self_info TEXT,
   weight REAL,
   growth REAL,

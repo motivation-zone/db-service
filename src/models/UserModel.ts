@@ -18,7 +18,7 @@ export interface IUserModel {
 }
 
 export const REQUIRED_FIELDS: (keyof IUserModel)[] = ['login', 'name', 'password', 'email', 'gender'];
-export const NOT_UPDATED_FIELDS = ['id', 'login', 'registered'];
+export const NOT_UPDATED_FIELDS: (keyof IUserModel)[] = ['id', 'login', 'registeredDate'];
 
 export default class UserModel implements IUserModel {
     public id?: number;
