@@ -1,35 +1,16 @@
 import * as request from 'supertest';
 import {expect, assert} from 'chai';
-import app from '../../src/app';
-import * as randomName from 'node-random-name';
+import app from '../../../src/app';
 
-import UserModel, {REQUIRED_FIELDS, NOT_UPDATED_FIELDS, IUserModel} from '../../src/models/UserModel';
-import {generateString, checkAssertion} from '../utils';
+import UserModel, {REQUIRED_FIELDS, NOT_UPDATED_FIELDS, IUserModel} from '../../../src/models/UserModel';
+import {checkAssertion, REQUEST_HEADERS, EXPECT_FIELDS} from '../../utils';
+import {USER_RETURNING_FIELDS} from '../../../src/query-creators/user';
+import {translatePostgresqlNameToNode} from '../../../src/utils/db/helper';
+import {checkNecessaryFields} from '../../../src/utils/utils';
+import {API_URL_PREFIX_USER} from '../../../src/urls';
+import {generateUser} from './utils';
 
-const URL_PREFIX = '/api/user';
-
-const generateUser = (): IUserModel => {
-    const gender = Math.random() > 0.5;
-    return new UserModel({
-        login: randomName({
-            first: true,
-            gender: gender ? 'male' : 'female'
-        }),
-        name: randomName(),
-        password: generateString(10),
-        email: `${randomName({last: true})}@amail.ru`,
-        selfInfo: 'smth about me',
-        gender,
-        countryId: 183,
-        weight: 74.5,
-        growth: 175,
-        instagram: 'instagramnickname',
-        phone: '7_123123123123',
-        birthDate: '1997-06-01'
-    });
-};
-
-const changeFieldValue = (field: string, value: any) => {
+const changeFieldValue = (value: any) => {
     if (value instanceof Date) {
         return UserModel.parseDate('1999-06-01');
     }
@@ -54,10 +35,10 @@ describe('USER:', function () {
     describe('Create', () => {
         it('simple', (done) => {
             request(app)
-                .post(`${URL_PREFIX}/create`)
+                .post(`${API_URL_PREFIX_USER}/create`)
                 .send(reqUser)
-                .set('Accept', 'application/json')
-                .expect('Content-Type', /json/)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                 .expect((res) => {
                     const user = new UserModel(res.body.data[0]);
                     // password mustn't return after user was created
@@ -89,10 +70,10 @@ describe('USER:', function () {
             user.countryId = 9999999;
 
             request(app)
-                .post(`${URL_PREFIX}/create`)
+                .post(`${API_URL_PREFIX_USER}/create`)
                 .send(user)
-                .set('Accept', 'application/json')
-                .expect('Content-Type', /json/)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                 .expect((res) => {
                     const msg = res.body.message;
                     expect(msg.indexOf('users_country_id_fkey')).to.not.equal(-1);
@@ -104,10 +85,10 @@ describe('USER:', function () {
             const user = generateUser();
             user.email = reqUser.email;
             request(app)
-                .post(`${URL_PREFIX}/create`)
+                .post(`${API_URL_PREFIX_USER}/create`)
                 .send(user)
-                .set('Accept', 'application/json')
-                .expect('Content-Type', /json/)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                 .expect((res) => {
                     const msg = res.body.message;
                     expect(msg.indexOf('users_email_key')).to.not.equal(-1);
@@ -120,10 +101,10 @@ describe('USER:', function () {
             user.login = reqUser.login;
 
             request(app)
-                .post(`${URL_PREFIX}/create`)
+                .post(`${API_URL_PREFIX_USER}/create`)
                 .send(user)
-                .set('Accept', 'application/json')
-                .expect('Content-Type', /json/)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                 .expect((res) => {
                     const msg = res.body.message;
                     expect(msg.indexOf('users_login_key')).to.not.equal(-1);
@@ -138,10 +119,10 @@ describe('USER:', function () {
 
                 return new Promise((resolve, reject) => {
                     request(app)
-                        .post(`${URL_PREFIX}/create`)
+                        .post(`${API_URL_PREFIX_USER}/create`)
                         .send(user)
-                        .set('Accept', 'application/json')
-                        .expect('Content-Type', /json/)
+                        .set(REQUEST_HEADERS.standart)
+                        .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                         .end((err, res) => {
                             if (err || res.status !== 400) {
                                 return reject();
@@ -165,13 +146,13 @@ describe('USER:', function () {
             });
 
             const promises = updatedFields.map((field) => {
-                reqUser[field] = changeFieldValue(field, reqUser[field]);
+                reqUser[field] = changeFieldValue(reqUser[field]);
                 return new Promise((resolve, reject) => {
                     request(app)
-                        .post(`${URL_PREFIX}/update/${reqUser.id}`)
+                        .post(`${API_URL_PREFIX_USER}/update/${reqUser.id}`)
                         .send({[field]: reqUser[field]})
-                        .set('Accept', 'application/json')
-                        .expect('Content-Type', /json/)
+                        .set(REQUEST_HEADERS.standart)
+                        .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                         .end((err, res) => {
                             if (err || res.status !== 200) {
                                 return reject();
@@ -192,18 +173,18 @@ describe('USER:', function () {
 
         it('not updated fields with some updated field', (done) => {
             const promises = NOT_UPDATED_FIELDS.map((field) => {
-                const newValue = changeFieldValue(field, reqUser[field]);
+                const newValue = changeFieldValue(reqUser[field]);
                 return new Promise((resolve, reject) => {
                     request(app)
-                        .post(`${URL_PREFIX}/update/${reqUser.id}`)
+                        .post(`${API_URL_PREFIX_USER}/update/${reqUser.id}`)
                         .send({
                             [field]: newValue,
                             // if send only not_updated_field => server remove it
                             // and send empty query => will be error 409
                             selfInfo: reqUser.selfInfo
                         })
-                        .set('Accept', 'application/json')
-                        .expect('Content-Type', /json/)
+                        .set(REQUEST_HEADERS.standart)
+                        .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                         .end((err, res) => {
                             if (err || res.status !== 200) {
                                 return reject();
@@ -224,13 +205,13 @@ describe('USER:', function () {
 
         it('only not updated fields', (done) => {
             const promises = NOT_UPDATED_FIELDS.map((field) => {
-                const newValue = changeFieldValue(field, reqUser[field]);
+                const newValue = changeFieldValue(reqUser[field]);
                 return new Promise((resolve, reject) => {
                     request(app)
-                        .post(`${URL_PREFIX}/update/${reqUser.id}`)
+                        .post(`${API_URL_PREFIX_USER}/update/${reqUser.id}`)
                         .send({[field]: newValue})
-                        .set('Accept', 'application/json')
-                        .expect('Content-Type', /json/)
+                        .set(REQUEST_HEADERS.standart)
+                        .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                         .expect(409, resolve);
                 });
             });
@@ -238,17 +219,85 @@ describe('USER:', function () {
             Promise.all(promises).then(() => done());
         });
 
-        /* it('with not existing id', (done) => {
-
-        }); */
+        it('with not existing id', (done) => {
+            request(app)
+                .post(`${API_URL_PREFIX_USER}/update/9999999`)
+                .send({name: 'name'})
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .end((err, res) => {
+                    const result = res.body.data;
+                    expect(result).to.be.empty;
+                    expect(res.status).to.equal(200);
+                    done();
+                });
+        });
     });
 
     describe('Get', () => {
-        /* it('users', (done) => {
+        it('users', (done) => {
+            request(app)
+                .get(`${API_URL_PREFIX_USER}/get?limit=3&skip=0`)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .end((err, res) => {
+                    const result = res.body.data;
+                    expect(result.length).to.equal(3);
 
+                    const userReturningFields = USER_RETURNING_FIELDS.split(', ')
+                        .map(translatePostgresqlNameToNode);
+
+                    const userData = result[0];
+                    expect(checkNecessaryFields(userReturningFields, userData)).to.be.true;
+                    done();
+                });
         });
 
-        it('user by id', (done) => {
+        it('should contains limit params', (done) => {
+            request(app)
+                .get(`${API_URL_PREFIX_USER}/get`)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .expect(400, done);
+        });
+
+        it('order params by default ASC', (done) => {
+            request(app)
+                .get(`${API_URL_PREFIX_USER}/get?limit=100&skip=0`)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .end((err, res) => {
+                    const result = res.body.data;
+                    result.every((user: IUserModel, i: number) => {
+                        if (i === 0) {
+                            return true;
+                        }
+                        return Number(user.id) > Number(result[i - 1].id);
+                    });
+                    expect(res.status).to.equal(200);
+                    done();
+                });
+        });
+
+        it('order params DESC', (done) => {
+            request(app)
+                .get(`${API_URL_PREFIX_USER}/get?limit=100&skip=0&order=desc`)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .end((err, res) => {
+                    const result = res.body.data;
+                    result.every((user: IUserModel, i: number) => {
+                        if (i === 0) {
+                            return true;
+                        }
+                        return Number(user.id) < Number(result[i - 1].id);
+                    });
+                    expect(res.status).to.equal(200);
+                    done();
+                });
+        });
+
+        /* it('user by id', (done) => {
 
         });
 

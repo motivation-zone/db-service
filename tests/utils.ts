@@ -1,3 +1,14 @@
+interface IExpectFields {
+    json: [string, RegExp];
+}
+export const EXPECT_FIELDS: IExpectFields = {
+    json: ['Content-Type', /json/]
+};
+
+export const REQUEST_HEADERS = {
+    standart: {'Accept': 'application/json'}
+};
+
 export const generateString = (size: number) => {
     let text = '';
     const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
