@@ -7,8 +7,10 @@ import {checkAssertion, REQUEST_HEADERS, EXPECT_FIELDS} from '../../utils';
 import {USER_RETURNING_FIELDS} from '../../../src/query-creators/user';
 import {translatePostgresqlNameToNode} from '../../../src/utils/db/helper';
 import {checkNecessaryFields} from '../../../src/utils/utils';
-import {API_URL_PREFIX_USER} from '../../../src/urls';
+import {API_URLS} from '../../../src/urls';
 import {generateUser} from './utils';
+
+const urls = API_URLS.user;
 
 const changeFieldValue = (value: any) => {
     if (value instanceof Date) {
@@ -35,7 +37,7 @@ describe('USER:', function () {
     describe('Create', () => {
         it('simple', (done) => {
             request(app)
-                .post(`${API_URL_PREFIX_USER}/create`)
+                .post(`${urls.prefix}${urls.create}`)
                 .send(reqUser)
                 .set(REQUEST_HEADERS.standart)
                 .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
@@ -70,7 +72,7 @@ describe('USER:', function () {
             user.countryId = 9999999;
 
             request(app)
-                .post(`${API_URL_PREFIX_USER}/create`)
+                .post(`${urls.prefix}${urls.create}`)
                 .send(user)
                 .set(REQUEST_HEADERS.standart)
                 .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
@@ -85,7 +87,7 @@ describe('USER:', function () {
             const user = generateUser();
             user.email = reqUser.email;
             request(app)
-                .post(`${API_URL_PREFIX_USER}/create`)
+                .post(`${urls.prefix}${urls.create}`)
                 .send(user)
                 .set(REQUEST_HEADERS.standart)
                 .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
@@ -101,7 +103,7 @@ describe('USER:', function () {
             user.login = reqUser.login;
 
             request(app)
-                .post(`${API_URL_PREFIX_USER}/create`)
+                .post(`${urls.prefix}${urls.create}`)
                 .send(user)
                 .set(REQUEST_HEADERS.standart)
                 .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
@@ -119,7 +121,7 @@ describe('USER:', function () {
 
                 return new Promise((resolve, reject) => {
                     request(app)
-                        .post(`${API_URL_PREFIX_USER}/create`)
+                        .post(`${urls.prefix}${urls.create}`)
                         .send(user)
                         .set(REQUEST_HEADERS.standart)
                         .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
@@ -149,7 +151,7 @@ describe('USER:', function () {
                 reqUser[field] = changeFieldValue(reqUser[field]);
                 return new Promise((resolve, reject) => {
                     request(app)
-                        .post(`${API_URL_PREFIX_USER}/update/${reqUser.id}`)
+                        .post(`${urls.prefix}${urls.updateById.replace(':id', String(reqUser.id))}`)
                         .send({[field]: reqUser[field]})
                         .set(REQUEST_HEADERS.standart)
                         .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
@@ -176,7 +178,7 @@ describe('USER:', function () {
                 const newValue = changeFieldValue(reqUser[field]);
                 return new Promise((resolve, reject) => {
                     request(app)
-                        .post(`${API_URL_PREFIX_USER}/update/${reqUser.id}`)
+                        .post(`${urls.prefix}${urls.updateById.replace(':id', String(reqUser.id))}`)
                         .send({
                             [field]: newValue,
                             // if send only not_updated_field => server remove it
@@ -208,7 +210,7 @@ describe('USER:', function () {
                 const newValue = changeFieldValue(reqUser[field]);
                 return new Promise((resolve, reject) => {
                     request(app)
-                        .post(`${API_URL_PREFIX_USER}/update/${reqUser.id}`)
+                        .post(`${urls.prefix}${urls.updateById.replace(':id', String(reqUser.id))}`)
                         .send({[field]: newValue})
                         .set(REQUEST_HEADERS.standart)
                         .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
@@ -221,7 +223,7 @@ describe('USER:', function () {
 
         it('with not existing id', (done) => {
             request(app)
-                .post(`${API_URL_PREFIX_USER}/update/9999999`)
+                .post(`${urls.prefix}${urls.updateById.replace(':id', '9999999')}`)
                 .send({name: 'name'})
                 .set(REQUEST_HEADERS.standart)
                 .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
@@ -237,7 +239,7 @@ describe('USER:', function () {
     describe('Get', () => {
         it('users', (done) => {
             request(app)
-                .get(`${API_URL_PREFIX_USER}/get?limit=3&skip=0`)
+                .get(`${urls.prefix}/${urls.get}?limit=3&skip=0`)
                 .set(REQUEST_HEADERS.standart)
                 .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                 .end((err, res) => {
@@ -255,7 +257,7 @@ describe('USER:', function () {
 
         it('should contains limit params', (done) => {
             request(app)
-                .get(`${API_URL_PREFIX_USER}/get`)
+                .get(`${urls.prefix}/${urls.get}`)
                 .set(REQUEST_HEADERS.standart)
                 .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                 .expect(400, done);
@@ -263,7 +265,7 @@ describe('USER:', function () {
 
         it('order params by default ASC', (done) => {
             request(app)
-                .get(`${API_URL_PREFIX_USER}/get?limit=100&skip=0`)
+                .get(`${urls.prefix}/${urls.get}?limit=100&skip=0`)
                 .set(REQUEST_HEADERS.standart)
                 .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                 .end((err, res) => {
@@ -281,7 +283,7 @@ describe('USER:', function () {
 
         it('order params DESC', (done) => {
             request(app)
-                .get(`${API_URL_PREFIX_USER}/get?limit=100&skip=0&order=desc`)
+                .get(`${urls.prefix}/${urls.get}?limit=100&skip=0&order=desc`)
                 .set(REQUEST_HEADERS.standart)
                 .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
                 .end((err, res) => {

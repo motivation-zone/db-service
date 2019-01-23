@@ -1,7 +1,8 @@
-import fillUser from './user';
+import {createUsers} from './user';
 
 (async () => {
     // TODO truncate all tables before filling
-    await fillUser();
+    
+    await createUsers(10);
     process.exit();
 })();

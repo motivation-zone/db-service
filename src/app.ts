@@ -6,13 +6,14 @@ import CountryController from './controllers/CountryController';
 import SportController from './controllers/SportController';
 import DifficultyLevelController from './controllers/DifficultyLevelController';
 import ExerciseController from './controllers/ExerciseController';
+import { API_URLS } from './urls';
 
 const app = express()
     .disable('x-powered-by')
     .use(bodyParser.urlencoded({extended: false}))
     .use(bodyParser.json())
     .get('/ping', (req, res) => res.end())
-    .use('/api/user/', UserController)
+    .use(API_URLS.user.prefix, UserController)
     .use('/api/country/', CountryController)
     .use('/api/sport/', SportController)
     .use('/api/difficulty-level/', DifficultyLevelController)

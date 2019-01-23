@@ -1,14 +1,17 @@
 import * as request from 'supertest';
 import app from '../../src/app';
-import {API_URL_PREFIX_USER} from '../../src/urls';
-import {generateUser} from '../func/user/utils';
 
-export default async () => {
-    for (let i = 0; i < 10; i++) {
+import {generateUser} from '../func/user/utils';
+import {API_URLS} from '../../src/urls';
+
+const userUrls = API_URLS.user;
+
+export const createUsers = async (count: number) => {
+    for (let i = 0; i < count; i++) {
         const user = generateUser();
         await new Promise((resolve, reject) => {
             request(app)
-                .post(`${API_URL_PREFIX_USER}/create`)
+                .post(`${userUrls.prefix}${userUrls.create}`)
                 .send(user)
                 .set('Accept', 'application/json')
                 .end((err, res) => {

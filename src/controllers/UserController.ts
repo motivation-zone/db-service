@@ -3,10 +3,12 @@ import UserModel, {REQUIRED_FIELDS} from '../models/UserModel';
 import UserService from '../services/UserService';
 import HttpResponse from '../utils/http/HttpResponse';
 import {stringToBoolean, checkNecessaryFields, checkGetLimitParameters} from '../utils/utils';
+import {API_URLS} from '../urls';
 
 const userController = express();
+const urls = API_URLS.user;
 
-userController.post('/create', async (req: express.Request, res: express.Response) => {
+userController.post(urls.create, async (req: express.Request, res: express.Response) => {
     const user = new UserModel(req.body);
     const isOk = checkNecessaryFields(REQUIRED_FIELDS, user);
 
@@ -22,7 +24,7 @@ userController.post('/create', async (req: express.Request, res: express.Respons
     }
 });
 
-userController.get('/get', async (req: express.Request, res: express.Response) => {
+userController.get(urls.get, async (req: express.Request, res: express.Response) => {
     const limitParameters = checkGetLimitParameters(req.query);
     if (!limitParameters) {
         return HttpResponse[400](res);
@@ -36,7 +38,7 @@ userController.get('/get', async (req: express.Request, res: express.Response) =
     }
 });
 
-userController.get('/get/id/:id', async (req: express.Request, res: express.Response) => {
+userController.get(urls.getById, async (req: express.Request, res: express.Response) => {
     const {id} = req.params;
 
     try {
@@ -47,7 +49,7 @@ userController.get('/get/id/:id', async (req: express.Request, res: express.Resp
     }
 });
 
-userController.get('/get/login/:login', async (req: express.Request, res: express.Response) => {
+userController.get(urls.getByLogin, async (req: express.Request, res: express.Response) => {
     const {login} = req.params;
     const {strict} = req.query;
 
@@ -59,7 +61,7 @@ userController.get('/get/login/:login', async (req: express.Request, res: expres
     }
 });
 
-userController.post('/update/:id', async (req: express.Request, res: express.Response) => {
+userController.post(urls.updateById, async (req: express.Request, res: express.Response) => {
     const {id} = req.params;
     const user = new UserModel(req.body);
     user.id = id;
@@ -72,7 +74,7 @@ userController.post('/update/:id', async (req: express.Request, res: express.Res
     }
 });
 
-userController.post('/check/password', async (req: express.Request, res: express.Response) => {
+userController.post(urls.checkPassword, async (req: express.Request, res: express.Response) => {
     const {login, password} = req.body;
 
     try {
@@ -83,7 +85,7 @@ userController.post('/check/password', async (req: express.Request, res: express
     }
 });
 
-userController.delete('/delete/:id', async (req: express.Request, res: express.Response) => {
+userController.delete(urls.deleteById, async (req: express.Request, res: express.Response) => {
     const {id} = req.params;
 
     try {
