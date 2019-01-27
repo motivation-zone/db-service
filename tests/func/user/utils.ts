@@ -1,11 +1,12 @@
 import {generateString} from '../../utils';
 import UserModel, {IUserModel} from '../../../src/models/UserModel';
+import {intervalRandom} from '../../../src/utils/utils';
 
 export const generateUser = (): IUserModel => {
     const gender = Math.random() > 0.5;
     const name = generateString(10);
     return new UserModel({
-        login: generateString(10),
+        login: `${generateString(intervalRandom(2, 5))}_${generateString(intervalRandom(2, 5))}`,
         name,
         password: generateString(10),
         email: `${name}@amail.ru`,

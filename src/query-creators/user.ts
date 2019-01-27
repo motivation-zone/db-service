@@ -20,7 +20,7 @@ export const updateUser = (fields: string[]) => updateQuery(
 );
 
 export const getUserById = () => {
-    return `SELECT * FROM users WHERE id = $1`;
+    return `SELECT ${USER_RETURNING_FIELDS} FROM users WHERE id = $1`;
 };
 
 export const checkUser = () => {

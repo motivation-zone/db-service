@@ -299,25 +299,99 @@ describe('USER:', function () {
                 });
         });
 
-        /* it('user by id', (done) => {
+        it('user by id', (done) => {
+            request(app)
+                .get(`${urls.prefix}/${urls.getById.replace(':id', String(reqUser.id))}`)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .end((err, res) => {
+                    const user = new UserModel(res.body.data[0]);
+                    user.countryId = Number(user.countryId);
+                    user.password = reqUser.password;
 
+                    expect(user).to.deep.equal(reqUser);
+                    expect(res.status).to.equal(200);
+                    done();
+                });
         });
 
-        it('user by login', (done) => {
+        it('user by login (strict)', (done) => {
+            request(app)
+                .get(`${urls.prefix}/${urls.getByLogin.replace(':login', String(reqUser.login))}`)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .end((err, res) => {
+                    const user = new UserModel(res.body.data[0]);
+                    user.countryId = Number(user.countryId);
+                    user.password = reqUser.password;
 
-        }); */
+                    expect(user).to.deep.equal(reqUser);
+                    expect(res.status).to.equal(200);
+                    done();
+                });
+        });
+
+        it('user by login (not strict)', (done) => {
+            request(app)
+                .get(
+                    `${urls.prefix}/${urls.getByLogin.replace(':login', '_')}?strict=false`
+                )
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .end((err, res) => {
+                    const result = res.body.data;
+                    expect(result.length > 0 && result.length <= 10).to.be.true;
+                    expect(res.status).to.equal(200);
+                    done();
+                });
+        });
     });
 
     describe('CHECK', () => {
-        /* it('password', (done) => {
+        it('password', (done) => {
+            request(app)
+                .post(`${urls.prefix}/${urls.checkPassword}`)
+                .send({login: reqUser.login, password: reqUser.password})
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .end((err, res) => {
+                    const result = res.body.data;
+                    expect(result.length === 1).to.be.true;
 
-        }); */
+                    expect(result[0].id).to.equal(reqUser.id);
+                    expect(res.status).to.equal(200);
+                    done();
+                });
+        });
     });
 
     describe('DELETE', () => {
-        /* it('by id', (done) => {
+        it('by id', (done) => {
+            request(app)
+                .delete(`${urls.prefix}/${urls.deleteById.replace(':id', String(reqUser.id))}`)
+                .set(REQUEST_HEADERS.standart)
+                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .end((err, res) => {
+                    const user = new UserModel(res.body.data[0]);
+                    user.countryId = Number(user.countryId);
+                    user.password = reqUser.password;
 
-        }); */
+                    expect(user).to.deep.equal(reqUser);
+                    expect(res.status).to.equal(200);
+
+                    request(app)
+                        .get(`${urls.prefix}/${urls.getById.replace(':id', String(reqUser.id))}`)
+                        .set(REQUEST_HEADERS.standart)
+                        .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                        .end((err, res) => {
+                            const result = res.body.data;
+
+                            expect(result.length === 0).to.be.true;
+                            expect(res.status).to.equal(200);
+                            done();
+                        });
+                });
+        });
     });
 });
 
