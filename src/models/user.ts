@@ -1,24 +1,35 @@
+import * as Boom from 'boom';
+import * as dateParser from 'date-and-time';
+import HttpResponse from '../utils/http/response';
+import HttpErrors from '../utils/http/errors';
+import {checkRequiredFields} from '../utils';
+
 export interface IUserModel {
     id?: number;
     login?: string;
     name?: string;
     password?: string;
     email?: string;
-    selfInfo?: string;
-    gender?: boolean;
-    countryId?: number;
     isAthlete?: boolean;
-    isBanned?: boolean;
+    gender?: boolean;
+    selfInfo?: string;
     weight?: number;
     growth?: number;
+    countryId?: number;
+    birthDate?: Date;
+    isBanned?: boolean;
     instagram?: string;
     phone?: string;
-    birthDate?: Date;
     registeredDate?: Date;
 }
 
-export const REQUIRED_FIELDS: (keyof IUserModel)[] = ['login', 'name', 'password', 'email', 'gender'];
-export const NOT_UPDATED_FIELDS: (keyof IUserModel)[] = ['id', 'login', 'registeredDate'];
+interface IOptions {
+    checkRequiredFields?: boolean;
+    clearNotUpdatedFields?: boolean;
+}
+
+const REQUIRED_FIELDS: (keyof IUserModel)[] = ['login', 'name', 'password', 'email', 'gender'];
+const NOT_UPDATED_FIELDS: (keyof IUserModel)[] = ['id', 'login', 'registeredDate'];
 
 export default class UserModel implements IUserModel {
     public id?: number;
@@ -26,19 +37,19 @@ export default class UserModel implements IUserModel {
     public name?: string;
     public password?: string;
     public email?: string;
+    public isAthlete?: boolean;
     public gender?: boolean;
     public selfInfo?: string;
-    public countryId?: number;
-    public isAthlete?: boolean;
-    public isBanned?: boolean;
     public weight?: number;
     public growth?: number;
+    public countryId?: number;
+    public birthDate?: Date;
+    public isBanned?: boolean;
     public instagram?: string;
     public phone?: string;
-    public birthDate?: Date;
     public registeredDate?: Date;
 
-    constructor(data: any) {
+    constructor(data: any, options: IOptions = {}) {
         const {
             id, login, name, password, email, selfInfo, gender,
             isAthlete, isBanned, weight, growth, birthDate,
@@ -61,6 +72,17 @@ export default class UserModel implements IUserModel {
         this.countryId = countryId;
         this.birthDate = UserModel.parseDate(birthDate);
         this.registeredDate = UserModel.parseDate(registeredDate);
+
+        if (options.clearNotUpdatedFields) {
+            NOT_UPDATED_FIELDS.forEach((field) => delete this[field]);
+        }
+
+        if (options.checkRequiredFields) {
+            const check = checkRequiredFields(REQUIRED_FIELDS, this);
+            if (!check) {
+                throw HttpResponse.error(Boom.badRequest, HttpErrors.MISSING_PARAMS);
+            }
+        }
     }
 
     static parseDate(date: Date | string): Date | undefined {
@@ -69,7 +91,7 @@ export default class UserModel implements IUserModel {
         }
 
         if (typeof date === 'string') {
-            return new Date(Date.parse(date));
+            return dateParser.parse(date, 'DD-MM-YYYY');
         }
     }
 };

@@ -1,6 +1,5 @@
-import {generateString} from '../../utils';
-import UserModel, {IUserModel} from '../../../src/models/UserModel';
-import {intervalRandom} from '../../../src/utils/utils';
+import {generateString, intervalRandom} from '../../utils';
+import UserModel, {IUserModel} from '../../../src/models/user';
 
 export const generateUser = (): IUserModel => {
     const gender = Math.random() > 0.5;
@@ -17,6 +16,6 @@ export const generateUser = (): IUserModel => {
         growth: 175,
         instagram: 'instagramnickname',
         phone: '7_123123123123',
-        birthDate: '1997-06-01'
+        birthDate: '01-06-1997'
     });
 };

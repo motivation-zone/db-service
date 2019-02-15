@@ -1,8 +1,20 @@
 import {createUsers} from './user';
+import {query} from '../../src/lib/db/client';
+
+const truncateAll = async () => {
+    await query({
+        text: [
+            'TRUNCATE TABLE users CASCADE',
+            'TRUNCATE TABLE user_sport CASCADE'
+        ].join(';'),
+        values: []
+    })
+};
 
 (async () => {
-    // TODO truncate all tables before filling
-    
-    await createUsers(20);
+    await truncateAll();
+
+    const users = await createUsers(20);
+
     process.exit();
 })();

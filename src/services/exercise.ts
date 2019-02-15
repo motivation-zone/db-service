@@ -15,7 +15,7 @@ import {
     deleteExercise as deleteExerciseQuery
 } from '../query-creators/exercise';
 import {translateNodeToPostgresqlName} from '../utils/db/helper';
-import {filterMapData} from '../utils/utils';
+import {filterMapData} from '../utils';
 
 interface IExercise {
     exerciseTemplateId: number;

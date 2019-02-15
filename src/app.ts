@@ -1,27 +1,50 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import logger from './lib/logger/logger';
-import UserController from './controllers/UserController';
-import CountryController from './controllers/CountryController';
-import SportController from './controllers/SportController';
-import DifficultyLevelController from './controllers/DifficultyLevelController';
-import ExerciseController from './controllers/ExerciseController';
-import { API_URLS } from './urls';
+
+import logger from './lib/logger';
+import notFoundMiddleware from './middleware/not-found';
+import errorMiddleware from './middleware/error';
+
+import controllers from './controllers';
+const {
+    CountryController,
+    DifficultyLevelController,
+    ExerciseController,
+    ProgramController,
+    SportController,
+    TrainingTypeController,
+    TrainingController,
+    UserController
+} = controllers;
+
+import {API_URLS} from './urls';
+
+const {
+    user,
+    country,
+    sport,
+    difficultyLevel,
+    exercise,
+    program,
+    trainingType,
+    training
+} = API_URLS;
 
 const app = express()
     .disable('x-powered-by')
     .use(bodyParser.urlencoded({extended: false}))
     .use(bodyParser.json())
     .get('/ping', (req, res) => res.end())
-    .use(API_URLS.user.prefix, UserController)
-    .use('/api/country/', CountryController)
-    .use('/api/sport/', SportController)
-    .use('/api/difficulty-level/', DifficultyLevelController)
-    .use('/api/exercise', ExerciseController)
-    .use((req, res, next) => res.status(404).json({error: 'endpoint not found'}))
-    .use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-        res.status(500).send('Server error');
-    });
+    .use(user.prefix, UserController)
+    .use(country.prefix, CountryController)
+    .use(sport.prefix, SportController)
+    .use(difficultyLevel.prefix, DifficultyLevelController)
+    .use(exercise.prefix, ExerciseController)
+    .use(program.prefix, ProgramController)
+    .use(trainingType.prefix, TrainingTypeController)
+    .use(training.prefix, TrainingController)
+    .use(notFoundMiddleware)
+    .use(errorMiddleware);
 
 if (!module.parent) {
     const envPort = Number(process.env.NODEJS_PORT);

@@ -7,8 +7,14 @@ import {
 import {query} from '../lib/db/client';
 import {prepareDBResult, IGetLimit} from './base';
 
-type SportUserActionTypes = 'delete' | 'add';
-export const SPORT_USER_ACTION_TYPES: SportUserActionTypes[] = ['delete', 'add'];
+enum SportUserActionType {
+    DELETE = 'delete',
+    ADD = 'add'
+}
+export const SPORT_USER_ACTION_TYPES: SportUserActionType[] = [
+    SportUserActionType.DELETE,
+    SportUserActionType.ADD
+];
 
 export default class SportService {
     static async getSports() {
@@ -29,8 +35,8 @@ export default class SportService {
         return prepareDBResult(result);
     }
 
-    static async updateUser(type: SportUserActionTypes, userId: number, sportId: number) {
-        const text = type === 'delete' ? deleteUserQuery() : addUserQuery();
+    static async updateUser(actionType: SportUserActionType, userId: number, sportId: number) {
+        const text = actionType === SportUserActionType.DELETE ? deleteUserQuery() : addUserQuery();
         const result = await query({
             text,
             values: [userId, sportId]

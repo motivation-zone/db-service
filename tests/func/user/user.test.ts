@@ -1,12 +1,12 @@
-import * as request from 'supertest';
+/* import * as request from 'supertest';
 import {expect, assert} from 'chai';
-import app from '../../../src/app';
 
-import UserModel, {REQUIRED_FIELDS, NOT_UPDATED_FIELDS, IUserModel} from '../../../src/models/UserModel';
+import app from '../../../src/app';
+import UserModel, {IUserModel} from '../../../src/models/user';
 import {checkAssertion, REQUEST_HEADERS, EXPECT_FIELDS} from '../../utils';
 import {USER_RETURNING_FIELDS} from '../../../src/query-creators/user';
 import {translatePostgresqlNameToNode} from '../../../src/utils/db/helper';
-import {checkNecessaryFields} from '../../../src/utils/utils';
+import {checkRequiredFields} from '../../../src/utils';
 import {API_URLS} from '../../../src/urls';
 import {generateUser} from './utils';
 
@@ -30,7 +30,7 @@ const changeFieldValue = (value: any) => {
     }
 };
 
-describe('USER:', function () {
+describe('User:', function () {
     this.timeout(5000);
     const reqUser = generateUser();
 
@@ -250,7 +250,7 @@ describe('USER:', function () {
                         .map(translatePostgresqlNameToNode);
 
                     const userData = result[0];
-                    expect(checkNecessaryFields(userReturningFields, userData)).to.be.true;
+                    expect(checkRequiredFields(userReturningFields, userData)).to.be.true;
                     done();
                 });
         });
@@ -396,3 +396,4 @@ describe('USER:', function () {
 });
 
 
+ */

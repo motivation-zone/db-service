@@ -1,16 +1,17 @@
 import * as pg from 'pg';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
-import logger from '../logger/logger';
+
+import logger from '../logger';
 import {getAbsolutePath} from '../../utils/fs';
-import DBError from '../../utils/db/DBError';
+import DBError from '../../utils/db/db-error';
 
 interface IQuery {
     text: string;
     values: any[];
 }
 
-const dbErrorHandler = (err: Error, client: pg.PoolClient) => {
+const dbErrorHandler = (err: Error, _client: pg.PoolClient) => {
     logger('error', 'db', err.stack || '');
 }
 

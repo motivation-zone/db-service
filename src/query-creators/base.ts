@@ -1,4 +1,7 @@
-export type OrderType = 'DESC' | 'ASC';
+export enum OrderType {
+    DESC = 'DESC',
+    ASC = 'ASC'
+}
 
 export const updateQuery = (fields: string[], tableName: string, returning: string = '*') => {
     if (fields.length > 1) {

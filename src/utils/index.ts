@@ -1,5 +1,9 @@
+import * as Boom from 'boom';
+
 import {IGetLimit} from '../services/base';
 import {OrderType} from '../query-creators/base';
+import HttpErrors from './http/errors';
+import HttpResponse from './http/response';
 
 export const stringToBoolean = (value: string): boolean | undefined => {
     if (typeof value === 'undefined') {
@@ -9,7 +13,7 @@ export const stringToBoolean = (value: string): boolean | undefined => {
     return value === 'true' ? true : value === 'false' ? false : undefined;
 };
 
-export const checkNecessaryFields = (fields: string[], obj: any): boolean => {
+export const checkRequiredFields = (fields: string[], obj: any): boolean => {
     return fields.every((field) => {
         if (typeof obj[field] === 'boolean') {
             return true;
@@ -19,18 +23,17 @@ export const checkNecessaryFields = (fields: string[], obj: any): boolean => {
     });
 }
 
-export const checkGetLimitParameters = (data: any): IGetLimit | undefined => {
-    const { limit, skip, order } = data;
-    const orderTypes: OrderType[] = ['DESC', 'ASC'];
-
-    if (!limit || !skip || order && !orderTypes.includes(order.toUpperCase())) {
-        return;
+export const checkGetLimitParameters = (data: any): IGetLimit => {
+    const {limit, skip, order} = data;
+    if (!limit || !skip ||
+        order && ![OrderType.DESC, OrderType.ASC].includes(order.toUpperCase())) {
+            throw HttpResponse.error(Boom.badRequest, HttpErrors.MISSING_LIMIT_PARAMS);
     }
 
-    return { limit, skip, order };
+    return {limit, skip, order};
 }
 
-export const getNotEmptyFields = (obj: any, notUpdateFields: any[] = []) => {
+export const getNotEmptyFields = (obj: any, notUpdateFields: string[] = []) => {
     return Object.keys(obj).filter((field) => {
         return !notUpdateFields.includes(field);
     }).filter((field) => {
@@ -49,10 +52,4 @@ export const filterMapData = (nameFields: string[], valueFields: any[]) => {
             value: valueFields[i]
         };
     }).filter((el) => el.value);
-};
-
-export const intervalRandom = (min: number, max: number): number => {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
 };

@@ -1,4 +1,4 @@
-import UserModel, {NOT_UPDATED_FIELDS} from '../models/UserModel';
+import UserModel from '../models/user';
 import {
     createUser as createUserQuery,
     getUserByLogin as getUserByLoginQuery,
@@ -11,7 +11,7 @@ import {
 import {query} from '../lib/db/client';
 import {translateNodeToPostgresqlName} from '../utils/db/helper';
 import {prepareDBResult, IGetLimit} from './base';
-import {getNotEmptyFields} from '../utils/utils';
+import {getNotEmptyFields} from '../utils';
 
 export default class UserService {
     static async createUser(user: UserModel) {
@@ -30,7 +30,7 @@ export default class UserService {
     }
 
     static async updateUser(user: UserModel) {
-        const fields = getNotEmptyFields(user, NOT_UPDATED_FIELDS) as (keyof UserModel)[];
+        const fields = getNotEmptyFields(user) as (keyof UserModel)[];
         const result = await query({
             text: updateUserQuery(fields.map(translateNodeToPostgresqlName)),
             values: [
