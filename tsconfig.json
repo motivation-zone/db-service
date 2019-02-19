@@ -1,36 +1,34 @@
 {
     "compilerOptions": {
-        "target": "es2015",
+        "target": "es2017",
+        "moduleResolution": "node",
         "lib": ["es2017", "dom"],
         "outDir": "./build",
         "module": "commonjs",
-        "baseUrl": ".",
 
         "strict": true,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "sourceMap": true,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "noImplicitThis": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
         "strictNullChecks": true,
 
+        "baseUrl": ".",
         "paths": {
             "*": [
-                "../../node_modules/@types/*",
+                "./node_modules/@types/*",
                 "./@types/*"
             ]
         },
+
         "types": [
             "node",
             "chai",
             "mocha",
-            "supertest"
+            "supertest",
+            "express"
         ],
         "typeRoots": [
-            "node_modules/@types"
+            "./node_modules/@types"
         ]
     },
     "include": [
@@ -38,8 +36,5 @@
         "configs/**/*",
         "@types/**/*",
         "tests/**/*"
-    ],
-    "files": [
-        "./@types/express.d.ts"
     ]
 }

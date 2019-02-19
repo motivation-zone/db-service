@@ -1,4 +1,4 @@
-import * as request from 'supertest';
+/* import * as request from 'supertest';
 import {expect, assert} from 'chai';
 import app from '../../../src/app';
 
@@ -13,7 +13,7 @@ describe('Sport:', function () {
     describe('Get', () => {
         it('all sports', (done) => {
             done();
-            /* request(app)
+            request(app)
                 .post(`${urls.prefix}${urls.create}`)
                 .send(user)
                 .set(REQUEST_HEADERS.standart)
@@ -22,7 +22,7 @@ describe('Sport:', function () {
                     const msg = res.body.message;
                     expect(msg.indexOf('users_country_id_fkey')).to.not.equal(-1);
                 })
-                .expect(409, done); */
+                .expect(409, done);
         });
 
         it('get users by sports', (done) => {
@@ -39,4 +39,4 @@ describe('Sport:', function () {
             done();
         });
     });
-})
+}) */

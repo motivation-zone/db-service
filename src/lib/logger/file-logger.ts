@@ -1,13 +1,13 @@
-import * as winston from 'winston';
+import winston, {format} from 'winston';
 import {getAbsolutePath} from '../../utils/fs';
 
-const {combine, timestamp, splat} = winston.format;
+const {combine, timestamp, splat} = format;
 
 /**
  * File writing logger
  */
 const createLogger = (): winston.Logger => {
-    const logFormat = winston.format.printf((info) => {
+    const logFormat = format.printf((info) => {
         return `${info.timestamp} [${info.level}] ${info.message}`;
     });
 
@@ -31,7 +31,7 @@ export interface ILogger {
     info: (msg: string) => void
 }
 
-class Logger implements ILogger {
+class FileLogger implements ILogger {
     private _logger: winston.Logger;
 
     constructor() {
@@ -47,4 +47,4 @@ class Logger implements ILogger {
     }
 }
 
-export default new Logger();
+export default new FileLogger();

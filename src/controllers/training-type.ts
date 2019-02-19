@@ -1,4 +1,4 @@
-import * as express from 'express';
+import express from 'express';
 
 import TrainingTypeService from '../services/training-type';
 import HttpResponse from '../utils/http/response';

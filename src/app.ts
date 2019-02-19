@@ -1,4 +1,4 @@
-import * as express from 'express';
+import express, {Request, Response} from 'express';
 import * as bodyParser from 'body-parser';
 
 import logger from './lib/logger';
@@ -34,7 +34,7 @@ const app = express()
     .disable('x-powered-by')
     .use(bodyParser.urlencoded({extended: false}))
     .use(bodyParser.json())
-    .get('/ping', (_req, res) => res.end())
+    .get('/ping', (_req: Request, res: Response) => res.end())
     .use(user.prefix, UserController)
     .use(country.prefix, CountryController)
     .use(sport.prefix, SportController)

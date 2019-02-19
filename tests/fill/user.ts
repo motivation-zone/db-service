@@ -1,4 +1,4 @@
-import * as request from 'supertest';
+import request from 'supertest';
 import app from '../../src/app';
 
 import UserModel, {IUserModel} from '../../src/models/user';
@@ -15,7 +15,7 @@ export const createUsers = async (count: number): Promise<IUserModel[]> => {
                 .post(`${userUrls.prefix}${userUrls.create}`)
                 .send(user)
                 .set('Accept', 'application/json')
-                .end((err, res) => {
+                .end((err: Error, res: request.Response) => {
                     if (err || res.status !== 200) {
                         return reject(err || res.body);
                     }

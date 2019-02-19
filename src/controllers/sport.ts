@@ -1,5 +1,5 @@
-import * as express from 'express';
-import * as Boom from 'boom';
+import express from 'express';
+import Boom from 'boom';
 
 import SportService, {SPORT_USER_ACTION_TYPES} from '../services/sport';
 import HttpResponse from '../utils/http/response';
