@@ -1,5 +1,5 @@
 import * as Boom from 'boom';
-import * as dateParser from 'date-and-time';
+
 import HttpResponse from '../utils/http/response';
 import HttpErrors from '../utils/http/errors';
 import {checkRequiredFields} from '../utils';
@@ -85,13 +85,17 @@ export default class UserModel implements IUserModel {
         }
     }
 
-    static parseDate(date: Date | string): Date | undefined {
+    static parseDate(date: Date | string | undefined): Date | undefined {
+        if (!date) {
+            return;
+        }
+
         if (date instanceof Date) {
             return date;
         }
 
         if (typeof date === 'string') {
-            return dateParser.parse(date, 'DD-MM-YYYY');
+            return new Date(Date.parse(date));
         }
     }
 };

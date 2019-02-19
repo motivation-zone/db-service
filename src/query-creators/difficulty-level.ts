@@ -1,3 +1,1 @@
-export const getDifficultyLevels = () => {
-    return `SELECT * FROM difficulty_level`;
-};
+export const getDifficultyLevels = () => 'SELECT * FROM difficulty_level';

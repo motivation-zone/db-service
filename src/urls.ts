@@ -33,7 +33,7 @@ export const API_URLS = {
             create: '/template/create',
             get: '/template/:templateId/get',
             delete: '/template/:templateId/delete',
-            update: '/template/:templateId/update',
+            update: '/template/:templateId/update'
         },
         getMany: '/many/:userId/get',
         get: '/:exerciseId/get',

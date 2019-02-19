@@ -1,3 +1,1 @@
-export const getTrainingTypes = () => {
-    return `SELECT * FROM training_type`;
-};
+export const getTrainingTypes = () => 'SELECT * FROM training_type';

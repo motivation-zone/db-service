@@ -6,7 +6,6 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "boom": "^7.3.0",
-    "date-and-time": "^0.6.3",
     "debug": "4.0.1",
     "express": "4.16.3",
     "got": "8.3.0",
@@ -30,8 +29,11 @@
     "mocha": "^5.2.0",
     "supertest": "^3.3.0",
     "supervisor": "0.12.0",
-    "tslint": "5.9.1",
-    "tslint-config-loris": "4.0.0",
-    "typescript": "2.9.1"
+    "tslint": "^5.12.1",
+    "tslint-consistent-codestyle": "^1.15.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-sonarts": "^1.9.0",
+    "typescript": "^3.3.3",
+    "typescript-tslint-plugin": "^0.3.1"
   }
 }

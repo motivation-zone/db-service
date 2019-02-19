@@ -6,15 +6,16 @@ export const EXPECT_FIELDS: IExpectFields = {
 };
 
 export const REQUEST_HEADERS = {
-    standart: {'Accept': 'application/json'}
+    standart: {Accept: 'application/json'}
 };
 
 export const generateString = (size: number) => {
     let text = '';
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-    for (let i = 0; i < size; i++)
+    for (let i = 0; i < size; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
 
     return text;
 };
@@ -25,7 +26,7 @@ export const checkAssertion = (a: any, b: any, strict = false): boolean => {
         b = String(a);
     }
 
-    return strict ? a === b : a == b;
+    return strict ? a === b : a == b; // tslint:disable-line
 };
 
 export const intervalRandom = (min: number, max: number): number => {

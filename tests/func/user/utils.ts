@@ -14,7 +14,7 @@ export const generateUser = (): IUserModel => {
         countryId: 183,
         weight: 74.5,
         growth: 175,
-        instagram: 'instagramnickname',
+        instagram: `instagramnickname${name}`,
         phone: '7_123123123123',
         birthDate: '01-06-1997'
     });
