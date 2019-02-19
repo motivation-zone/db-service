@@ -1,5 +1,4 @@
-import * as express from 'express';
-import {Request, Response} from 'express';
+import express, {Request, Response} from 'express';
 import * as Boom from 'boom';
 
 import ExerciseService from '../services/exercise';

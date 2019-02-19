@@ -5,7 +5,7 @@ import {query} from '../lib/db/client';
 import {prepareDBResult} from './base';
 
 export default class DifficultyLevelService {
-    static async getDifficultyLevels() {
+    static async getDifficultyLevels(): Promise<any[]> {
         const result = await query({
             text: getDifficultyLevelsQuery(),
             values: []
@@ -13,4 +13,4 @@ export default class DifficultyLevelService {
 
         return prepareDBResult(result);
     }
-};
+}

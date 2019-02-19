@@ -14,7 +14,7 @@ import {prepareDBResult, IGetLimit} from './base';
 import {getNotEmptyFields} from '../utils';
 
 export default class UserService {
-    static async createUser(user: UserModel) {
+    static async createUser(user: UserModel): Promise<any[]> {
         const values = [
             user.login, user.name, user.password, user.email,
             user.selfInfo, user.gender, user.weight, user.growth,
@@ -29,7 +29,7 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async updateUser(user: UserModel) {
+    static async updateUser(user: UserModel): Promise<any[]> {
         const fields = getNotEmptyFields(user) as (keyof UserModel)[];
         const result = await query({
             text: updateUserQuery(fields.map(translateNodeToPostgresqlName)),
@@ -42,7 +42,7 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async getUserById(id: number) {
+    static async getUserById(id: number): Promise<any[]> {
         const result = await query({
             text: getUserByIdQuery(),
             values: [id]
@@ -51,7 +51,7 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async getUserByLogin(login: string, strict?: boolean) {
+    static async getUserByLogin(login: string, strict = false): Promise<any[]> {
         const result = await query({
             text: getUserByLoginQuery(strict),
             values: [login]
@@ -60,7 +60,7 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async getUsers(data: IGetLimit) {
+    static async getUsers(data: IGetLimit): Promise<any[]> {
         const result = await query({
             text: getUsersQuery(data.order),
             values: [data.limit, data.skip]
@@ -69,7 +69,7 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async deleteUser(id: number) {
+    static async deleteUser(id: number): Promise<any[]> {
         const result = await query({
             text: deleteUserQuery(),
             values: [id]
@@ -78,7 +78,7 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async checkUserPassword(login: string, password: string) {
+    static async checkUserPassword(login: string, password: string): Promise<any[]> {
         const result = await query({
             text: checkUserQuery(),
             values: [login, password]
@@ -86,4 +86,4 @@ export default class UserService {
 
         return prepareDBResult(result);
     }
-};
+}

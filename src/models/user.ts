@@ -98,4 +98,4 @@ export default class UserModel implements IUserModel {
             return new Date(Date.parse(date));
         }
     }
-};
+}

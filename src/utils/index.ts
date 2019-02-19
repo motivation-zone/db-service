@@ -21,17 +21,16 @@ export const checkRequiredFields = (fields: string[], obj: any): boolean => {
 
         return Boolean(obj[field]);
     });
-}
+};
 
 export const checkGetLimitParameters = (data: any): IGetLimit => {
     const {limit, skip, order} = data;
-    if (!limit || !skip ||
-        order && ![OrderType.DESC, OrderType.ASC].includes(order.toUpperCase())) {
-            throw HttpResponse.error(Boom.badRequest, HttpErrors.MISSING_LIMIT_PARAMS);
+    if (!limit || !skip || order && ![OrderType.DESC, OrderType.ASC].includes(order.toUpperCase())) {
+        throw HttpResponse.error(Boom.badRequest, HttpErrors.MISSING_LIMIT_PARAMS);
     }
 
     return {limit, skip, order};
-}
+};
 
 export const getNotEmptyFields = (obj: any, notUpdateFields: string[] = []) => {
     return Object.keys(obj).filter((field) => {

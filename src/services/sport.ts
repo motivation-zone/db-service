@@ -11,13 +11,14 @@ enum SportUserActionType {
     DELETE = 'delete',
     ADD = 'add'
 }
+
 export const SPORT_USER_ACTION_TYPES: SportUserActionType[] = [
     SportUserActionType.DELETE,
     SportUserActionType.ADD
 ];
 
 export default class SportService {
-    static async getSports() {
+    static async getSports(): Promise<any[]> {
         const result = await query({
             text: getSportsQuery(),
             values: []
@@ -26,7 +27,7 @@ export default class SportService {
         return prepareDBResult(result);
     }
 
-    static async getUsers(data: IGetLimit, id: number) {
+    static async getUsers(data: IGetLimit, id: number): Promise<any[]> {
         const result = await query({
             text: getUsersQuery(data.order),
             values: [data.limit, data.skip, id]
@@ -35,7 +36,7 @@ export default class SportService {
         return prepareDBResult(result);
     }
 
-    static async updateUser(actionType: SportUserActionType, userId: number, sportId: number) {
+    static async updateUser(actionType: SportUserActionType, userId: number, sportId: number): Promise<any[]> {
         const text = actionType === SportUserActionType.DELETE ? deleteUserQuery() : addUserQuery();
         const result = await query({
             text,
@@ -44,4 +45,4 @@ export default class SportService {
 
         return prepareDBResult(result);
     }
-};
+}

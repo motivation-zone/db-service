@@ -3,7 +3,7 @@ import {query} from '../lib/db/client';
 import {prepareDBResult} from './base';
 
 export default class TrainingService {
-    static async smth() {
+    static async smth(): Promise<any[]> {
         const result = await query({
             text: '',
             values: []
@@ -11,4 +11,4 @@ export default class TrainingService {
 
         return prepareDBResult(result);
     }
-};
+}

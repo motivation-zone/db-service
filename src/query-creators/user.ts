@@ -25,12 +25,11 @@ export const updateUser = (fields: string[]) => updateQuery(
 export const getUserById = () => `SELECT ${USER_RETURNING_FIELDS} FROM users WHERE id = $1`;
 export const checkUser = () => 'SELECT id FROM users WHERE login = $1 AND password = $2';
 
-export const getUserByLogin = (strict: boolean = true) => {
+export const getUserByLogin = (strict = true) => {
     if (strict) {
         return `SELECT ${USER_RETURNING_FIELDS} FROM users WHERE login = $1`;
-    } else {
-        return `SELECT ${USER_RETURNING_FIELDS} FROM users WHERE login LIKE '%' || $1 || '%' LIMIT 10`;
     }
+    return `SELECT ${USER_RETURNING_FIELDS} FROM users WHERE login LIKE '%' || $1 || '%' LIMIT 10`;
 };
 
 export const getUsers = (order: OrderType = OrderType.ASC) => {

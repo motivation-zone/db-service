@@ -8,13 +8,13 @@ const truncateAll = async () => {
             'TRUNCATE TABLE user_sport CASCADE'
         ].join(';'),
         values: []
-    })
+    });
 };
 
 (async () => {
     await truncateAll();
 
-    const users = await createUsers(20);
+    const users = await createUsers(20); // tslint:disable-line
 
     process.exit();
 })();

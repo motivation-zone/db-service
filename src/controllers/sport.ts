@@ -10,7 +10,7 @@ import HttpErrors from '../utils/http/errors';
 const sportController = express();
 const urls = API_URLS.sport;
 
-sportController.get(urls.get, async (req: express.Request, res: express.Response) => {
+sportController.get(urls.get, async (_req: express.Request, res: express.Response) => {
     const result = await SportService.getSports();
     HttpResponse.ok(res, result);
 });

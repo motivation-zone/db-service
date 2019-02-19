@@ -31,7 +31,7 @@ interface IExerciseTemplate {
 }
 
 export default class ExerciseService {
-    static async createExerciseTemplate(params: IExerciseTemplate) {
+    static async createExerciseTemplate(params: IExerciseTemplate): Promise<any[]> {
         const {title, description, userId, sportId} = params;
         const result = await query({
             text: createExerciseTemplateQuery(),
@@ -41,7 +41,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async updateExerciseTemplate(templateId: number, fields: string[], obj: any) {
+    static async updateExerciseTemplate(templateId: number, fields: string[], obj: any): Promise<any[]> {
         const result = await query({
             text: updateExerciseTemplateQuery(fields.map(translateNodeToPostgresqlName)),
             values: [
@@ -53,7 +53,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async getUserExerciseTemplates(limitParams: IGetLimit, userId: number, sportId?: number) {
+    static async getUserExerciseTemplates(limitParams: IGetLimit, userId: number, sportId?: number): Promise<any[]> {
         const result = await query({
             text: sportId ?
                 getUserExerciseTemplatesBySportQuery(limitParams.order) :
@@ -66,7 +66,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async getExerciseTemplate(templateId: number) {
+    static async getExerciseTemplate(templateId: number): Promise<any[]> {
         const result = await query({
             text: getExerciseTemplateByIdQuery(),
             values: [templateId]
@@ -75,7 +75,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async deleteExerciseTemplate(templateId: number) {
+    static async deleteExerciseTemplate(templateId: number): Promise<any[]> {
         const result = await query({
             text: deleteExerciseTemplateQuery(),
             values: [templateId]
@@ -84,7 +84,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async createExercise(params: IExercise) {
+    static async createExercise(params: IExercise): Promise<any[]> {
         const {duration, reps, exerciseTemplateId} = params;
         const fields = filterMapData(['duration', 'reps'], [duration, reps]);
 
@@ -96,7 +96,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async updateExercise(exerciseId: number, fields: string[], obj: any) {
+    static async updateExercise(exerciseId: number, fields: string[], obj: any): Promise<any[]> {
         const result = await query({
             text: updateExerciseQuery(fields.map(translateNodeToPostgresqlName)),
             values: [
@@ -108,7 +108,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async getExerciseById(exerciseId: number) {
+    static async getExerciseById(exerciseId: number): Promise<any[]> {
         const result = await query({
             text: getExerciseByIdQuery(),
             values: [exerciseId]
@@ -117,7 +117,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async getUserExercises(limitParams: IGetLimit, userId: number, sportId?: number) {
+    static async getUserExercises(limitParams: IGetLimit, userId: number, sportId?: number): Promise<any[]> {
         const result = await query({
             text: sportId ?
                 getUserExercisesBySportQuery(limitParams.order) :
@@ -130,7 +130,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async deleteExercise(exerciseId: number) {
+    static async deleteExercise(exerciseId: number): Promise<any[]> {
         const result = await query({
             text: deleteExerciseQuery(),
             values: [exerciseId]
@@ -138,4 +138,4 @@ export default class ExerciseService {
 
         return prepareDBResult(result);
     }
-};
+}

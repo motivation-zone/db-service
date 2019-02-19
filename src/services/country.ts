@@ -7,7 +7,7 @@ import {query} from '../lib/db/client';
 import {prepareDBResult, IGetLimit} from './base';
 
 export default class CountryService {
-    static async getCountries() {
+    static async getCountries(): Promise<any[]> {
         const result = await query({
             text: getCountriesQuery(),
             values: []
@@ -15,7 +15,7 @@ export default class CountryService {
         return prepareDBResult(result);
     }
 
-    static async getUsers(data: IGetLimit, id?: number) {
+    static async getUsers(data: IGetLimit, id?: number): Promise<any[]> {
         const result = await query({
             text: id ? getUsersQuery(data.order) : getUsersWithoutCountryQuery(data.order),
             values: [data.limit, data.skip].concat(id ? [id] : [])
@@ -23,4 +23,4 @@ export default class CountryService {
 
         return prepareDBResult(result);
     }
-};
+}
