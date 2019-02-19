@@ -26,9 +26,13 @@ clean:
 	rm -rf $(OUT_DIR)
 
 # Linting
+.PHONY: lint.staged
+lint.staged:
+	node_modules/.bin/lint-staged -c .lintstagedrc.json
+
 .PHONY: lint
 lint:
-	node_modules/.bin/tslint -p tsconfig.json **/*.ts
+	node_modules/.bin/tslint -p tsconfig.json src/**/*.ts tests/**/*.ts
 
 # Run the application in development mode
 .PHONY: dev
