@@ -1,8 +1,8 @@
-import * as Boom from 'boom';
+import Boom from 'boom';
+import * as yup from 'yup';
 
 import HttpResponse from '../utils/http/response';
 import HttpErrors from '../utils/http/errors';
-import {checkRequiredFields} from '../utils';
 
 export interface IUserModel {
     id?: number;
@@ -23,12 +23,30 @@ export interface IUserModel {
     registeredDate?: Date;
 }
 
-interface IOptions {
-    checkRequiredFields?: boolean;
-    clearNotUpdatedFields?: boolean;
-}
+// Ex: +7(987)713-55-32
+const phoneRegexp = /^\+[0-9]{1,4}\([0-9]{3}\)[0-9]{3}\-[0-9]{2}\-[0-9]{2}$/;
+const VALIDATION_SCHEMES = {
+    create: {
+        login: yup.string().required(),
+        name: yup.string().required(),
+        password: yup.string().required(),
+        email: yup.string().email().required(),
+        gender: yup.boolean().required(),
+        isAthlete: yup.boolean().notRequired(),
+        selfInfo: yup.string().notRequired(),
+        weight: yup.number().positive().notRequired(),
+        growth: yup.number().positive().notRequired(),
+        countryId: yup.number().positive().integer().notRequired(),
+        birthDate: yup.date().notRequired(),
+        isBanned: yup.boolean().notRequired(),
+        instagram: yup.string().notRequired(),
+        phone: yup.string().matches(phoneRegexp, HttpErrors.INVALID_PHONE_NUMBER).notRequired(),
+        registeredDate: yup.date().notRequired()
+    },
+    update: {},
+    get: {}
+};
 
-const REQUIRED_FIELDS: (keyof IUserModel)[] = ['login', 'name', 'password', 'email', 'gender'];
 const NOT_UPDATED_FIELDS: (keyof IUserModel)[] = ['id', 'login', 'registeredDate'];
 
 export default class UserModel implements IUserModel {
@@ -49,7 +67,7 @@ export default class UserModel implements IUserModel {
     public phone?: string;
     public registeredDate?: Date;
 
-    constructor(data: any, options: IOptions = {}) {
+    constructor(data: any) {
         const {
             id, login, name, password, email, selfInfo, gender,
             isAthlete, isBanned, weight, growth, birthDate,
@@ -72,16 +90,19 @@ export default class UserModel implements IUserModel {
         this.countryId = countryId;
         this.birthDate = UserModel.parseDate(birthDate);
         this.registeredDate = UserModel.parseDate(registeredDate);
+    }
 
-        if (options.clearNotUpdatedFields) {
-            NOT_UPDATED_FIELDS.forEach((field) => delete this[field]);
-        }
+    clearNotUpdatedFields(): void {
+        NOT_UPDATED_FIELDS.forEach((field) => delete this[field]);
+    }
 
-        if (options.checkRequiredFields) {
-            const check = checkRequiredFields(REQUIRED_FIELDS, this);
-            if (!check) {
-                throw HttpResponse.error(Boom.badRequest, HttpErrors.MISSING_PARAMS);
-            }
+    async validateForCreate(): Promise<void> {
+        const schema = yup.object().shape(VALIDATION_SCHEMES.create);
+        try {
+            await schema.validate(this);
+        } catch (e) {
+            // TODO change names from e.errors on HttpErrors.* types
+            throw HttpResponse.error(Boom.badRequest, e.errors.join(', '));
         }
     }
 

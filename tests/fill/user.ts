@@ -4,12 +4,14 @@ import app from '../../src/app';
 import UserModel, {IUserModel} from '../../src/models/user';
 import {generateUser} from '../func/user/utils';
 import {API_URLS} from '../../src/urls';
+import {getAllCountries} from './country';
 
 const userUrls = API_URLS.user;
 
 export const createUsers = async (count: number): Promise<IUserModel[]> => {
+    const countries = await getAllCountries();
     return await Promise.all((new Array(count).fill(true)).map(async () => {
-        const user = generateUser();
+        const user = generateUser([countries[0].id, countries[countries.length - 1].id]);
         return await new Promise((resolve, reject) => {
             request(app)
                 .post(`${userUrls.prefix}${userUrls.create}`)

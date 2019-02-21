@@ -1,10 +1,11 @@
 import * as pg from 'pg';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
+import Boom from 'boom';
 
 import logger from '../logger';
 import {getAbsolutePath} from '../../utils/fs';
-import DBError from '../../utils/db/db-error';
+import HttpResponse from '../../utils/http/response';
 
 interface IQuery {
     text: string;
@@ -41,7 +42,7 @@ export const query = async (queryData: IQuery) => {
         data = await client.query(queryData);
     } catch (e) {
         logger('error', 'db', e.message);
-        throw new DBError(e.detail, e.message);
+        HttpResponse.error(Boom.conflict, `${e.detail} ${e.message}`);
     } finally {
         if (client) {
             client.release();

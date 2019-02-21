@@ -13,8 +13,6 @@ const truncateAll = async () => {
 
 (async () => {
     await truncateAll();
-
     const users = await createUsers(20); // tslint:disable-line
-
     process.exit();
 })();

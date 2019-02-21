@@ -9,17 +9,6 @@ export const REQUEST_HEADERS = {
     standart: {Accept: 'application/json'}
 };
 
-export const generateString = (size: number) => {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (let i = 0; i < size; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-
-    return text;
-};
-
 export const checkAssertion = (a: any, b: any, strict = false): boolean => {
     if (a instanceof Date && b instanceof Date) {
         a = String(a);
@@ -27,10 +16,4 @@ export const checkAssertion = (a: any, b: any, strict = false): boolean => {
     }
 
     return strict ? a === b : a == b; // tslint:disable-line
-};
-
-export const intervalRandom = (min: number, max: number): number => {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
 };
