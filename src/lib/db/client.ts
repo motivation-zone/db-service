@@ -33,7 +33,7 @@ const config = {
 const pool = new Pool(config);
 pool.on('error', dbErrorHandler);
 
-export const query = async (queryData: IQuery) => {
+export const query = async (queryData: IQuery): Promise<any[]> => {
     let client;
     let data;
 

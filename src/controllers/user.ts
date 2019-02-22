@@ -11,7 +11,7 @@ const urls = API_URLS.user;
 
 userController.post(urls.create, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const user = new UserModel(req.body);
-    user.validateForCreate();
+    await user.validateForCreate();
     const result = await UserService.createUser(user);
     HttpResponse.ok(res, result);
 }));

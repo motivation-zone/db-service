@@ -102,7 +102,7 @@ export default class UserModel implements IUserModel {
             await schema.validate(this);
         } catch (e) {
             // TODO change names from e.errors on HttpErrors.* types
-            throw HttpResponse.error(Boom.badRequest, e.errors.join(', '));
+            HttpResponse.error(Boom.badRequest, e.errors.join(', '));
         }
     }
 
