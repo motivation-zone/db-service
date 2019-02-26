@@ -27,16 +27,16 @@ export interface IUserModel {
 const phoneRegexp = /^\+[0-9]{1,4}\([0-9]{3}\)[0-9]{3}\-[0-9]{2}\-[0-9]{2}$/;
 const VALIDATION_SCHEMES = {
     create: {
-        login: yup.string().required(),
-        name: yup.string().required(),
-        password: yup.string().required(),
-        email: yup.string().email().required(),
-        gender: yup.boolean().required(),
+        login: yup.string().required(HttpErrors.MISSING_REQUIRED_FIELD),
+        name: yup.string().required(HttpErrors.MISSING_REQUIRED_FIELD),
+        password: yup.string().required(HttpErrors.MISSING_REQUIRED_FIELD),
+        email: yup.string().email().required(HttpErrors.MISSING_REQUIRED_FIELD),
+        gender: yup.boolean().required(HttpErrors.MISSING_REQUIRED_FIELD),
         isAthlete: yup.boolean().notRequired(),
         selfInfo: yup.string().notRequired(),
-        weight: yup.number().positive().notRequired(),
-        growth: yup.number().positive().notRequired(),
-        countryId: yup.number().positive().integer().notRequired(),
+        weight: yup.number().positive(HttpErrors.WRONG_DATA).notRequired(),
+        growth: yup.number().positive(HttpErrors.WRONG_DATA).notRequired(),
+        countryId: yup.number().positive(HttpErrors.WRONG_DATA).integer().notRequired(),
         birthDate: yup.date().notRequired(),
         isBanned: yup.boolean().notRequired(),
         instagram: yup.string().notRequired(),
@@ -47,7 +47,8 @@ const VALIDATION_SCHEMES = {
     get: {}
 };
 
-const NOT_UPDATED_FIELDS: (keyof IUserModel)[] = ['id', 'login', 'registeredDate'];
+export const NOT_UPDATED_FIELDS: (keyof IUserModel)[] = ['id', 'login', 'registeredDate'];
+export const REQUIRED_FIELDS: (keyof IUserModel)[] = ['login', 'name', 'password', 'email', 'gender'];
 
 export default class UserModel implements IUserModel {
     public id?: number;
@@ -74,7 +75,7 @@ export default class UserModel implements IUserModel {
             countryId, instagram, phone, registeredDate
         } = data;
 
-        this.id = id;
+        this.id = Number(id);
         this.login = login;
         this.name = name;
         this.password = password;
@@ -87,7 +88,7 @@ export default class UserModel implements IUserModel {
         this.instagram = instagram;
         this.phone = phone;
         this.isBanned = isBanned;
-        this.countryId = countryId;
+        this.countryId = countryId ? Number(countryId) : undefined;
         this.birthDate = UserModel.parseDate(birthDate);
         this.registeredDate = UserModel.parseDate(registeredDate);
     }
@@ -101,7 +102,6 @@ export default class UserModel implements IUserModel {
         try {
             await schema.validate(this);
         } catch (e) {
-            // TODO change names from e.errors on HttpErrors.* types
             HttpResponse.error(Boom.badRequest, e.errors.join(', '));
         }
     }
