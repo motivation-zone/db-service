@@ -1,10 +1,10 @@
 import Boom from 'boom';
 import {Request, Response, NextFunction} from 'express';
 
-import {IGetLimit} from '../services/base';
-import {OrderType} from '../query-creators/base';
-import HttpErrors from './http/errors';
-import HttpResponse from './http/response';
+import {IGetLimit} from 'src/services/base';
+import {OrderType} from 'src/query-creators/base';
+import HttpErrors from 'src/utils/http/errors';
+import HttpResponse from 'src/utils/http/response';
 
 /**
  * It's neccessary for parsing boolean keys from query
@@ -48,7 +48,7 @@ export const checkRequiredFields = (fields: string[], obj: any): boolean => {
 export const checkGetLimitParameters = (data: any): IGetLimit => {
     const {limit, skip, order} = data;
     if (!limit || !skip || order && ![OrderType.DESC, OrderType.ASC].includes(order.toUpperCase())) {
-        throw HttpResponse.error(Boom.badRequest, HttpErrors.MISSING_LIMIT_PARAMS);
+        HttpResponse.error(Boom.badRequest, HttpErrors.MISSING_LIMIT_PARAMS);
     }
 
     return {limit, skip, order};

@@ -1,5 +1,5 @@
-import {translatePostgresqlNameToNode} from '../utils/db/helper';
-import {OrderType} from '../query-creators/base';
+import {translatePostgresqlNameToNode} from 'src/utils/db/helper';
+import {OrderType} from 'src/query-creators/base';
 
 export interface IGetLimit {
     limit: number;

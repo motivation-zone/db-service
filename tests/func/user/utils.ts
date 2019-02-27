@@ -1,7 +1,7 @@
 import faker from 'faker';
 
-import UserModel, {IUserModel} from '../../../src/models/user';
-import {intervalRandom} from '../../../src/utils';
+import UserModel, {IUserModel} from 'src/models/user';
+import {intervalRandom} from 'src/utils';
 
 const {internet, name, random, lorem, phone, date} = faker;
 

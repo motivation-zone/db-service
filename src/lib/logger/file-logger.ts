@@ -1,5 +1,5 @@
 import winston, {format} from 'winston';
-import {getAbsolutePath} from '../../utils/fs';
+import {getAbsolutePath} from 'src/utils/fs';
 
 const {combine, timestamp, splat} = format;
 
@@ -27,8 +27,8 @@ const createLogger = (): winston.Logger => {
 };
 
 export interface ILogger {
-    error: (msg: string) => void,
-    info: (msg: string) => void
+    error: (msg: string) => void;
+    info: (msg: string) => void;
 }
 
 class FileLogger implements ILogger {
@@ -38,11 +38,11 @@ class FileLogger implements ILogger {
         this._logger = createLogger();
     }
 
-    error(msg: string) {
+    error(msg: string): void {
         this._logger.error(msg);
     }
 
-    info(msg: string) {
+    info(msg: string): void {
         this._logger.info(msg);
     }
 }

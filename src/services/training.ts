@@ -1,6 +1,6 @@
-import {} from '../query-creators/training';
-import {query} from '../lib/db/client';
-import {prepareDBResult} from './base';
+import {} from 'src/query-creators/training';
+import {query} from 'src/lib/db/client';
+import {prepareDBResult} from 'src/services/base';
 
 export default class TrainingService {
     static async smth(): Promise<any[]> {

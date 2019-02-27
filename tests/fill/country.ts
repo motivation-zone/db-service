@@ -1,8 +1,8 @@
 import request from 'supertest';
-import app from '../../src/app';
 
-import {API_URLS} from '../../src/urls';
-import CountryModel, {ICountryModel} from '../../src/models/country';
+import app from 'src/app';
+import {API_URLS} from 'src/urls';
+import CountryModel, {ICountryModel} from 'src/models/country';
 
 const countryUrls = API_URLS.country;
 

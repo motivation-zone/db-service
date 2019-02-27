@@ -30,14 +30,21 @@ clean:
 lint.staged:
 	node_modules/.bin/lint-staged -c .lintstagedrc.json
 
-.PHONY: lint
-lint:
-	node_modules/.bin/tslint -p tsconfig.json src/**/*.ts tests/**/*.ts
+.PHONY: lint.main
+lint.main:
+	node_modules/.bin/tslint -c tslint.json 'src/**/*.ts'
+	# node_modules/.bin/tslint -p tsconfig.json
+
+.PHONY: lint.tests
+lint.tests:
+	node_modules/.bin/tslint -c tslint.tests.json 'tests/**/*.ts'
+	# node_modules/.bin/tslint -p tsconfig.json
 
 # Run the application in development mode
 .PHONY: dev
 dev:
 	DEBUG=dbservice:* \
+	NODE_PATH=$(OUT_DIR) \
 	TZ=UTC \
 	node_modules/.bin/supervisor \
 		--non-interactive \
@@ -49,12 +56,16 @@ dev:
 # Tests
 .PHONY: test.fill
 test.fill:
-	DEBUG=dbservice:* node build/tests/fill/fill.js
+	NODE_PATH=$(OUT_DIR) DEBUG=dbservice:* node build/tests/fill/index.js
 
 .PHONY: test.func
 test.func:
 	make test.fill
-	DEBUG=dbservice:* node_modules/.bin/mocha build/tests/**/*.test.js --exit
+	NODE_PATH=$(OUT_DIR) DEBUG=dbservice:* node_modules/.bin/mocha build/tests/**/*.test.js --exit
+
+.PHONY: test
+test:
+	make test.fill && make test.func
 
 # Deployment
 VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")

@@ -1,4 +1,4 @@
-import UserModel from '../models/user';
+import UserModel from 'src/models/user';
 import {
     createUser as createUserQuery,
     getUserByLogin as getUserByLoginQuery,
@@ -7,11 +7,11 @@ import {
     updateUser as updateUserQuery,
     deleteUser as deleteUserQuery,
     checkUser as checkUserQuery
-} from '../query-creators/user';
-import {query} from '../lib/db/client';
-import {translateNodeToPostgresqlName} from '../utils/db/helper';
-import {prepareDBResult, IGetLimit} from './base';
-import {getNotEmptyFields} from '../utils';
+} from 'src/query-creators/user';
+import {query} from 'src/lib/db/client';
+import {translateNodeToPostgresqlName} from 'src/utils/db/helper';
+import {prepareDBResult, IGetLimit} from 'src/services/base';
+import {getNotEmptyFields} from 'src/utils';
 
 export default class UserService {
     static async createUser(user: UserModel): Promise<any[]> {

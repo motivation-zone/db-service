@@ -1,7 +1,7 @@
 import Boom from 'boom';
 import {Request, Response, NextFunction} from 'express';
 
-import logger from '../lib/logger';
+import logger from 'src/lib/logger';
 
 export default (err: any, _req: Request, res: Response, _next: NextFunction): void => {
     if (err.isBoom) {

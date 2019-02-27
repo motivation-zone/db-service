@@ -1,11 +1,11 @@
-import * as pg from 'pg';
-import * as fs from 'fs';
-import * as yaml from 'yaml';
+import pg from 'pg';
+import fs from 'fs';
+import yaml from 'yaml';
 import Boom from 'boom';
 
-import logger from '../logger';
-import {getAbsolutePath} from '../../utils/fs';
-import HttpResponse from '../../utils/http/response';
+import logger from 'src/lib/logger';
+import {getAbsolutePath} from 'src/utils/fs';
+import HttpResponse from 'src/utils/http/response';
 
 interface IQuery {
     text: string;
@@ -14,7 +14,7 @@ interface IQuery {
 
 const dbErrorHandler = (err: Error, _client: pg.PoolClient) => {
     logger('error', 'db', err.stack || '');
-}
+};
 
 const yamlDbConfig = fs.readFileSync(getAbsolutePath(`./configs/db/db.yaml`), 'utf8');
 const dbConfig = yaml.parse(yamlDbConfig);
@@ -27,7 +27,7 @@ const config = {
     database: dbConfig.database,
     port: dbConfig.port,
     idleTimeoutMillis: 1000 * 60 * 2,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 2000
 };
 
 const pool = new Pool(config);

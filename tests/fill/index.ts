@@ -1,5 +1,5 @@
-import {createUsers} from './user';
-import {query} from '../../src/lib/db/client';
+import {createUsers} from 'tests/fill/user';
+import {query} from 'src/lib/db/client';
 
 const truncateAll = async () => {
     await query({

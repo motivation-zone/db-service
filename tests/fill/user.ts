@@ -1,11 +1,11 @@
 import request from 'supertest';
-import app from '../../src/app';
 
-import UserModel, {IUserModel} from '../../src/models/user';
-import {generateUser} from '../func/user/utils';
-import {API_URLS} from '../../src/urls';
-import {getAllCountries} from './country';
-import {intervalRandom} from '../../src/utils';
+import app from 'src/app';
+import UserModel, {IUserModel} from 'src/models/user';
+import {generateUser} from 'tests/func/user/utils';
+import {API_URLS} from 'src/urls';
+import {getAllCountries} from 'tests/fill/country';
+import {intervalRandom} from 'src/utils';
 
 const userUrls = API_URLS.user;
 

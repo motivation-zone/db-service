@@ -1,39 +1,22 @@
 import request from 'supertest';
 import {expect, assert} from 'chai';
 
-import app from '../../../src/app';
-import UserModel, {IUserModel, REQUIRED_FIELDS, NOT_UPDATED_FIELDS} from '../../../src/models/user';
-import {checkAssertion} from '../../utils';
-import {USER_RETURNING_FIELDS} from '../../../src/query-creators/user';
-import {translatePostgresqlNameToNode} from '../../../src/utils/db/helper';
-import {checkRequiredFields} from '../../../src/utils';
-import {API_URLS} from '../../../src/urls';
-import {generateUser} from './utils';
-import {getAllCountries} from '../../fill/country';
-import HttpErrors from '../../../src/utils/http/errors';
+import app from 'src/app';
+import UserModel, {IUserModel, REQUIRED_FIELDS, NOT_UPDATED_FIELDS} from 'src/models/user';
+import {checkAssertion} from 'tests/utils';
+import {USER_RETURNING_FIELDS} from 'src/query-creators/user';
+import {translatePostgresqlNameToNode} from 'src/utils/db/helper';
+import {checkRequiredFields} from 'src/utils';
+import {API_URLS} from 'src/urls';
+import {generateUser} from 'tests/func/user/utils';
+import {getAllCountries} from 'tests/fill/country';
+import HttpErrors from 'src/utils/http/errors';
 
 const urls = API_URLS.user;
+const REQUEST_HEADERS = {Accept: 'application/json'};
+const RESPONSE_HEADERS: [string, RegExp] = ['Content-Type', /json/];
 
-/* const changeFieldValue = (value: any) => {
-    if (value instanceof Date) {
-        return UserModel.parseDate('1999-06-01');
-    }
-
-    if (typeof value === 'string') {
-        return `${value}_extra_text`;
-    }
-
-    if (typeof value === 'number') {
-        return ++value;
-    }
-
-    if (typeof value === 'boolean') {
-        return !value;
-    }
-}; */
-
-describe('User:', function () {
-    this.timeout(5000);
+describe('User:', (): void => {
     const reqUser = generateUser();
 
     describe('Create', () => {
@@ -45,8 +28,8 @@ describe('User:', function () {
                 request(app)
                     .post(`${urls.prefix}${urls.create}`)
                     .send(reqUser)
-                    .set({Accept: 'application/json'})
-                    .expect('Content-Type', /json/)
+                    .set(REQUEST_HEADERS)
+                    .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                     .expect((res) => {
                         const user = new UserModel(res.body.data[0]);
                         // password mustn't return after user was created
@@ -72,8 +55,7 @@ describe('User:', function () {
                         resolve();
                     })
                     .expect(200, () => {});
-                }
-            );
+            });
         });
 
         it('with not existing country id', (done) => {
@@ -83,8 +65,8 @@ describe('User:', function () {
             request(app)
                 .post(`${urls.prefix}${urls.create}`)
                 .send(user)
-                .set({Accept: 'application/json'})
-                .expect('Content-Type', /json/)
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                 .expect((res) => {
                     const {message} = res.body.err;
                     expect(message.includes('users_country_id_fkey')).to.be.true;
@@ -98,8 +80,8 @@ describe('User:', function () {
             request(app)
                 .post(`${urls.prefix}${urls.create}`)
                 .send(user)
-                .set({Accept: 'application/json'})
-                .expect('Content-Type', /json/)
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                 .expect((res) => {
                     const [userData] = res.body.data;
                     const userModel = new UserModel(userData);
@@ -115,8 +97,8 @@ describe('User:', function () {
             request(app)
                 .post(`${urls.prefix}${urls.create}`)
                 .send(user)
-                .set({Accept: 'application/json'})
-                .expect('Content-Type', /json/)
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                 .expect((res) => {
                     const {message} = res.body.err;
                     expect(message.includes('users_email_key')).to.be.true;
@@ -131,8 +113,8 @@ describe('User:', function () {
             request(app)
                 .post(`${urls.prefix}${urls.create}`)
                 .send(user)
-                .set({Accept: 'application/json'})
-                .expect('Content-Type', /json/)
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                 .expect((res) => {
                     const {message} = res.body.err;
                     expect(message.includes('users_login_key')).to.be.true;
@@ -149,8 +131,8 @@ describe('User:', function () {
                     request(app)
                         .post(`${urls.prefix}${urls.create}`)
                         .send(user)
-                        .set({Accept: 'application/json'})
-                        .expect('Content-Type', /json/)
+                        .set(REQUEST_HEADERS)
+                        .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                         .end((err, res) => {
                             if (err) {
                                 reject(err);
@@ -187,8 +169,8 @@ describe('User:', function () {
                     request(app)
                         .post(`${urls.prefix}${urls.updateById.replace(':id', String(reqUser.id))}`)
                         .send({[field]: newUser[field]})
-                        .set({Accept: 'application/json'})
-                        .expect('Content-Type', /json/)
+                        .set(REQUEST_HEADERS)
+                        .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                         .end((err, res) => {
                             if (err) {
                                 reject(err);
@@ -200,6 +182,8 @@ describe('User:', function () {
                                 checkAssertion(updatedUser[field], newUser[field]),
                                 `${field}: ${updatedUser[field]} != ${newUser[field]}`
                             );
+                            // save data for next tests
+                            reqUser[field] = updatedUser[field];
                             resolve();
                         });
                 });
@@ -219,8 +203,8 @@ describe('User:', function () {
                             // and send empty query => will be error 409 (next test)
                             selfInfo: newUser.selfInfo
                         })
-                        .set({Accept: 'application/json'})
-                        .expect('Content-Type', /json/)
+                        .set(REQUEST_HEADERS)
+                        .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                         .end((err, res) => {
                             if (err) {
                                 reject(err);
@@ -233,6 +217,8 @@ describe('User:', function () {
                                 `${updatedUser[field]} != ${reqUser[field]}`
                             );
                             expect(updatedUser.selfInfo).to.equal(newUser.selfInfo);
+                            // save data for next tests
+                            reqUser.selfInfo = updatedUser.selfInfo;
                             resolve();
                         });
                 });
@@ -247,8 +233,8 @@ describe('User:', function () {
                     request(app)
                         .post(`${urls.prefix}${urls.updateById.replace(':id', String(reqUser.id))}`)
                         .send({[field]: newUser[field]})
-                        .set({Accept: 'application/json'})
-                        .expect('Content-Type', /json/)
+                        .set(REQUEST_HEADERS)
+                        .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                         .expect(409, resolve);
                 });
             }));
@@ -258,8 +244,8 @@ describe('User:', function () {
             request(app)
                 .post(`${urls.prefix}${urls.updateById.replace(':id', '9999999')}`)
                 .send({name: 'name'})
-                .set({Accept: 'application/json'})
-                .expect('Content-Type', /json/)
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                 .end((_, res) => {
                     const result = res.body.data;
                     expect(result).to.be.empty;
@@ -269,13 +255,13 @@ describe('User:', function () {
         });
     });
 
-    /* describe('Get', () => {
+    describe('Get', () => {
         it('users', (done) => {
             request(app)
                 .get(`${urls.prefix}/${urls.get}?limit=3&skip=0`)
-                .set(REQUEST_HEADERS.standart)
-                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
-                .end((err, res) => {
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
+                .end((_, res) => {
                     const result = res.body.data;
                     expect(result.length).to.equal(3);
 
@@ -291,23 +277,24 @@ describe('User:', function () {
         it('should contains limit params', (done) => {
             request(app)
                 .get(`${urls.prefix}/${urls.get}`)
-                .set(REQUEST_HEADERS.standart)
-                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                 .expect(400, done);
         });
 
         it('order params by default ASC', (done) => {
             request(app)
                 .get(`${urls.prefix}/${urls.get}?limit=100&skip=0`)
-                .set(REQUEST_HEADERS.standart)
-                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
-                .end((err, res) => {
-                    const result = res.body.data;
-                    result.every((user: IUserModel, i: number) => {
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
+                .end((_, res) => {
+                    const users = res.body.data.map((userData: any) => new UserModel(userData));
+                    users.every((user: IUserModel, i: number) => {
                         if (i === 0) {
                             return true;
                         }
-                        return Number(user.id) > Number(result[i - 1].id);
+
+                        return user.id! > users[i - 1].id!;
                     });
                     expect(res.status).to.equal(200);
                     done();
@@ -317,15 +304,15 @@ describe('User:', function () {
         it('order params DESC', (done) => {
             request(app)
                 .get(`${urls.prefix}/${urls.get}?limit=100&skip=0&order=desc`)
-                .set(REQUEST_HEADERS.standart)
-                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
-                .end((err, res) => {
-                    const result = res.body.data;
-                    result.every((user: IUserModel, i: number) => {
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
+                .end((_, res) => {
+                    const users = res.body.data.map((userData: any) => new UserModel(userData));
+                    users.every((user: IUserModel, i: number) => {
                         if (i === 0) {
                             return true;
                         }
-                        return Number(user.id) < Number(result[i - 1].id);
+                        return user.id! < users[i - 1].id!;
                     });
                     expect(res.status).to.equal(200);
                     done();
@@ -335,13 +322,11 @@ describe('User:', function () {
         it('user by id', (done) => {
             request(app)
                 .get(`${urls.prefix}/${urls.getById.replace(':id', String(reqUser.id))}`)
-                .set(REQUEST_HEADERS.standart)
-                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
-                .end((err, res) => {
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
+                .end((_, res) => {
                     const user = new UserModel(res.body.data[0]);
-                    user.countryId = Number(user.countryId);
                     user.password = reqUser.password;
-
                     expect(user).to.deep.equal(reqUser);
                     expect(res.status).to.equal(200);
                     done();
@@ -351,11 +336,10 @@ describe('User:', function () {
         it('user by login (strict)', (done) => {
             request(app)
                 .get(`${urls.prefix}/${urls.getByLogin.replace(':login', String(reqUser.login))}`)
-                .set(REQUEST_HEADERS.standart)
-                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
-                .end((err, res) => {
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
+                .end((_, res) => {
                     const user = new UserModel(res.body.data[0]);
-                    user.countryId = Number(user.countryId);
                     user.password = reqUser.password;
 
                     expect(user).to.deep.equal(reqUser);
@@ -367,11 +351,11 @@ describe('User:', function () {
         it('user by login (not strict)', (done) => {
             request(app)
                 .get(
-                    `${urls.prefix}/${urls.getByLogin.replace(':login', '_')}?strict=false`
+                    `${urls.prefix}/${urls.getByLogin.replace(':login', '.')}?strict=false`
                 )
-                .set(REQUEST_HEADERS.standart)
-                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
-                .end((err, res) => {
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
+                .end((_, res) => {
                     const result = res.body.data;
                     expect(result.length > 0 && result.length <= 10).to.be.true;
                     expect(res.status).to.equal(200);
@@ -385,13 +369,14 @@ describe('User:', function () {
             request(app)
                 .post(`${urls.prefix}/${urls.checkPassword}`)
                 .send({login: reqUser.login, password: reqUser.password})
-                .set(REQUEST_HEADERS.standart)
-                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
-                .end((err, res) => {
+                .set(REQUEST_HEADERS)
+                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
+                .end((_, res) => {
                     const result = res.body.data;
+                    const user = new UserModel(result[0]);
                     expect(result.length === 1).to.be.true;
 
-                    expect(result[0].id).to.equal(reqUser.id);
+                    expect(user.id).to.equal(reqUser.id);
                     expect(res.status).to.equal(200);
                     done();
                 });
@@ -399,31 +384,34 @@ describe('User:', function () {
     });
 
     describe('DELETE', () => {
-        it('by id', (done) => {
-            request(app)
-                .delete(`${urls.prefix}/${urls.deleteById.replace(':id', String(reqUser.id))}`)
-                .set(REQUEST_HEADERS.standart)
-                .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
-                .end((err, res) => {
-                    const user = new UserModel(res.body.data[0]);
-                    user.countryId = Number(user.countryId);
-                    user.password = reqUser.password;
+        it('by id', async () => {
+            await new Promise((resolve) => {
+                request(app)
+                    .delete(`${urls.prefix}/${urls.deleteById.replace(':id', String(reqUser.id))}`)
+                    .set(REQUEST_HEADERS)
+                    .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
+                    .end((_, res) => {
+                        const user = new UserModel(res.body.data[0]);
+                        user.password = reqUser.password;
 
-                    expect(user).to.deep.equal(reqUser);
-                    expect(res.status).to.equal(200);
+                        expect(user).to.deep.equal(reqUser);
+                        expect(res.status).to.equal(200);
+                        resolve();
+                    });
+            });
 
-                    request(app)
-                        .get(`${urls.prefix}/${urls.getById.replace(':id', String(reqUser.id))}`)
-                        .set(REQUEST_HEADERS.standart)
-                        .expect(EXPECT_FIELDS.json[0], EXPECT_FIELDS.json[1])
-                        .end((err, res) => {
-                            const result = res.body.data;
-
-                            expect(result.length === 0).to.be.true;
-                            expect(res.status).to.equal(200);
-                            done();
-                        });
-                });
+            await new Promise((resolve) => {
+                request(app)
+                    .get(`${urls.prefix}/${urls.getById.replace(':id', String(reqUser.id))}`)
+                    .set(REQUEST_HEADERS)
+                    .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
+                    .end((_, res) => {
+                        const result = res.body.data;
+                        expect(result.length === 0).to.be.true;
+                        expect(res.status).to.equal(200);
+                        resolve();
+                    });
+            });
         });
-    }); */
+    });
 });

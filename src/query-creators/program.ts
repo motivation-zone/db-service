@@ -1,4 +1,4 @@
-import {OrderType, updateQuery} from './base';
+import {OrderType, updateQuery} from 'src/query-creators/base';
 
 export const createProgram = () => {
     return `

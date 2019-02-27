@@ -2,9 +2,9 @@ import {
     getCountries as getCountriesQuery,
     getUsers as getUsersQuery,
     getUsersWithoutCountry as getUsersWithoutCountryQuery
-} from '../query-creators/country';
-import {query} from '../lib/db/client';
-import {prepareDBResult, IGetLimit} from './base';
+} from 'src/query-creators/country';
+import {query} from 'src/lib/db/client';
+import {prepareDBResult, IGetLimit} from 'src/services/base';
 
 export default class CountryService {
     static async getCountries(): Promise<any[]> {

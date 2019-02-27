@@ -11,7 +11,7 @@ export interface IDebugTarget {
  * Console debug logger
  */
 const proxy = new Proxy<IDebugTarget>({} as IDebugTarget, {
-    get(target: IDebugTarget, prop: LevelType) {
+    get(target: IDebugTarget, prop: LevelType): Function {
         return prop in target ? target[prop] : target[prop] = debug(`dbservice:${prop}`);
     }
 });

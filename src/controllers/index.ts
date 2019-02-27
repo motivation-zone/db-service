@@ -1,11 +1,11 @@
-import CountryController from './сountry';
-import DifficultyLevelController from './difficulty-level';
-import ExerciseController from './exercise';
-import ProgramController from './program';
-import SportController from './sport';
-import TrainingTypeController from './training-type';
-import TrainingController from './training';
-import UserController from './user';
+import CountryController from 'src/controllers/сountry';
+import DifficultyLevelController from 'src/controllers/difficulty-level';
+import ExerciseController from 'src/controllers/exercise';
+import ProgramController from 'src/controllers/program';
+import SportController from 'src/controllers/sport';
+import TrainingTypeController from 'src/controllers/training-type';
+import TrainingController from 'src/controllers/training';
+import UserController from 'src/controllers/user';
 
 export default {
     CountryController,

@@ -1,5 +1,5 @@
-import {query} from '../lib/db/client';
-import {prepareDBResult, IGetLimit} from './base';
+import {query} from 'src/lib/db/client';
+import {prepareDBResult, IGetLimit} from 'src/services/base';
 import {
     createExerciseTemplate as createExerciseTemplateQuery,
     updateExerciseTemplate as updateExerciseTemplateQuery,
@@ -13,9 +13,9 @@ import {
     getUserExercisesBySport as getUserExercisesBySportQuery,
     getAllUserExercises as getAllUserExercisesQuery,
     deleteExercise as deleteExerciseQuery
-} from '../query-creators/exercise';
-import {translateNodeToPostgresqlName} from '../utils/db/helper';
-import {filterMapData} from '../utils';
+} from 'src/query-creators/exercise';
+import {translateNodeToPostgresqlName} from 'src/utils/db/helper';
+import {filterMapData} from 'src/utils';
 
 interface IExercise {
     exerciseTemplateId: number;

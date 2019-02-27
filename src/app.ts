@@ -1,11 +1,11 @@
 import express, {Request, Response} from 'express';
-import * as bodyParser from 'body-parser';
+import bodyParser from 'body-parser';
 
-import logger from './lib/logger';
-import notFoundMiddleware from './middleware/not-found';
-import errorMiddleware from './middleware/error';
+import logger from 'src/lib/logger';
+import notFoundMiddleware from 'src/middleware/not-found';
+import errorMiddleware from 'src/middleware/error';
 
-import controllers from './controllers';
+import controllers from 'src/controllers';
 const {
     CountryController,
     DifficultyLevelController,

@@ -1,8 +1,8 @@
 import {
     getTrainingTypes as getTrainingTypesQuery
-} from '../query-creators/training-type';
-import {query} from '../lib/db/client';
-import {prepareDBResult} from './base';
+} from 'src/query-creators/training-type';
+import {query} from 'src/lib/db/client';
+import {prepareDBResult} from 'src/services/base';
 
 export default class TrainingTypeService {
     static async getTrainingTypes(): Promise<any[]> {

@@ -1,8 +1,8 @@
 import * as yup from 'yup';
 import Boom from 'boom';
 
-import HttpResponse from '../utils/http/response';
-import HttpErrors from '../utils/http/errors';
+import HttpResponse from 'src/utils/http/response';
+import HttpErrors from 'src/utils/http/errors';
 
 export interface ICountryModel {
     id: number;

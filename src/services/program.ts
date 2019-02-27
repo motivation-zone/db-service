@@ -1,6 +1,6 @@
-import {} from '../query-creators/program';
-import {query} from '../lib/db/client';
-import {prepareDBResult} from './base';
+import {} from 'src/query-creators/program';
+import {query} from 'src/lib/db/client';
+import {prepareDBResult} from 'src/services/base';
 
 export default class ProgramService {
     static async smth(): Promise<any[]> {

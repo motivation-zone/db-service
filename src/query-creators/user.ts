@@ -1,4 +1,4 @@
-import {OrderType, updateQuery} from './base';
+import {OrderType, updateQuery} from 'src/query-creators/base';
 
 export const USER_RETURNING_FIELDS = [
     'id', 'login', 'name', 'email', 'is_athlete',

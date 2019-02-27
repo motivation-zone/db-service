@@ -1,8 +1,8 @@
 import {
     getDifficultyLevels as getDifficultyLevelsQuery
-} from '../query-creators/difficulty-level';
-import {query} from '../lib/db/client';
-import {prepareDBResult} from './base';
+} from 'src/query-creators/difficulty-level';
+import {query} from 'src/lib/db/client';
+import {prepareDBResult} from 'src/services/base';
 
 export default class DifficultyLevelService {
     static async getDifficultyLevels(): Promise<any[]> {

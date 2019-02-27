@@ -1,5 +1,5 @@
-import {OrderType} from './base';
-import {USER_RETURNING_FIELDS} from './user';
+import {OrderType} from 'src/query-creators/base';
+import {USER_RETURNING_FIELDS} from 'src/query-creators/user';
 
 export const getCountries = () => {
     return `SELECT * FROM country`;

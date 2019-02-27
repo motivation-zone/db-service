@@ -3,9 +3,9 @@ import {
     addUser as addUserQuery,
     deleteUser as deleteUserQuery,
     getUsers as getUsersQuery
-} from '../query-creators/sport';
-import {query} from '../lib/db/client';
-import {prepareDBResult, IGetLimit} from './base';
+} from 'src/query-creators/sport';
+import {query} from 'src/lib/db/client';
+import {prepareDBResult, IGetLimit} from 'src/services/base';
 
 enum SportUserActionType {
     DELETE = 'delete',

@@ -1,6 +1,6 @@
-import consoleLogger, {LevelType, IDebugTarget} from './console-logger';
-import fileLogger, {ILogger} from './file-logger';
-import env from '../env';
+import consoleLogger, {LevelType, IDebugTarget} from 'src/lib/logger/console-logger';
+import fileLogger, {ILogger} from 'src/lib/logger/file-logger';
+import env from 'src/lib/env';
 
 type LoggerType = 'app' | 'db';
 
