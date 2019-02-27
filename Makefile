@@ -33,12 +33,10 @@ lint.staged:
 .PHONY: lint.main
 lint.main:
 	node_modules/.bin/tslint -c tslint.json 'src/**/*.ts'
-	# node_modules/.bin/tslint -p tsconfig.json
 
 .PHONY: lint.tests
 lint.tests:
 	node_modules/.bin/tslint -c tslint.tests.json 'tests/**/*.ts'
-	# node_modules/.bin/tslint -p tsconfig.json
 
 # Run the application in development mode
 .PHONY: dev
@@ -56,12 +54,15 @@ dev:
 # Tests
 .PHONY: test.fill
 test.fill:
-	NODE_PATH=$(OUT_DIR) DEBUG=dbservice:* node build/tests/fill/index.js
+	NODE_PATH=$(OUT_DIR) \
+	DEBUG=dbservice:* \
+	node build/tests/fill/index.js
 
 .PHONY: test.func
 test.func:
-	make test.fill
-	NODE_PATH=$(OUT_DIR) DEBUG=dbservice:* node_modules/.bin/mocha build/tests/**/*.test.js --exit
+	NODE_PATH=$(OUT_DIR) \
+	DEBUG=dbservice:* \
+	node_modules/.bin/mocha build/tests/**/*.test.js --exit
 
 .PHONY: test
 test:

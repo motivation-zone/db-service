@@ -1,8 +1,7 @@
-import * as yup from 'yup';
+import Joi from 'joi';
 import Boom from 'boom';
 
 import HttpResponse from 'src/utils/http/response';
-import HttpErrors from 'src/utils/http/errors';
 
 export interface ICountryModel {
     id: number;
@@ -12,13 +11,13 @@ export interface ICountryModel {
     unCode: string;
 }
 
-const VALIDATION_SCHEMES = {
-    id: yup.number().required(),
-    name: yup.string().required(),
-    alpha2: yup.string().required(),
-    alpha3: yup.string().required(),
-    unCode: yup.string().required()
-};
+const VALIDATION_SCHEMES = Joi.object().keys({
+    id: Joi.number().integer().required(),
+    name: Joi.string().required(),
+    alpha2: Joi.string().required(),
+    alpha3: Joi.string().required(),
+    unCode: Joi.string().required()
+});
 
 export default class CountryModel {
     public id: number;
@@ -30,7 +29,7 @@ export default class CountryModel {
     constructor(data: any) {
         const {id, name, alpha2, alpha3, unCode} = data;
 
-        this.id = id;
+        this.id = Number(id);
         this.name = name;
         this.alpha2 = alpha2;
         this.alpha3 = alpha3;
@@ -38,10 +37,10 @@ export default class CountryModel {
     }
 
     async validate(): Promise<void> {
-        const schema = yup.object().shape(VALIDATION_SCHEMES);
-        const isValid = await schema.isValid(this);
-        if (!isValid) {
-            throw HttpResponse.error(Boom.badRequest, HttpErrors.MISSING_PARAMS);
+        try {
+            await Joi.validate(this, VALIDATION_SCHEMES);
+        } catch (e) {
+            HttpResponse.error(Boom.badRequest, e.details.message);
         }
     }
 }

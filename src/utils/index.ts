@@ -1,9 +1,9 @@
 import Boom from 'boom';
+import Joi from 'joi';
 import {Request, Response, NextFunction} from 'express';
 
 import {IGetLimit} from 'src/services/base';
-import {OrderType} from 'src/query-creators/base';
-import HttpErrors from 'src/utils/http/errors';
+import {ORDER_TYPES} from 'src/query-creators/base';
 import HttpResponse from 'src/utils/http/response';
 
 /**
@@ -45,12 +45,20 @@ export const checkRequiredFields = (fields: string[], obj: any): boolean => {
     });
 };
 
-export const checkGetLimitParameters = (data: any): IGetLimit => {
-    const {limit, skip, order} = data;
-    if (!limit || !skip || order && ![OrderType.DESC, OrderType.ASC].includes(order.toUpperCase())) {
-        HttpResponse.error(Boom.badRequest, HttpErrors.MISSING_LIMIT_PARAMS);
+export const checkGetLimitParameters = async (data: any): Promise<IGetLimit> => {
+    const schema = {
+        limit: Joi.number().required(),
+        skip: Joi.number().required(),
+        order: Joi.string().valid(ORDER_TYPES)
+    };
+
+    try {
+        await Joi.validate(data, schema);
+    } catch (e) {
+        HttpResponse.error(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
     }
 
+    const {limit, skip, order} = data;
     return {limit, skip, order};
 };
 

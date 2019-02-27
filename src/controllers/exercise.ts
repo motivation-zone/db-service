@@ -1,11 +1,11 @@
 import express, {Request, Response} from 'express';
 import Boom from 'boom';
+import Joi from 'joi';
 
 import ExerciseService from 'src/services/exercise';
 import HttpResponse from 'src/utils/http/response';
 import {getNotEmptyFields, checkGetLimitParameters, asyncMiddlewareWrapper} from 'src/utils';
 import {API_URLS} from 'src/urls';
-import HttpErrors from 'src/utils/http/errors';
 
 const exerciseController = express();
 const urls = API_URLS.exercise;
@@ -14,21 +14,29 @@ exerciseController.get(urls.template.getMany, asyncMiddlewareWrapper(async (req:
     const {userId} = req.params;
     const {sportId} = req.query;
 
-    const limitParameters = checkGetLimitParameters(req.query);
+    const limitParameters = await checkGetLimitParameters(req.query);
     const result = await ExerciseService.getUserExerciseTemplates(limitParameters, userId, sportId);
     HttpResponse.ok(res, result);
 }));
 
 exerciseController.post(urls.template.create, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
-    const {title, description, userId, sportId} = req.body;
-    if (!title || !description || !userId || !sportId) {
-        throw Boom.badRequest(HttpErrors.MISSING_PARAMS);
-    }
+    const schema = {
+        title: Joi.string().required(),
+        description: Joi.string().required(),
+        userId: Joi.number().required(),
+        sportId: Joi.number().required()
+    };
 
-    const result = await ExerciseService.createExerciseTemplate({
-        title, description, userId, sportId
-    });
-    HttpResponse.ok(res, result);
+    try {
+        const data = await Joi.validate(req.body, schema);
+        const result = await ExerciseService.createExerciseTemplate(data);
+        HttpResponse.ok(res, result);
+    } catch (e) {
+        if (!e.details) {
+            throw e;
+        }
+        HttpResponse.error(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
+    }
 }));
 
 exerciseController.get(urls.template.get, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
@@ -59,7 +67,7 @@ exerciseController.get(urls.getMany, asyncMiddlewareWrapper(async (req: Request,
     const {userId} = req.params;
     const {sportId} = req.query;
 
-    const limitParameters = checkGetLimitParameters(req.query);
+    const limitParameters = await checkGetLimitParameters(req.query);
     const result = await ExerciseService.getUserExercises(limitParameters, userId, sportId);
     HttpResponse.ok(res, result);
 }));
@@ -71,11 +79,17 @@ exerciseController.get(urls.get, asyncMiddlewareWrapper(async (req: Request, res
 }));
 
 exerciseController.post(urls.create, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
-    const {exerciseTemplateId, duration, reps} = req.body;
-    if (!exerciseTemplateId) {
-        throw Boom.badRequest(HttpErrors.MISSING_PARAMS);
+    const schema = {
+        exerciseTemplateId: Joi.number().required()
+    };
+
+    try {
+        await Joi.validate(req.body, schema);
+    } catch (e) {
+        HttpResponse.error(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
     }
 
+    const {exerciseTemplateId, duration, reps} = req.body;
     const result = await ExerciseService.createExercise({
         exerciseTemplateId, duration, reps
     });

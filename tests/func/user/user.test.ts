@@ -10,7 +10,6 @@ import {checkRequiredFields} from 'src/utils';
 import {API_URLS} from 'src/urls';
 import {generateUser} from 'tests/func/user/utils';
 import {getAllCountries} from 'tests/fill/country';
-import HttpErrors from 'src/utils/http/errors';
 
 const urls = API_URLS.user;
 const REQUEST_HEADERS = {Accept: 'application/json'};
@@ -140,7 +139,7 @@ describe('User:', (): void => {
                             }
 
                             const {message} = res.body.err;
-                            expect(message).to.equal(HttpErrors.MISSING_REQUIRED_FIELD);
+                            expect(message).to.equal(`"${field}" is required`);
                             expect(res.status).to.equal(400);
                             resolve();
                         });
@@ -303,7 +302,7 @@ describe('User:', (): void => {
 
         it('order params DESC', (done) => {
             request(app)
-                .get(`${urls.prefix}/${urls.get}?limit=100&skip=0&order=desc`)
+                .get(`${urls.prefix}/${urls.get}?limit=100&skip=0&order=DESC`)
                 .set(REQUEST_HEADERS)
                 .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                 .end((_, res) => {

@@ -3,6 +3,8 @@ export enum OrderType {
     ASC = 'ASC'
 }
 
+export const ORDER_TYPES = [OrderType.DESC, OrderType.ASC];
+
 export const updateQuery = (fields: string[], tableName: string, returning = '*') => {
     if (fields.length > 1) {
         return `UPDATE ${tableName} SET (

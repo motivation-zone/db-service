@@ -17,7 +17,7 @@ userController.post(urls.create, asyncMiddlewareWrapper(async (req: Request, res
 }));
 
 userController.get(urls.get, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
-    const limitParameters = checkGetLimitParameters(req.query);
+    const limitParameters = await checkGetLimitParameters(req.query);
     const result = await UserService.getUsers(limitParameters);
     HttpResponse.ok(res, result);
 }));

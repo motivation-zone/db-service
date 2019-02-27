@@ -1,8 +1,7 @@
 import Boom from 'boom';
-import * as yup from 'yup';
+import Joi from 'joi';
 
 import HttpResponse from 'src/utils/http/response';
-import HttpErrors from 'src/utils/http/errors';
 
 export interface IUserModel {
     id?: number;
@@ -27,24 +26,23 @@ export interface IUserModel {
 const phoneRegexp = /^\+[0-9]{1,4}\([0-9]{3}\)[0-9]{3}\-[0-9]{2}\-[0-9]{2}$/;
 const VALIDATION_SCHEMES = {
     create: {
-        login: yup.string().required(HttpErrors.MISSING_REQUIRED_FIELD),
-        name: yup.string().required(HttpErrors.MISSING_REQUIRED_FIELD),
-        password: yup.string().required(HttpErrors.MISSING_REQUIRED_FIELD),
-        email: yup.string().email().required(HttpErrors.MISSING_REQUIRED_FIELD),
-        gender: yup.boolean().required(HttpErrors.MISSING_REQUIRED_FIELD),
-        isAthlete: yup.boolean().notRequired(),
-        selfInfo: yup.string().notRequired(),
-        weight: yup.number().positive(HttpErrors.WRONG_DATA).notRequired(),
-        growth: yup.number().positive(HttpErrors.WRONG_DATA).notRequired(),
-        countryId: yup.number().positive(HttpErrors.WRONG_DATA).integer().notRequired(),
-        birthDate: yup.date().notRequired(),
-        isBanned: yup.boolean().notRequired(),
-        instagram: yup.string().notRequired(),
-        phone: yup.string().matches(phoneRegexp, HttpErrors.INVALID_PHONE_NUMBER).notRequired(),
-        registeredDate: yup.date().notRequired()
-    },
-    update: {},
-    get: {}
+        id: Joi.number(),
+        login: Joi.string().required(),
+        name: Joi.string().required(),
+        password: Joi.string().required(),
+        email: Joi.string().email().required(),
+        gender: Joi.boolean().required(),
+        isAthlete: Joi.boolean(),
+        selfInfo: Joi.string(),
+        weight: Joi.number().positive(),
+        growth: Joi.number().positive(),
+        countryId: Joi.number().positive().integer(),
+        birthDate: Joi.date(),
+        isBanned: Joi.boolean(),
+        instagram: Joi.string(),
+        phone: Joi.string().regex(phoneRegexp),
+        registeredDate: Joi.date()
+    }
 };
 
 export const NOT_UPDATED_FIELDS: (keyof IUserModel)[] = ['id', 'login', 'registeredDate'];
@@ -75,7 +73,7 @@ export default class UserModel implements IUserModel {
             countryId, instagram, phone, registeredDate
         } = data;
 
-        this.id = Number(id);
+        this.id = id;
         this.login = login;
         this.name = name;
         this.password = password;
@@ -98,11 +96,10 @@ export default class UserModel implements IUserModel {
     }
 
     async validateForCreate(): Promise<void> {
-        const schema = yup.object().shape(VALIDATION_SCHEMES.create);
         try {
-            await schema.validate(this);
+            await Joi.validate(this, VALIDATION_SCHEMES.create);
         } catch (e) {
-            HttpResponse.error(Boom.badRequest, e.errors.join(', '));
+            HttpResponse.error(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
         }
     }
 

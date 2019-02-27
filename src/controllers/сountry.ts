@@ -14,7 +14,7 @@ countryController.get(urls.get, asyncMiddlewareWrapper(async (_req: Request, res
 }));
 
 countryController.get(urls.getUsers, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
-    const limitParameters = checkGetLimitParameters(req.query);
+    const limitParameters = await checkGetLimitParameters(req.query);
     let {id} = req.params;
     if (id === 'null') {
         id = null;
