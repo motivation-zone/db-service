@@ -286,6 +286,7 @@ CREATE TABLE IF NOT EXISTS users (
   password TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   is_athlete BOOLEAN DEFAULT FALSE,
+  gender BOOLEAN NOT NULL,
   self_info TEXT,
   weight REAL,
   growth REAL,
@@ -308,7 +309,8 @@ CREATE TABLE IF NOT EXISTS exercise_template (
   description TEXT,
   user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
   sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
-  created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+  created_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  UNIQUE(title, description, user_id, sport_id)
 );
 
 CREATE TABLE IF NOT EXISTS exercise (
@@ -316,7 +318,8 @@ CREATE TABLE IF NOT EXISTS exercise (
   exercise_template_id BIGINT REFERENCES exercise_template(id) ON DELETE CASCADE,
   duration INTEGER DEFAULT 0,
   reps INTEGER DEFAULT 0,
-  created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+  created_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  UNIQUE(exercise_template_id, duration, reps)
 );
 -- Программа тренировок создается по выбору на кол-во дней (max 30 дней за раз, minimum 1 день)
 CREATE TABLE IF NOT EXISTS program (

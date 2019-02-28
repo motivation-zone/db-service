@@ -288,13 +288,14 @@ describe('User:', (): void => {
                 .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                 .end((_, res) => {
                     const users = res.body.data.map((userData: any) => new UserModel(userData));
-                    users.every((user: IUserModel, i: number) => {
+                    const checkDesc = users.every((user: IUserModel, i: number) => {
                         if (i === 0) {
                             return true;
                         }
 
-                        return user.id! > users[i - 1].id!;
+                        return user.registeredDate! >= users[i - 1].registeredDate!;
                     });
+                    expect(checkDesc).to.be.true;
                     expect(res.status).to.equal(200);
                     done();
                 });
@@ -307,12 +308,13 @@ describe('User:', (): void => {
                 .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
                 .end((_, res) => {
                     const users = res.body.data.map((userData: any) => new UserModel(userData));
-                    users.every((user: IUserModel, i: number) => {
+                    const checkDesc = users.every((user: IUserModel, i: number) => {
                         if (i === 0) {
                             return true;
                         }
-                        return user.id! < users[i - 1].id!;
+                        return user.registeredDate! <= users[i - 1].registeredDate!;
                     });
+                    expect(checkDesc).to.be.true;
                     expect(res.status).to.equal(200);
                     done();
                 });

@@ -11,9 +11,12 @@ const userUrls = API_URLS.user;
 
 export const createUsers = async (count: number): Promise<IUserModel[]> => {
     const countries = await getAllCountries();
-    return await Promise.all((new Array(count).fill(true)).map(async () => {
+
+    // this array fill on 50/50 true/false for creating users with country and without
+    const countsArray = [...new Array(count / 2).fill(true), ...new Array(count / 2).fill(false)];
+    return await Promise.all((countsArray).map(async (isCountryExist) => {
         const countryId = intervalRandom(countries[0].id, countries[countries.length - 1].id);
-        const user = generateUser({countryId});
+        const user = generateUser({countryId: isCountryExist ? countryId : undefined});
         return await new Promise((resolve, reject) => {
             request(app)
                 .post(`${userUrls.prefix}${userUrls.create}`)
@@ -27,4 +30,18 @@ export const createUsers = async (count: number): Promise<IUserModel[]> => {
                 });
         });
     }));
+};
+
+export const getUsers = async (limit: number, skip: number): Promise<IUserModel[]> => {
+    return await new Promise((resolve, reject) => {
+        request(app)
+            .get(`${userUrls.prefix}${userUrls.get}?limit=${limit}&skip=${skip}`)
+            .set('Accept', 'application/json')
+            .end((err: Error, res: request.Response) => {
+                if (err || res.status !== 200) {
+                    return reject(err || res.body);
+                }
+                resolve(res.body.data.map((user: any) => new UserModel(user)));
+            });
+    });
 };

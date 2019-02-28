@@ -1,18 +1,48 @@
+import {readFileSync} from 'fs';
+
 import {createUsers} from 'tests/fill/user';
 import {query} from 'src/lib/db/client';
+import {exec} from 'child_process';
+import {getAbsolutePath} from 'src/utils/fs';
+import {CREATED_USERS_COUNT} from 'tests/const';
 
-const truncateAll = async () => {
+const concatMigrations = async () => {
+    await new Promise((resolve, reject) => {
+        const concatFile = getAbsolutePath('./migration/concat.js');
+        exec(`node ${concatFile}`, (err) => {
+            if (err) {
+                reject(err);
+            }
+
+            resolve();
+        });
+    });
+};
+
+const reloadPublicSchema = async () => {
     await query({
-        text: [
-            'TRUNCATE TABLE users CASCADE',
-            'TRUNCATE TABLE user_sport CASCADE'
-        ].join(';'),
+        text: 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;',
         values: []
     });
 };
 
+const createTables = async () => {
+    const resultFile = readFileSync(getAbsolutePath('./migration/result.pgsql')).toString();
+    await query({
+        text: resultFile,
+        values: []
+    });
+};
+
+const clearDatabase = async () => {
+    await reloadPublicSchema();
+    await concatMigrations();
+    await createTables();
+};
+
 (async () => {
-    await truncateAll();
-    const users = await createUsers(20); // tslint:disable-line
+    await clearDatabase();
+    await createUsers(CREATED_USERS_COUNT);
+
     process.exit();
 })();
