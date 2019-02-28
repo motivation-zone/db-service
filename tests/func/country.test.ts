@@ -3,8 +3,8 @@ import {expect} from 'chai';
 
 import app from 'src/app';
 import {API_URLS} from 'src/urls';
-import {getAllCountries} from 'tests/fill/country';
-import {getUsers} from 'tests/fill/user';
+import {getAllCountriesFromDB} from 'tests/helpers/country';
+import {getUsersFromDB} from 'tests/helpers/user';
 import {CREATED_USERS_COUNT} from 'tests/const';
 import UserModel, {IUserModel} from 'src/models/user';
 
@@ -17,12 +17,12 @@ const COUNTRIES_COUNT = 247;
 describe('Country:', () => {
     describe('Get', () => {
         it('all countries', async () => {
-            const countries = await getAllCountries();
+            const countries = await getAllCountriesFromDB();
             expect(countries.length).to.equal(COUNTRIES_COUNT);
         });
 
         it('get users by countries', async () => {
-            const users = await getUsers(CREATED_USERS_COUNT, 0);
+            const users = await getUsersFromDB(CREATED_USERS_COUNT, 0);
             const usersWithCountry = users.filter((user) => user.countryId);
             const checkUser = usersWithCountry[0];
 

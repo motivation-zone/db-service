@@ -1,6 +1,6 @@
 import {readFileSync} from 'fs';
 
-import {createUsers} from 'tests/fill/user';
+import {insertUsersToDB} from 'tests/helpers/user';
 import {query} from 'src/lib/db/client';
 import {exec} from 'child_process';
 import {getAbsolutePath} from 'src/utils/fs';
@@ -42,7 +42,7 @@ const clearDatabase = async () => {
 
 (async () => {
     await clearDatabase();
-    await createUsers(CREATED_USERS_COUNT);
+    await insertUsersToDB(CREATED_USERS_COUNT);
 
     process.exit();
 })();

@@ -6,7 +6,7 @@ import CountryModel, {ICountryModel} from 'src/models/country';
 
 const countryUrls = API_URLS.country;
 
-export const getAllCountries = async (): Promise<ICountryModel[]> => {
+export const getAllCountriesFromDB = async (): Promise<ICountryModel[]> => {
     return await new Promise((resolve, reject) => {
         request(app)
             .get(`${countryUrls.prefix}${countryUrls.get}`)

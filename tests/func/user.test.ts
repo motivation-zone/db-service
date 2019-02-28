@@ -8,8 +8,8 @@ import {USER_RETURNING_FIELDS} from 'src/query-creators/user';
 import {translatePostgresqlNameToNode} from 'src/utils/db/helper';
 import {checkRequiredFields} from 'src/utils';
 import {API_URLS} from 'src/urls';
-import {generateUser} from 'tests/func/user/utils';
-import {getAllCountries} from 'tests/fill/country';
+import {generateUser} from 'tests/helpers/user';
+import {getAllCountriesFromDB} from 'tests/helpers/country';
 
 const urls = API_URLS.user;
 const REQUEST_HEADERS = {Accept: 'application/json'};
@@ -20,7 +20,7 @@ describe('User:', (): void => {
 
     describe('Create', () => {
         it('simple', async () => {
-            const countries = await getAllCountries();
+            const countries = await getAllCountriesFromDB();
             reqUser.countryId = Number(countries[0].id);
 
             return await new Promise((resolve, _reject) => {
@@ -150,7 +150,7 @@ describe('User:', (): void => {
 
     describe('Update', () => {
         it('simple', async () => {
-            const countries = await getAllCountries();
+            const countries = await getAllCountriesFromDB();
             const newUser = generateUser({
                 isAthlete: true,
                 isBanned: true,
