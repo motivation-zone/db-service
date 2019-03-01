@@ -39,9 +39,8 @@ userController.post(urls.updateById, asyncMiddlewareWrapper(async (req: Request,
     const {id} = req.params;
     const user = new UserModel(req.body);
     user.clearNotUpdatedFields();
-    user.id = id;
 
-    const result = await UserService.updateUser(user);
+    const result = await UserService.updateUser(id, user);
     HttpResponse.ok(res, result);
 }));
 

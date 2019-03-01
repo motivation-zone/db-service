@@ -29,12 +29,12 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async updateUser(user: UserModel): Promise<any[]> {
+    static async updateUser(id: number, user: UserModel): Promise<any[]> {
         const fields = getNotEmptyFields(user) as (keyof UserModel)[];
         const result = await query({
             text: updateUserQuery(fields.map(translateNodeToPostgresqlName)),
             values: [
-                user.id,
+                id,
                 ...fields.map((field) => user[field])
             ]
         });

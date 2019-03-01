@@ -19,7 +19,8 @@ export const API_URLS = {
     sport: {
         prefix: `${API_PREFIX}/sport`,
         get: '/get',
-        getUsers: '/get-users/:id',
+        getUsersBySport: '/get-users/:id',
+        getUserSports: '/get-sports/:id',
         updateUserSport: '/update-user/:actionType'
     },
     difficultyLevel: {

@@ -2,6 +2,7 @@ import Boom from 'boom';
 import {Request, Response, NextFunction} from 'express';
 
 import logger from 'src/lib/logger';
+import HttpResponse from 'src/utils/http/response';
 
 export default (err: any, _req: Request, res: Response, _next: NextFunction): void => {
     if (err.isBoom) {
@@ -13,5 +14,5 @@ export default (err: any, _req: Request, res: Response, _next: NextFunction): vo
 };
 
 function sendError(res: Response, err: Boom): void {
-    res.status(err.output.statusCode).json({err: err.output.payload});
+    HttpResponse.error(res, err.output.statusCode, err.output.payload);
 }

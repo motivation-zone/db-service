@@ -3,7 +3,7 @@ export interface ISportModel {
     name?: string;
 }
 
-export default class SportModel implements ISportModel{
+export default class SportModel implements ISportModel {
     public id?: number;
     public name?: string;
 

@@ -1,418 +1,263 @@
-import request from 'supertest';
 import {expect, assert} from 'chai';
+import pMap from 'p-map';
 
-import app from 'src/app';
-import UserModel, {IUserModel, REQUIRED_FIELDS, NOT_UPDATED_FIELDS} from 'src/models/user';
+import {IUserModel, REQUIRED_FIELDS, NOT_UPDATED_FIELDS} from 'src/models/user';
 import {checkAssertion} from 'tests/utils';
 import {USER_RETURNING_FIELDS} from 'src/query-creators/user';
 import {translatePostgresqlNameToNode} from 'src/utils/db/helper';
-import {checkRequiredFields} from 'src/utils';
-import {API_URLS} from 'src/urls';
-import {generateUser} from 'tests/helpers/user';
-import {getAllCountriesFromDB} from 'tests/helpers/country';
+import {checkRequiredFields, removeNotUpdatedFields} from 'src/utils';
+import {generateUser, dbActions as userDbActions} from 'tests/helpers/user';
+import {dbActions as countryDbActions} from 'tests/helpers/country';
+import {dbActions as sportDbActions} from 'tests/helpers/sport';
 
-const urls = API_URLS.user;
-const REQUEST_HEADERS = {Accept: 'application/json'};
-const RESPONSE_HEADERS: [string, RegExp] = ['Content-Type', /json/];
+const {getAllCountries} = countryDbActions;
+const {
+    insertUser,
+    updateUser,
+    getUserById,
+    getUserByLogin,
+    checkUserPassword,
+    getUsers,
+    deleteUserById
+} = userDbActions;
+const {getUserSports} = sportDbActions;
 
 describe('User:', (): void => {
-    const reqUser = generateUser();
-
     describe('Create', () => {
         it('simple', async () => {
-            const countries = await getAllCountriesFromDB();
-            reqUser.countryId = Number(countries[0].id);
+            const {data: [country]} = await getAllCountries();
+            const newUser = generateUser({countryId: country.id});
+            const {data: [insertedUser], status} = await insertUser(newUser);
 
-            return await new Promise((resolve, _reject) => {
-                request(app)
-                    .post(`${urls.prefix}${urls.create}`)
-                    .send(reqUser)
-                    .set(REQUEST_HEADERS)
-                    .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                    .expect((res) => {
-                        const user = new UserModel(res.body.data[0]);
-                        // password mustn't return after user was created
-                        expect(user.password).to.be.not.ok;
-                        // default values
-                        expect(user.isAthlete).to.be.false;
-                        expect(user.isBanned).to.be.false;
-                        // add for correct check
-                        user.password = reqUser.password;
-                        // check the availability of id & registeredDate
-                        expect(user.id).to.be.ok;
-                        expect(user.registeredDate).to.be.ok;
+            // password mustn't return after user was created
+            expect(insertedUser.password).to.be.not.ok;
+            // default values
+            expect(insertedUser.isAthlete).to.be.false;
+            expect(insertedUser.isBanned).to.be.false;
+            newUser.isAthlete = insertedUser.isAthlete;
+            newUser.isBanned = insertedUser.isBanned;
 
-                        user.countryId = user.countryId;
-
-                        // save data for next check & next 'update' tests
-                        reqUser.id = user.id;
-                        reqUser.registeredDate = user.registeredDate;
-                        reqUser.isAthlete = false;
-                        reqUser.isBanned = false;
-
-                        expect(user).to.deep.equal(reqUser);
-                        resolve();
-                    })
-                    .expect(200, () => {});
-            });
+            // add for correct check
+            insertedUser.password = newUser.password;
+            newUser.id = insertedUser.id;
+            newUser.registeredDate = insertedUser.registeredDate;
+            // check the availability of id & registeredDate
+            expect(insertedUser.id).to.be.ok;
+            expect(insertedUser.registeredDate).to.be.ok;
+            expect(insertedUser).to.deep.equal(newUser);
+            expect(status).to.equal(200);
         });
 
-        it('with not existing country id', (done) => {
-            const user = generateUser();
-            user.countryId = 99999999;
+        it('with not existing country id', async () => {
+            const {data: countries} = await getAllCountries();
+            const newUser = generateUser({countryId: countries![countries!.length - 1].id + 1});
+            const {error: {message}, status} = await insertUser(newUser);
 
-            request(app)
-                .post(`${urls.prefix}${urls.create}`)
-                .send(user)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .expect((res) => {
-                    const {message} = res.body.err;
-                    expect(message.includes('users_country_id_fkey')).to.be.true;
-                })
-                .expect(409, done);
+            expect(message.includes('users_country_id_fkey')).to.be.true;
+            expect(status).to.equal(409);
         });
 
-        it('with empty country id', (done) => {
-            const user = generateUser();
+        it('with empty country id', async () => {
+            const newUser = generateUser();
+            const {data: [insertedUser], status} = await insertUser(newUser);
 
-            request(app)
-                .post(`${urls.prefix}${urls.create}`)
-                .send(user)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .expect((res) => {
-                    const [userData] = res.body.data;
-                    const userModel = new UserModel(userData);
-                    expect(userModel.countryId).to.be.not.ok;
-                })
-                .expect(200, done);
+            expect(insertedUser.countryId).to.be.not.ok;
+            expect(status).to.equal(200);
         });
 
-        it('with same email', (done) => {
-            const user = generateUser();
-            user.email = reqUser.email;
+        it('with same email', async () => {
+            const {data: [user]} = await getUsers({limit: 10, skip: 0});
+            const newUser = generateUser();
+            newUser.email = user.email;
 
-            request(app)
-                .post(`${urls.prefix}${urls.create}`)
-                .send(user)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .expect((res) => {
-                    const {message} = res.body.err;
-                    expect(message.includes('users_email_key')).to.be.true;
-                })
-                .expect(409, done);
+            const {error: {message}, status} = await insertUser(newUser);
+
+            expect(message.includes('users_email_key')).to.be.true;
+            expect(status).to.equal(409);
         });
 
-        it('with same login', (done) => {
-            const user = generateUser();
-            user.login = reqUser.login;
+        it('with same login', async () => {
+            const {data: [user]} = await getUsers({limit: 10, skip: 0});
+            const newUser = generateUser();
+            newUser.login = user.login;
 
-            request(app)
-                .post(`${urls.prefix}${urls.create}`)
-                .send(user)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .expect((res) => {
-                    const {message} = res.body.err;
-                    expect(message.includes('users_login_key')).to.be.true;
-                })
-                .expect(409, done);
+            const {error: {message}, status} = await insertUser(newUser);
+
+            expect(message.includes('users_login_key')).to.be.true;
+            expect(status).to.equal(409);
         });
 
         it('without required fields', async () => {
-            await Promise.all(REQUIRED_FIELDS.map((field) => {
-                const user = generateUser();
-                delete user[field];
+            await Promise.all(REQUIRED_FIELDS.map(async (field) => {
+                const newUser = generateUser();
+                delete newUser[field];
 
-                return new Promise((resolve, reject) => {
-                    request(app)
-                        .post(`${urls.prefix}${urls.create}`)
-                        .send(user)
-                        .set(REQUEST_HEADERS)
-                        .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                        .end((err, res) => {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
+                const {error: {message}, status} = await insertUser(newUser);
 
-                            const {message} = res.body.err;
-                            expect(message).to.equal(`"${field}" is required`);
-                            expect(res.status).to.equal(400);
-                            resolve();
-                        });
-                });
+                expect(message).to.equal(`"${field}" is required`);
+                expect(status).to.equal(400);
             }));
         });
     });
 
     describe('Update', () => {
         it('simple', async () => {
-            const countries = await getAllCountriesFromDB();
+            const {data: [country]} = await getAllCountries();
             const newUser = generateUser({
                 isAthlete: true,
                 isBanned: true,
-                countryId: Number(countries[1].id)
+                countryId: country.id
             });
 
-            const updatedFields = Object.keys(reqUser) as (keyof IUserModel)[];
-            NOT_UPDATED_FIELDS.forEach((field) => {
-                const i = updatedFields.indexOf(field);
-                updatedFields.splice(i, 1);
-            });
+            const {data: [user]} = await getUsers({limit: 1, skip: 0});
+            const updatedFields = removeNotUpdatedFields(Object.keys(user), NOT_UPDATED_FIELDS) as (keyof IUserModel)[];
 
-            await Promise.all(updatedFields.map((field) => {
-                return new Promise((resolve, reject) => {
-                    request(app)
-                        .post(`${urls.prefix}${urls.updateById.replace(':id', String(reqUser.id))}`)
-                        .send({[field]: newUser[field]})
-                        .set(REQUEST_HEADERS)
-                        .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                        .end((err, res) => {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
+            await Promise.all(updatedFields.map(async (field) => {
+                const {data: [user]} = await getUsers({limit: 1, skip: 0});
+                const {data: [updatedUser]} = await updateUser(user.id!, {[field]: newUser[field]});
+                const {data: [checkUser]} = await getUserById(user.id!);
+                checkUser.password = updatedUser.password;
 
-                            const updatedUser = new UserModel(res.body.data[0]);
-                            assert(
-                                checkAssertion(updatedUser[field], newUser[field]),
-                                `${field}: ${updatedUser[field]} != ${newUser[field]}`
-                            );
-                            // save data for next tests
-                            reqUser[field] = updatedUser[field];
-                            resolve();
-                        });
-                });
+                assert(
+                    checkAssertion(checkUser[field], newUser[field]),
+                    `${field}: ${checkUser[field]} != ${newUser[field]}`
+                );
             }));
         });
 
         it('not updated fields with some updated field', async () => {
-            await Promise.all(NOT_UPDATED_FIELDS.map((field) => {
+            await pMap(NOT_UPDATED_FIELDS, async (field) => {
                 const newUser = generateUser();
+                const {data: [user]} = await getUsers({limit: 1, skip: 0});
 
-                return new Promise((resolve, reject) => {
-                    request(app)
-                        .post(`${urls.prefix}${urls.updateById.replace(':id', String(reqUser.id))}`)
-                        .send({
-                            [field]: newUser[field],
-                            // if send only not_updated_field => server remove it
-                            // and send empty query => will be error 409 (next test)
-                            selfInfo: newUser.selfInfo
-                        })
-                        .set(REQUEST_HEADERS)
-                        .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                        .end((err, res) => {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-
-                            const updatedUser = new UserModel(res.body.data[0]);
-                            assert(
-                                checkAssertion(updatedUser[field], reqUser[field]),
-                                `${updatedUser[field]} != ${reqUser[field]}`
-                            );
-                            expect(updatedUser.selfInfo).to.equal(newUser.selfInfo);
-                            // save data for next tests
-                            reqUser.selfInfo = updatedUser.selfInfo;
-                            resolve();
-                        });
+                await updateUser(user.id!, {
+                    [field]: newUser[field],
+                    // if send only not_updated_field => server remove it
+                    // and send empty query => will be error 409 (next test)
+                    selfInfo: newUser.selfInfo
                 });
-            }));
+                const {data: [checkUser]} = await getUserById(user.id!);
+
+                assert(
+                    checkAssertion(checkUser[field], user[field]),
+                    `${checkUser[field]} != ${user[field]}`
+                );
+                expect(checkUser.selfInfo).to.equal(newUser.selfInfo);
+            }, {concurrency: 1});
         });
 
         it('only not updated fields', async () => {
-            await Promise.all(NOT_UPDATED_FIELDS.map((field) => {
+            await Promise.all(NOT_UPDATED_FIELDS.map(async (field) => {
                 const newUser = generateUser();
+                const {data: [user]} = await getUsers({limit: 1, skip: 0});
 
-                return new Promise((resolve) => {
-                    request(app)
-                        .post(`${urls.prefix}${urls.updateById.replace(':id', String(reqUser.id))}`)
-                        .send({[field]: newUser[field]})
-                        .set(REQUEST_HEADERS)
-                        .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                        .expect(409, resolve);
-                });
+                const {status} = await updateUser(user.id!, {[field]: newUser[field]});
+                expect(status).to.equal(409);
             }));
         });
 
-        it('with not existing id', (done) => {
-            request(app)
-                .post(`${urls.prefix}${urls.updateById.replace(':id', '9999999')}`)
-                .send({name: 'name'})
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .end((_, res) => {
-                    const result = res.body.data;
-                    expect(result).to.be.empty;
-                    expect(res.status).to.equal(200);
-                    done();
-                });
+        it('with not existing id', async () => {
+            const {data, status} = await updateUser(99999999, {name: 'name'});
+            expect(data).to.be.empty;
+            expect(status).to.equal(200);
         });
     });
 
     describe('Get', () => {
-        it('users', (done) => {
-            request(app)
-                .get(`${urls.prefix}/${urls.get}?limit=3&skip=0`)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .end((_, res) => {
-                    const result = res.body.data;
-                    expect(result.length).to.equal(3);
+        it('users', async () => {
+            const {data: users} = await getUsers({limit: 3, skip: 0});
+            expect(users.length).to.equal(3);
 
-                    const userReturningFields = USER_RETURNING_FIELDS.split(', ')
-                        .map(translatePostgresqlNameToNode);
+            const userReturningFields = USER_RETURNING_FIELDS.split(', ')
+                    .map(translatePostgresqlNameToNode);
 
-                    const userData = result[0];
-                    expect(checkRequiredFields(userReturningFields, userData)).to.be.true;
-                    done();
-                });
+            const [user] = users;
+            expect(checkRequiredFields(userReturningFields, user)).to.be.true;
         });
 
-        it('should contains limit params', (done) => {
-            request(app)
-                .get(`${urls.prefix}/${urls.get}`)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .expect(400, done);
+        it('should contains limit params', async () => {
+            const {status} = await getUsers({});
+            expect(status).to.equal(400);
         });
 
-        it('order params by default ASC', (done) => {
-            request(app)
-                .get(`${urls.prefix}/${urls.get}?limit=100&skip=0`)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .end((_, res) => {
-                    const users = res.body.data.map((userData: any) => new UserModel(userData));
-                    const checkDesc = users.every((user: IUserModel, i: number) => {
-                        if (i === 0) {
-                            return true;
-                        }
+        it('order params by default ASC', async () => {
+            const {data: users, status} = await getUsers({limit: 100, skip: 0});
+            const checkAsc = users.every((user, i) => {
+                if (i === 0) {
+                    return true;
+                }
 
-                        return user.registeredDate! >= users[i - 1].registeredDate!;
-                    });
-                    expect(checkDesc).to.be.true;
-                    expect(res.status).to.equal(200);
-                    done();
-                });
+                return user.registeredDate! >= users[i - 1].registeredDate!;
+            });
+            expect(checkAsc).to.be.true;
+            expect(status).to.equal(200);
         });
 
-        it('order params DESC', (done) => {
-            request(app)
-                .get(`${urls.prefix}/${urls.get}?limit=100&skip=0&order=DESC`)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .end((_, res) => {
-                    const users = res.body.data.map((userData: any) => new UserModel(userData));
-                    const checkDesc = users.every((user: IUserModel, i: number) => {
-                        if (i === 0) {
-                            return true;
-                        }
-                        return user.registeredDate! <= users[i - 1].registeredDate!;
-                    });
-                    expect(checkDesc).to.be.true;
-                    expect(res.status).to.equal(200);
-                    done();
-                });
+        it('order params DESC', async () => {
+            const {data: users, status} = await getUsers({limit: 100, skip: 0, order: 'DESC'});
+            const checkDesc = users.every((user, i) => {
+                if (i === 0) {
+                    return true;
+                }
+
+                return user.registeredDate! <= users[i - 1].registeredDate!;
+            });
+            expect(checkDesc).to.be.true;
+            expect(status).to.equal(200);
         });
 
-        it('user by id', (done) => {
-            request(app)
-                .get(`${urls.prefix}/${urls.getById.replace(':id', String(reqUser.id))}`)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .end((_, res) => {
-                    const user = new UserModel(res.body.data[0]);
-                    user.password = reqUser.password;
-                    expect(user).to.deep.equal(reqUser);
-                    expect(res.status).to.equal(200);
-                    done();
-                });
+        it('SKIP work', async () => {
+            const {data: users1} = await getUsers({limit: 100, skip: 1});
+            const {data: users2} = await getUsers({limit: 100, skip: 2});
+
+            expect(users1[2]).to.deep.equal(users2[1]);
         });
 
-        it('user by login (strict)', (done) => {
-            request(app)
-                .get(`${urls.prefix}/${urls.getByLogin.replace(':login', String(reqUser.login))}`)
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .end((_, res) => {
-                    const user = new UserModel(res.body.data[0]);
-                    user.password = reqUser.password;
-
-                    expect(user).to.deep.equal(reqUser);
-                    expect(res.status).to.equal(200);
-                    done();
-                });
+        it('user by id', async () => {
+            const {data: [checkUser]} = await getUsers({limit: 1, skip: 0});
+            const {data: [user]} = await getUserById(checkUser.id!);
+            expect(user).to.deep.equal(checkUser);
         });
 
-        it('user by login (not strict)', (done) => {
-            request(app)
-                .get(
-                    `${urls.prefix}/${urls.getByLogin.replace(':login', '.')}?strict=false`
-                )
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .end((_, res) => {
-                    const result = res.body.data;
-                    expect(result.length > 0 && result.length <= 10).to.be.true;
-                    expect(res.status).to.equal(200);
-                    done();
-                });
+        it('user by login (strict)', async () => {
+            const {data: [checkUser]} = await getUsers({limit: 1, skip: 1, order: 'DESC'});
+            const {data: [user]} = await getUserByLogin(checkUser.login!);
+            expect(user).to.deep.equal(checkUser);
+        });
+
+        it('user by login (not strict)', async () => {
+            const STRICT_LENGTH_OF_RETURNING = 10; // in code write const
+            const {data: users, status} = await getUserByLogin('.', false);
+            expect(users.length > 0 && users.length <= STRICT_LENGTH_OF_RETURNING).to.be.true;
+            expect(status).to.equal(200);
         });
     });
 
-    describe('CHECK', () => {
-        it('password', (done) => {
-            request(app)
-                .post(`${urls.prefix}/${urls.checkPassword}`)
-                .send({login: reqUser.login, password: reqUser.password})
-                .set(REQUEST_HEADERS)
-                .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                .end((_, res) => {
-                    const result = res.body.data;
-                    const user = new UserModel(result[0]);
-                    expect(result.length === 1).to.be.true;
+    describe('Check', () => {
+        it('password', async () => {
+            const newUser = generateUser();
+            const {data: [user]} = await insertUser(newUser);
+            const {data: users} = await checkUserPassword(newUser.login!, newUser.password!);
 
-                    expect(user.id).to.equal(reqUser.id);
-                    expect(res.status).to.equal(200);
-                    done();
-                });
+            expect(users.length === 1).to.be.true;
+            expect(user.id).to.deep.equal(users[0].id);
         });
     });
 
-    describe('DELETE', () => {
+    describe('Delete', () => {
         it('by id', async () => {
-            await new Promise((resolve) => {
-                request(app)
-                    .delete(`${urls.prefix}/${urls.deleteById.replace(':id', String(reqUser.id))}`)
-                    .set(REQUEST_HEADERS)
-                    .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                    .end((_, res) => {
-                        const user = new UserModel(res.body.data[0]);
-                        user.password = reqUser.password;
+            const {data: [user]} = await getUsers({limit: 1, skip: 0});
+            const {data: sports} = await getUserSports(user.id!);
+            expect(sports.length > 0).to.be.true;
 
-                        expect(user).to.deep.equal(reqUser);
-                        expect(res.status).to.equal(200);
-                        resolve();
-                    });
-            });
+            const {data: [deletedUser]} = await deleteUserById(user.id!);
+            expect(user).to.deep.equal(deletedUser);
 
-            await new Promise((resolve) => {
-                request(app)
-                    .get(`${urls.prefix}/${urls.getById.replace(':id', String(reqUser.id))}`)
-                    .set(REQUEST_HEADERS)
-                    .expect(RESPONSE_HEADERS[0], RESPONSE_HEADERS[1])
-                    .end((_, res) => {
-                        const result = res.body.data;
-                        expect(result.length === 0).to.be.true;
-                        expect(res.status).to.equal(200);
-                        resolve();
-                    });
-            });
+            const {data: users} = await getUserById(user.id!);
+            expect(users.length === 0).to.be.true;
+
+            const {data: deletedSports} = await getUserSports(user.id!);
+            expect(deletedSports.length === 0).to.be.true;
         });
     });
 });

@@ -1,3 +1,9 @@
+export interface IGetLimitTest {
+    limit?: number;
+    skip?: number;
+    order?: string;
+}
+
 export const checkAssertion = (a: any, b: any, strict = false): boolean => {
     if (a instanceof Date && b instanceof Date) {
         a = String(a);

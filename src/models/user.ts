@@ -73,7 +73,7 @@ export default class UserModel implements IUserModel {
             countryId, instagram, phone, registeredDate
         } = data;
 
-        this.id = Number(id);
+        this.id = id ? Number(id) : undefined;
         this.login = login;
         this.name = name;
         this.password = password;
@@ -99,7 +99,7 @@ export default class UserModel implements IUserModel {
         try {
             await Joi.validate(this, VALIDATION_SCHEMES.create);
         } catch (e) {
-            HttpResponse.error(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
+            HttpResponse.throwError(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
         }
     }
 

@@ -4,46 +4,136 @@ import faker from 'faker';
 import app from 'src/app';
 import UserModel, {IUserModel} from 'src/models/user';
 import {API_URLS} from 'src/urls';
-import {getAllCountriesFromDB} from 'tests/helpers/country';
-import {intervalRandom} from 'src/utils';
+import {intervalRandom, formQueryString} from 'src/utils';
+import {IResponse, formResponse} from 'src/utils/http/response';
+import {IGetLimitTest} from 'tests/utils';
 
-const userUrls = API_URLS.user;
+const urls = API_URLS.user;
+const REQUEST_HEADERS = {Accept: 'application/json'};
 
-export const insertUsersToDB = async (count: number): Promise<IUserModel[]> => {
-    const countries = await getAllCountriesFromDB();
-
-    // this array fill on 50/50 true/false for creating users with country and without
-    const countsArray = [...new Array(count / 2).fill(true), ...new Array(count / 2).fill(false)];
-    return await Promise.all((countsArray).map(async (isCountryExist) => {
-        const countryId = intervalRandom(countries[0].id, countries[countries.length - 1].id);
-        const user = generateUser({countryId: isCountryExist ? countryId : undefined});
-        return await new Promise((resolve, reject) => {
-            request(app)
-                .post(`${userUrls.prefix}${userUrls.create}`)
-                .send(user)
-                .set('Accept', 'application/json')
-                .end((err: Error, res: request.Response) => {
-                    if (err || res.status !== 200) {
-                        return reject(err || res.body);
-                    }
-                    resolve(new UserModel(res.body.data[0]));
-                });
-        });
-    }));
-};
-
-export const getUsersFromDB = async (limit: number, skip: number): Promise<IUserModel[]> => {
+const insertUser = async (user: IUserModel): Promise<IResponse<IUserModel[]>> => {
     return await new Promise((resolve, reject) => {
         request(app)
-            .get(`${userUrls.prefix}${userUrls.get}?limit=${limit}&skip=${skip}`)
-            .set('Accept', 'application/json')
-            .end((err: Error, res: request.Response) => {
-                if (err || res.status !== 200) {
-                    return reject(err || res.body);
+            .post(`${urls.prefix}${urls.create}`)
+            .send(user)
+            .set(REQUEST_HEADERS)
+            .end((error, response) => {
+                if (error) {
+                    return reject(error);
                 }
-                resolve(res.body.data.map((user: any) => new UserModel(user)));
+
+                const result = formResponse<IUserModel>(response, UserModel);
+                resolve(result);
             });
     });
+};
+
+export const updateUser = async (id: number, data: any): Promise<IResponse<IUserModel[]>> => {
+    return await new Promise((resolve, reject) => {
+        request(app)
+            .post(`${urls.prefix}${urls.updateById.replace(':id', String(id))}`)
+            .send(data)
+            .set(REQUEST_HEADERS)
+            .end((error, response) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                const result = formResponse<IUserModel>(response, UserModel);
+                resolve(result);
+            });
+    });
+};
+
+export const getUserById = async (id: number): Promise<IResponse<IUserModel[]>> => {
+    return await new Promise((resolve, reject) => {
+        request(app)
+            .get(`${urls.prefix}${urls.getById.replace(':id', String(id))}`)
+            .set(REQUEST_HEADERS)
+            .end((error, response) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                const result = formResponse<IUserModel>(response, UserModel);
+                resolve(result);
+            });
+    });
+};
+
+export const getUserByLogin = async (login: string, strict = true): Promise<IResponse<IUserModel[]>> => {
+    return await new Promise((resolve, reject) => {
+        request(app)
+            .get(`${urls.prefix}/${urls.getByLogin.replace(':login', login)}?${!strict ? `strict=${strict}` : ''}`)
+            .set(REQUEST_HEADERS)
+            .end((error, response) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                const result = formResponse<IUserModel>(response, UserModel);
+                resolve(result);
+            });
+    });
+};
+
+export const checkUserPassword = async (login: string, password: string): Promise<IResponse<IUserModel[]>> => {
+    return await new Promise((resolve, reject) => {
+        request(app)
+            .post(`${urls.prefix}/${urls.checkPassword}`)
+            .send({login, password})
+            .set(REQUEST_HEADERS)
+            .end((error, response) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                const result = formResponse<IUserModel>(response, UserModel);
+                resolve(result);
+            });
+    });
+};
+
+export const getUsers = async (queryParams: IGetLimitTest): Promise<IResponse<IUserModel[]>> => {
+    return await new Promise((resolve, reject) => {
+        request(app)
+            .get(`${urls.prefix}${urls.get}?${formQueryString(queryParams)}`)
+            .set(REQUEST_HEADERS)
+            .end((error, response) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                const result = formResponse<IUserModel>(response, UserModel);
+                resolve(result);
+            });
+    });
+};
+
+export const deleteUserById = async (id: number): Promise<IResponse<IUserModel[]>> => {
+    return await new Promise((resolve, reject) => {
+        request(app)
+            .delete(`${urls.prefix}/${urls.deleteById.replace(':id', String(id))}`)
+            .set(REQUEST_HEADERS)
+            .end((error, response) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                const result = formResponse<IUserModel>(response, UserModel);
+                resolve(result);
+            });
+    });
+};
+
+export const dbActions = {
+    insertUser,
+    updateUser,
+    getUserById,
+    getUserByLogin,
+    checkUserPassword,
+    getUsers,
+    deleteUserById
 };
 
 const generatePhone = () => {

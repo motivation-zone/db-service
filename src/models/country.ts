@@ -40,7 +40,7 @@ export default class CountryModel {
         try {
             await Joi.validate(this, VALIDATION_SCHEMES);
         } catch (e) {
-            HttpResponse.error(Boom.badRequest, e.details.message);
+            HttpResponse.throwError(Boom.badRequest, e.details.message);
         }
     }
 }

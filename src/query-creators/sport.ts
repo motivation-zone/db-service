@@ -1,6 +1,8 @@
 import {OrderType} from 'src/query-creators/base';
 import {USER_RETURNING_FIELDS} from 'src/query-creators/user';
 
+const SPORT_RETURNING_FIELDS = ['id', 'name'];
+
 export const getSports = () => 'SELECT * FROM sport';
 
 export const addUser = () => {
@@ -22,5 +24,14 @@ export const getUsers = (order: OrderType = OrderType.ASC) => {
         INNER JOIN sport ON user_sport.sport_id = sport.id
         WHERE sport.id = $3
         ORDER BY registered_date ${order} LIMIT $1 OFFSET $2
+    `;
+};
+
+export const getUsersSport = () => {
+    return `
+        SELECT ${SPORT_RETURNING_FIELDS.map((x) => `sport.${x}`).join(', ')} FROM sport
+        INNER JOIN user_sport ON user_sport.sport_id = sport.id
+        INNER JOIN users ON user_sport.user_id = users.id
+        WHERE users.id = $1
     `;
 };

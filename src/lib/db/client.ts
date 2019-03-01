@@ -42,7 +42,7 @@ export const query = async (queryData: IQuery): Promise<any[]> => {
         data = await client.query(queryData);
     } catch (e) {
         logger('error', 'db', e.message);
-        HttpResponse.error(Boom.conflict, `${e.detail} ${e.message}`);
+        HttpResponse.throwError(Boom.conflict, `${e.detail} ${e.message}`);
     } finally {
         if (client) {
             client.release();

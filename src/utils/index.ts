@@ -35,6 +35,9 @@ export const intervalRandom = (min: number, max: number): number => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+/**
+ * Check that all fields has a value in object
+ */
 export const checkRequiredFields = (fields: string[], obj: any): boolean => {
     return fields.every((field) => {
         if (typeof obj[field] === 'boolean') {
@@ -45,6 +48,9 @@ export const checkRequiredFields = (fields: string[], obj: any): boolean => {
     });
 };
 
+/**
+ * Checker for get request limit params {limit, skip, order}
+ */
 export const checkGetLimitParameters = async (data: any): Promise<IGetLimit> => {
     const schema = {
         limit: Joi.number().required(),
@@ -55,18 +61,31 @@ export const checkGetLimitParameters = async (data: any): Promise<IGetLimit> => 
     try {
         await Joi.validate(data, schema);
     } catch (e) {
-        HttpResponse.error(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
+        HttpResponse.throwError(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
     }
 
     const {limit, skip, order} = data;
     return {limit, skip, order};
 };
 
-export const getNotEmptyFields = (obj: any, notUpdateFields: string[] = []) => {
+/**
+ * Remove all fields that includes in not updated fields
+ */
+export const removeNotUpdatedFields = (fields: string[], notUpdateFields: string[] = []): string[] => {
+    return fields.filter((field) => {
+        return !notUpdateFields.includes(field);
+    });
+};
+
+/**
+ * Return all fields of objects which not empty (has a value)
+ */
+export const getNotEmptyFields = (obj: any, notUpdateFields: string[] = []): string[] => {
+    const types = ['boolean', 'number'];
     return Object.keys(obj).filter((field) => {
         return !notUpdateFields.includes(field);
     }).filter((field) => {
-        if (typeof obj[field] === 'boolean') {
+        if (types.includes(typeof obj[field])) {
             return true;
         }
 
@@ -74,11 +93,18 @@ export const getNotEmptyFields = (obj: any, notUpdateFields: string[] = []) => {
     });
 };
 
-export const filterMapData = (nameFields: string[], valueFields: any[]) => {
+/**
+ * Create array of objects {name, value} from to arrays
+ */
+export const createMapData = (nameFields: string[], valueFields: any[]) => {
     return nameFields.map((name, i) => {
         return {
             name,
             value: valueFields[i]
         };
     }).filter((el) => el.value);
+};
+
+export const formQueryString = (data: any): string => {
+    return getNotEmptyFields(data).map((key) => `${key}=${data[key]}`).join('&');
 };

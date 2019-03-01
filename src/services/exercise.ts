@@ -15,7 +15,7 @@ import {
     deleteExercise as deleteExerciseQuery
 } from 'src/query-creators/exercise';
 import {translateNodeToPostgresqlName} from 'src/utils/db/helper';
-import {filterMapData} from 'src/utils';
+import {createMapData} from 'src/utils';
 
 interface IExercise {
     exerciseTemplateId: number;
@@ -86,7 +86,7 @@ export default class ExerciseService {
 
     static async createExercise(params: IExercise): Promise<any[]> {
         const {duration, reps, exerciseTemplateId} = params;
-        const fields = filterMapData(['duration', 'reps'], [duration, reps]);
+        const fields = createMapData(['duration', 'reps'], [duration, reps]);
 
         const result = await query({
             text: createExerciseQuery(fields.map((f) => f.name)),

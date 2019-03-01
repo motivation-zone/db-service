@@ -35,7 +35,8 @@ exerciseController.post(urls.template.create, asyncMiddlewareWrapper(async (req:
         if (!e.details) {
             throw e;
         }
-        HttpResponse.error(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
+
+        HttpResponse.throwError(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
     }
 }));
 
@@ -86,7 +87,7 @@ exerciseController.post(urls.create, asyncMiddlewareWrapper(async (req: Request,
     try {
         await Joi.validate(req.body, schema);
     } catch (e) {
-        HttpResponse.error(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
+        HttpResponse.throwError(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
     }
 
     const {exerciseTemplateId, duration, reps} = req.body;

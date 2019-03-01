@@ -2,19 +2,20 @@ import {
     getSports as getSportsQuery,
     addUser as addUserQuery,
     deleteUser as deleteUserQuery,
-    getUsers as getUsersQuery
+    getUsers as getUsersQuery,
+    getUsersSport as getUserSportsQuery
 } from 'src/query-creators/sport';
 import {query} from 'src/lib/db/client';
 import {prepareDBResult, IGetLimit} from 'src/services/base';
 
-enum SportUserActionType {
+export enum UserSportActionType {
     DELETE = 'delete',
     ADD = 'add'
 }
 
-export const SPORT_USER_ACTION_TYPES: SportUserActionType[] = [
-    SportUserActionType.DELETE,
-    SportUserActionType.ADD
+export const SPORT_USER_ACTION_TYPES: UserSportActionType[] = [
+    UserSportActionType.DELETE,
+    UserSportActionType.ADD
 ];
 
 export default class SportService {
@@ -36,8 +37,17 @@ export default class SportService {
         return prepareDBResult(result);
     }
 
-    static async updateUser(actionType: SportUserActionType, userId: number, sportId: number): Promise<any[]> {
-        const text = actionType === SportUserActionType.DELETE ? deleteUserQuery() : addUserQuery();
+    static async getUserSports(id: number): Promise<any[]> {
+        const result = await query({
+            text: getUserSportsQuery(),
+            values: [id]
+        });
+
+        return prepareDBResult(result);
+    }
+
+    static async updateUser(actionType: UserSportActionType, userId: number, sportId: number): Promise<any[]> {
+        const text = actionType === UserSportActionType.DELETE ? deleteUserQuery() : addUserQuery();
         const result = await query({
             text,
             values: [userId, sportId]
