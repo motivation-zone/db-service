@@ -74,7 +74,7 @@ describe('Sport:', () => {
             const userData = await generateUser();
             const {data: [newUser]} = await insertUser(userData);
             await insertUserSportLink(newUser.id!, sport.id!);
-            const {data: users} = await getUsersBySport(sport.id!, {limit: 10, skip: 0});
+            const {data: users} = await getUsersBySport(sport.id!, {limit: 100, skip: 0});
 
             const checkUser = users.find((user) => newUser.id === user.id);
             expect(checkUser!.id).to.equal(newUser.id);

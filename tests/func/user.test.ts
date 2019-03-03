@@ -246,7 +246,7 @@ describe('User:', (): void => {
 
     describe('Delete', () => {
         it('by id', async () => {
-            const {data: [user]} = await getUsers({limit: 1, skip: 0});
+            const {data: [user]} = await getUsers({limit: 1, skip: 10});
             const {data: sports} = await getUserSports(user.id!);
             expect(sports.length > 0).to.be.true;
 

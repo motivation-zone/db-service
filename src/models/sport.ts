@@ -10,7 +10,7 @@ export default class SportModel implements ISportModel {
     constructor(data: any) {
         const {id, name} = data;
 
-        this.id = id;
+        this.id = id && Number(id);
         this.name = name;
     }
 }

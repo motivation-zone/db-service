@@ -29,7 +29,7 @@ export default class CountryModel {
     constructor(data: any) {
         const {id, name, alpha2, alpha3, unCode} = data;
 
-        this.id = Number(id);
+        this.id = id && Number(id);
         this.name = name;
         this.alpha2 = alpha2;
         this.alpha3 = alpha3;

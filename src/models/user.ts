@@ -73,7 +73,7 @@ export default class UserModel implements IUserModel {
             countryId, instagram, phone, registeredDate
         } = data;
 
-        this.id = id ? Number(id) : undefined;
+        this.id = id && Number(id);
         this.login = login;
         this.name = name;
         this.password = password;
