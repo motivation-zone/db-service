@@ -1,1 +1,1 @@
-export default process.env.NODEJS_ENVIRONMENT || 'development';
+export default process.env.NODEJS_ENV || 'development';

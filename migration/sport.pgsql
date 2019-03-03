@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS sport (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT UNIQUE
+);
+
+INSERT INTO sport (name) VALUES ('calisthenic') ON CONFLICT DO NOTHING;
+INSERT INTO sport (name) VALUES ('swimming') ON CONFLICT DO NOTHING;

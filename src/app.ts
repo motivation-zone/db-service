@@ -1,20 +1,57 @@
-import * as express from 'express';
-import consoleLogger from './lib/console-logger';
+import express, {Request, Response} from 'express';
+import bodyParser from 'body-parser';
+
+import logger from 'src/lib/logger';
+import notFoundMiddleware from 'src/middleware/not-found';
+import errorMiddleware from 'src/middleware/error';
+
+import controllers from 'src/controllers';
+const {
+    CountryController,
+    DifficultyLevelController,
+    ExerciseController,
+    ProgramController,
+    SportController,
+    TrainingTypeController,
+    TrainingController,
+    UserController
+} = controllers;
+
+import {API_URLS} from './urls';
+
+const {
+    user,
+    country,
+    sport,
+    difficultyLevel,
+    exercise,
+    program,
+    trainingType,
+    training
+} = API_URLS;
 
 const app = express()
     .disable('x-powered-by')
-    .get('/ping', (req, res) => res.end())
-    .use((req, res, next) => res.status(404).send('Not found'))
-    .use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-        res.status(500).send('Server error');
-    });
-
-export default app;
+    .use(bodyParser.urlencoded({extended: false}))
+    .use(bodyParser.json())
+    .get('/ping', (_req: Request, res: Response) => res.end())
+    .use(user.prefix, UserController)
+    .use(country.prefix, CountryController)
+    .use(sport.prefix, SportController)
+    .use(difficultyLevel.prefix, DifficultyLevelController)
+    .use(exercise.prefix, ExerciseController)
+    .use(program.prefix, ProgramController)
+    .use(trainingType.prefix, TrainingTypeController)
+    .use(training.prefix, TrainingController)
+    .use(notFoundMiddleware)
+    .use(errorMiddleware);
 
 if (!module.parent) {
     const envPort = Number(process.env.NODEJS_PORT);
     const port: number = isNaN(envPort) ? 8080 : envPort;
     app.listen(port, () => {
-        consoleLogger['info'](`Application started on port ${port}`);
+        logger('info', 'app', `Application started on port ${port}`);
     });
 }
+
+export default app;

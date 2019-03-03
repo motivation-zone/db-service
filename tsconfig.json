@@ -1,17 +1,45 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "target": "ESNext",
         "moduleResolution": "node",
-        "target": "es2017",
-        "lib": ["es2017"],
+        "lib": ["es2017", "dom"],
+        "outDir": "./build",
+        "module": "commonjs",
+
         "strict": true,
-        "noEmitOnError": true,
-        "types": ["node"],
-        "sourceMap": true
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "sourceMap": true,
+        "strictNullChecks": true,
+
+        "baseUrl": "./",
+        "paths": {
+            "src/*": [
+                "./src/*",
+            ],
+            "tests/*": [
+                "./tests/*"
+            ],
+            "*": [
+                "./node_modules/@types/*",
+                "./@types/*"
+            ]
+        },
+        "types": [
+            "node",
+            "chai",
+            "mocha",
+            "supertest",
+            "express"
+        ],
+        "typeRoots": [
+            "./node_modules/@types"
+        ]
     },
     "include": [
         "src/**/*",
         "configs/**/*",
-        "ts/**/*"
+        "@types/**/*",
+        "tests/**/*"
     ]
 }
