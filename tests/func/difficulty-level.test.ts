@@ -6,8 +6,8 @@ import {DIFFICULTY_LEVEL_COUNT} from 'tests/const';
 const {getAllDifficultyLevels} = difficultyLevelDbActions;
 
 describe('Difficulty-level:', () => {
-    describe('Get', () => {
-        it('all levels', async () => {
+    describe('Get levels', () => {
+        it('all', async () => {
             const {data: levels} = await getAllDifficultyLevels();
             expect(levels.length).to.equal(DIFFICULTY_LEVEL_COUNT);
 

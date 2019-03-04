@@ -13,13 +13,15 @@ const {
 } = sportDbActions;
 
 describe('Sport:', () => {
-    describe('Get', () => {
-        it('all sports', async () => {
+    describe('Get sports', () => {
+        it('all', async () => {
             const {data: sports} = await getAllSports();
             expect(sports.length).to.equal(SPORTS_COUNT);
         });
+    });
 
-        it('get users by sports ASC', async () => {
+    describe('Get users', () => {
+        it('by sports with order param = ASC', async () => {
             const {data: [sport]} = await getAllSports();
             const {data: users} = await getUsersBySport(sport.id!, {limit: 10, skip: 0});
             expect(users.length).be.greaterThan(0);
@@ -34,7 +36,7 @@ describe('Sport:', () => {
             expect(checkAsc).to.be.true;
         });
 
-        it('get users by sports DESC', async () => {
+        it('by sports with order param = DESC', async () => {
             const {data: [sport]} = await getAllSports();
             const {data: users} = await getUsersBySport(sport.id!, {limit: 10, skip: 0, order: 'DESC'});
             expect(users.length).be.greaterThan(0);
@@ -49,15 +51,14 @@ describe('Sport:', () => {
             expect(checkDesc).to.be.true;
         });
 
-        it('get users by sport with empty params', async () => {
+        it('by sport without limit params', async () => {
             const {data: [sport]} = await getAllSports();
             const {status} = await getUsersBySport(sport.id!, {});
             expect(status).to.equal(400);
         });
     });
 
-    describe('Update', () => {
-        // Remove link of user-sport
+    describe('Update user-sport link', () => {
         it('delete', async () => {
             const {data: [sport]} = await getAllSports();
             const {data: [deletedUser]} = await getUsersBySport(sport.id!, {limit: 10, skip: 0});
@@ -68,7 +69,6 @@ describe('Sport:', () => {
             expect(checkUser).to.be.not.ok;
         });
 
-        // Add link of user-sport
         it('add', async () => {
             const {data: [sport]} = await getAllSports();
             const userData = await generateUser();

@@ -4,7 +4,7 @@ import Joi from 'joi';
 
 import SportService, {SPORT_USER_ACTION_TYPES} from 'src/services/sport';
 import HttpResponse from 'src/utils/http/response';
-import {checkGetLimitParameters, asyncMiddlewareWrapper} from 'src/utils';
+import {checkGetLimitParameters, asyncMiddlewareWrapper, joiValidationErrorToString} from 'src/utils';
 import {API_URLS} from 'src/urls';
 
 const sportController = express();
@@ -17,16 +17,16 @@ sportController.get(urls.get, asyncMiddlewareWrapper(async (_req: Request, res: 
 
 sportController.get(urls.getUsersBySport, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const limitParameters = await checkGetLimitParameters(req.query);
-    const {id} = req.params;
+    const {sportId} = req.params;
 
-    const result = await SportService.getUsers(limitParameters, id);
+    const result = await SportService.getUsers(limitParameters, sportId);
     HttpResponse.ok(res, result);
 }));
 
 sportController.get(urls.getUserSports, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
-    const {id} = req.params;
+    const {userId} = req.params;
 
-    const result = await SportService.getUserSports(id);
+    const result = await SportService.getUserSports(userId);
     HttpResponse.ok(res, result);
 }));
 
@@ -44,7 +44,7 @@ sportController.post(urls.updateUserSport, asyncMiddlewareWrapper(
         try {
             await Joi.validate({userId, sportId, actionType}, schema);
         } catch (e) {
-            HttpResponse.throwError(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
+            HttpResponse.throwError(Boom.badRequest, joiValidationErrorToString(e));
         }
 
         const result = await SportService.updateUser(actionType, userId, sportId);

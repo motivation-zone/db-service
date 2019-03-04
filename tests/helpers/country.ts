@@ -32,7 +32,7 @@ const getUsersByCountry = async (
 ): Promise<IResponse<IUserModel[]>> => {
     return await new Promise((resolve, reject) => {
         request(app)
-            .get(`${urls.prefix}${urls.getUsers.replace(':id', String(countryId))}?${formQueryString(queryParams)}`)
+            .get(`${urls.prefix}${urls.getUsers.replace(':countryId', String(countryId))}?${formQueryString(queryParams)}`)
             .set(REQUEST_HEADERS)
             .end((error, response) => {
                 if (error) {

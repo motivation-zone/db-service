@@ -10,6 +10,7 @@ const {
     CountryController,
     DifficultyLevelController,
     ExerciseController,
+    ExerciseTemplateController,
     ProgramController,
     SportController,
     TrainingTypeController,
@@ -25,6 +26,7 @@ const {
     sport,
     difficultyLevel,
     exercise,
+    exerciseTemplate,
     program,
     trainingType,
     training
@@ -40,6 +42,7 @@ const app = express()
     .use(sport.prefix, SportController)
     .use(difficultyLevel.prefix, DifficultyLevelController)
     .use(exercise.prefix, ExerciseController)
+    .use(exerciseTemplate.prefix, ExerciseTemplateController)
     .use(program.prefix, ProgramController)
     .use(trainingType.prefix, TrainingTypeController)
     .use(training.prefix, TrainingController)

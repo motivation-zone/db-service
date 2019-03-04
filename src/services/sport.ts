@@ -28,19 +28,19 @@ export default class SportService {
         return prepareDBResult(result);
     }
 
-    static async getUsers(data: IGetLimit, id: number): Promise<any[]> {
+    static async getUsers(data: IGetLimit, sportId: number): Promise<any[]> {
         const result = await query({
             text: getUsersQuery(data.order),
-            values: [data.limit, data.skip, id]
+            values: [data.limit, data.skip, sportId]
         });
 
         return prepareDBResult(result);
     }
 
-    static async getUserSports(id: number): Promise<any[]> {
+    static async getUserSports(userId: number): Promise<any[]> {
         const result = await query({
             text: getUserSportsQuery(),
-            values: [id]
+            values: [userId]
         });
 
         return prepareDBResult(result);

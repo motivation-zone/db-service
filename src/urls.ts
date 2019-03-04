@@ -14,33 +14,34 @@ export const API_URLS = {
     country: {
         prefix: `${API_PREFIX}/country`,
         get: '/get',
-        getUsers: '/get-users/:id'
+        getUsers: '/get-users/:countryId'
     },
     sport: {
         prefix: `${API_PREFIX}/sport`,
         get: '/get',
-        getUsersBySport: '/get-users/:id',
-        getUserSports: '/get-sports/:id',
+        getUsersBySport: '/get-users/:sportId',
+        getUserSports: '/get-sports/:userId',
         updateUserSport: '/update-user/:actionType'
     },
     difficultyLevel: {
         prefix: `${API_PREFIX}/difficulty-level`,
         get: '/get'
     },
+    exerciseTemplate: {
+        prefix: `${API_PREFIX}/exercise-template`,
+        get: '/get/:userId',
+        create: '/create',
+        getById: '/get/id/:templateId',
+        deleteById: '/delete/:templateId',
+        updateById: '/update/:templateId'
+    },
     exercise: {
         prefix: `${API_PREFIX}/exercise`,
-        template: {
-            getMany: '/template/many/:userId/get',
-            create: '/template/create',
-            get: '/template/:templateId/get',
-            delete: '/template/:templateId/delete',
-            update: '/template/:templateId/update'
-        },
-        getMany: '/many/:userId/get',
-        get: '/:exerciseId/get',
+        get: '/get/:userId',
+        getById: '/get/id/:exerciseId',
         create: '/create',
-        update: '/:exerciseId/update',
-        delete: '/:exerciseId/delete'
+        updateById: '/update/:exerciseId',
+        deleteById: '/delete/:exerciseId'
     },
     program: {
         prefix: `${API_PREFIX}/program`,

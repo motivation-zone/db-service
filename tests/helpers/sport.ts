@@ -66,7 +66,7 @@ const getUsersBySport = async (sportId: number, queryParams: IGetLimitTest): Pro
     return await new Promise((resolve, reject) => {
         request(app)
             .get(`${urls.prefix}${urls.getUsersBySport
-                .replace(':id', String(sportId))}?${formQueryString(queryParams)}`)
+                .replace(':sportId', String(sportId))}?${formQueryString(queryParams)}`)
             .set(REQUEST_HEADERS)
             .end((error, response) => {
                 if (error) {
@@ -82,7 +82,7 @@ const getUsersBySport = async (sportId: number, queryParams: IGetLimitTest): Pro
 const getUserSports = async (userId: number): Promise<IResponse<ISportModel[]>> => {
     return await new Promise((resolve, reject) => {
         request(app)
-            .get(`${urls.prefix}${urls.getUserSports.replace(':id', String(userId))}`)
+            .get(`${urls.prefix}${urls.getUserSports.replace(':userId', String(userId))}`)
             .set(REQUEST_HEADERS)
             .end((error, response) => {
                 if (error) {

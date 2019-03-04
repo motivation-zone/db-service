@@ -2,6 +2,7 @@ import Boom from 'boom';
 import Joi from 'joi';
 
 import HttpResponse from 'src/utils/http/response';
+import {parseDate, joiValidationErrorToString} from 'src/utils';
 
 export interface IUserModel {
     id?: number;
@@ -87,8 +88,8 @@ export default class UserModel implements IUserModel {
         this.phone = phone;
         this.isBanned = isBanned;
         this.countryId = countryId ? Number(countryId) : undefined;
-        this.birthDate = UserModel.parseDate(birthDate);
-        this.registeredDate = UserModel.parseDate(registeredDate);
+        this.birthDate = parseDate(birthDate);
+        this.registeredDate = parseDate(registeredDate);
     }
 
     clearNotUpdatedFields(): void {
@@ -99,21 +100,7 @@ export default class UserModel implements IUserModel {
         try {
             await Joi.validate(this, VALIDATION_SCHEMES.create);
         } catch (e) {
-            HttpResponse.throwError(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
-        }
-    }
-
-    static parseDate(date: Date | string | undefined): Date | undefined {
-        if (!date) {
-            return;
-        }
-
-        if (date instanceof Date) {
-            return date;
-        }
-
-        if (typeof date === 'string') {
-            return new Date(Date.parse(date));
+            HttpResponse.throwError(Boom.badRequest, joiValidationErrorToString(e));
         }
     }
 }

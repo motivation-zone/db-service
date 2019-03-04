@@ -23,7 +23,7 @@ const {
 const {getUserSports} = sportDbActions;
 
 describe('User:', (): void => {
-    describe('Create', () => {
+    describe('Create user', () => {
         it('simple', async () => {
             const {data: [country]} = await getAllCountries();
             const newUser = generateUser({countryId: country.id});
@@ -100,7 +100,7 @@ describe('User:', (): void => {
         });
     });
 
-    describe('Update', () => {
+    describe('Update user', () => {
         it('simple', async () => {
             const {data: [country]} = await getAllCountries();
             const newUser = generateUser({
@@ -125,7 +125,7 @@ describe('User:', (): void => {
             }));
         });
 
-        it('not updated fields with some updated field', async () => {
+        it('with not updated fields and some updated field', async () => {
             await pMap(NOT_UPDATED_FIELDS, async (field) => {
                 const newUser = generateUser();
                 const {data: [user]} = await getUsers({limit: 1, skip: 0});
@@ -146,7 +146,7 @@ describe('User:', (): void => {
             }, {concurrency: 1});
         });
 
-        it('only not updated fields', async () => {
+        it('with only not updated fields', async () => {
             await Promise.all(NOT_UPDATED_FIELDS.map(async (field) => {
                 const newUser = generateUser();
                 const {data: [user]} = await getUsers({limit: 1, skip: 0});
@@ -163,8 +163,8 @@ describe('User:', (): void => {
         });
     });
 
-    describe('Get', () => {
-        it('users', async () => {
+    describe('Get users', () => {
+        it('many', async () => {
             const {data: users} = await getUsers({limit: 3, skip: 0});
             expect(users.length).to.equal(3);
 
@@ -175,12 +175,12 @@ describe('User:', (): void => {
             expect(checkRequiredFields(userReturningFields, user)).to.be.true;
         });
 
-        it('should contains limit params', async () => {
+        it('without limit params', async () => {
             const {status} = await getUsers({});
             expect(status).to.equal(400);
         });
 
-        it('order params by default ASC', async () => {
+        it('with default order param = ASC', async () => {
             const {data: users, status} = await getUsers({limit: 100, skip: 0});
             const checkAsc = users.every((user, i) => {
                 if (i === 0) {
@@ -193,7 +193,7 @@ describe('User:', (): void => {
             expect(status).to.equal(200);
         });
 
-        it('order params DESC', async () => {
+        it('with order param = DESC', async () => {
             const {data: users, status} = await getUsers({limit: 100, skip: 0, order: 'DESC'});
             const checkDesc = users.every((user, i) => {
                 if (i === 0) {
@@ -206,26 +206,28 @@ describe('User:', (): void => {
             expect(status).to.equal(200);
         });
 
-        it('SKIP work', async () => {
+        it('with offset param', async () => {
             const {data: users1} = await getUsers({limit: 100, skip: 1});
             const {data: users2} = await getUsers({limit: 100, skip: 2});
 
             expect(users1[2]).to.deep.equal(users2[1]);
         });
+    });
 
-        it('user by id', async () => {
+    describe('Get user', () => {
+        it('by id', async () => {
             const {data: [checkUser]} = await getUsers({limit: 1, skip: 0});
             const {data: [user]} = await getUserById(checkUser.id!);
             expect(user).to.deep.equal(checkUser);
         });
 
-        it('user by login (strict)', async () => {
+        it('by login (strict)', async () => {
             const {data: [checkUser]} = await getUsers({limit: 1, skip: 1, order: 'DESC'});
             const {data: [user]} = await getUserByLogin(checkUser.login!);
             expect(user).to.deep.equal(checkUser);
         });
 
-        it('user by login (not strict)', async () => {
+        it('by login (not strict)', async () => {
             const STRICT_LENGTH_OF_RETURNING = 10; // in code write const
             const {data: users, status} = await getUserByLogin('.', false);
             expect(users.length > 0 && users.length <= STRICT_LENGTH_OF_RETURNING).to.be.true;
@@ -233,7 +235,7 @@ describe('User:', (): void => {
         });
     });
 
-    describe('Check', () => {
+    describe('Check user', () => {
         it('password', async () => {
             const newUser = generateUser();
             const {data: [user]} = await insertUser(newUser);
@@ -244,7 +246,7 @@ describe('User:', (): void => {
         });
     });
 
-    describe('Delete', () => {
+    describe('Delete user', () => {
         it('by id', async () => {
             const {data: [user]} = await getUsers({limit: 1, skip: 10});
             const {data: sports} = await getUserSports(user.id!);

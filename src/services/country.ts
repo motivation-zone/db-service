@@ -15,10 +15,10 @@ export default class CountryService {
         return prepareDBResult(result);
     }
 
-    static async getUsers(data: IGetLimit, id?: number): Promise<any[]> {
+    static async getUsers(data: IGetLimit, countryId?: number): Promise<any[]> {
         const result = await query({
-            text: id ? getUsersQuery(data.order) : getUsersWithoutCountryQuery(data.order),
-            values: [data.limit, data.skip].concat(id ? [id] : [])
+            text: countryId ? getUsersQuery(data.order) : getUsersWithoutCountryQuery(data.order),
+            values: [data.limit, data.skip].concat(countryId ? [countryId] : [])
         });
 
         return prepareDBResult(result);

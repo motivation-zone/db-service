@@ -6,6 +6,20 @@ import {IGetLimit} from 'src/services/base';
 import {ORDER_TYPES} from 'src/query-creators/base';
 import HttpResponse from 'src/utils/http/response';
 
+export const parseDate = (date: Date | string | undefined): Date | undefined => {
+    if (!date) {
+        return;
+    }
+
+    if (date instanceof Date) {
+        return date;
+    }
+
+    if (typeof date === 'string') {
+        return new Date(Date.parse(date));
+    }
+};
+
 /**
  * It's neccessary for parsing boolean keys from query
  */
@@ -61,7 +75,7 @@ export const checkGetLimitParameters = async (data: any): Promise<IGetLimit> => 
     try {
         await Joi.validate(data, schema);
     } catch (e) {
-        HttpResponse.throwError(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
+        HttpResponse.throwError(Boom.badRequest, joiValidationErrorToString(e));
     }
 
     const {limit, skip, order} = data;
@@ -107,4 +121,8 @@ export const createMapData = (nameFields: string[], valueFields: any[]) => {
 
 export const formQueryString = (data: any): string => {
     return getNotEmptyFields(data).map((key) => `${key}=${data[key]}`).join('&');
+};
+
+export const joiValidationErrorToString = (error: Joi.ValidationError): string => {
+    return error.details.map((d: any) => d.message).join(', ');
 };

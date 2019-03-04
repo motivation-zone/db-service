@@ -8,13 +8,15 @@ const {getAllCountries, getUsersByCountry} = countryDbActions;
 const {getUsers} = userDbActions;
 
 describe('Country:', () => {
-    describe('Get', () => {
-        it('all countries', async () => {
+    describe('Get countries', () => {
+        it('all', async () => {
             const {data: countries} = await getAllCountries();
             expect(countries.length).to.equal(COUNTRIES_COUNT);
         });
+    });
 
-        it('get users by countries', async () => {
+    describe('Get users', () => {
+        it('by country', async () => {
             const {data: users} = await getUsers({limit: CREATED_USERS_COUNT, skip: 0});
             const [checkUser] = users.filter((user) => user.countryId);
 
@@ -23,7 +25,7 @@ describe('Country:', () => {
             countryUsers.forEach((user) => expect(user.countryId).to.equal(checkUser.countryId));
         });
 
-        it('get users by countries ASC', async () => {
+        it('by country with order param = ASC', async () => {
             const {data: users} = await getUsersByCountry(null, {limit: 10, skip: 0});
             expect(users.length).be.greaterThan(0);
             users.forEach((user) => expect(user.countryId).to.be.not.ok);
@@ -38,7 +40,7 @@ describe('Country:', () => {
             expect(checkAsc).to.be.true;
         });
 
-        it('get users by countries DESC', async () => {
+        it('by country with order param = DESC', async () => {
             const {data: users} = await getUsersByCountry(null, {limit: 10, skip: 0, order: 'DESC'});
             expect(users.length).be.greaterThan(0);
             users.forEach((user) => expect(user.countryId).to.be.not.ok);
@@ -53,7 +55,7 @@ describe('Country:', () => {
             expect(checkDesc).to.be.true;
         });
 
-        it('get users by country with empty params', async () => {
+        it('by country without limit params', async () => {
             const {data: users} = await getUsers({limit: CREATED_USERS_COUNT, skip: 0});
             const [checkUser] = users.filter((user) => user.countryId);
 
