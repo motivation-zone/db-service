@@ -5,12 +5,12 @@ import HttpResponse from 'src/utils/http/response';
 import {parseDate, joiValidationErrorToString} from 'src/utils';
 
 export interface IExerciseTemplateModel {
-    id?: number,
-    title?: string,
-    description?: string,
-    userId?: number,
-    sportId?: number,
-    createdDate?: Date
+    id?: number;
+    title?: string;
+    description?: string;
+    userId?: number;
+    sportId?: number;
+    createdDate?: Date;
 }
 
 const VALIDATION_SCHEMES = Joi.object().keys({
