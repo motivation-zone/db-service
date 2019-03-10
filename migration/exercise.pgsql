@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS exercise_template (
   id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
-  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
   sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
   created_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
   UNIQUE(title, description, user_id, sport_id)

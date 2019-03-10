@@ -9,7 +9,8 @@ import {
     getExerciseTemplateById as getExerciseTemplateByIdQuery
 } from 'src/query-creators/exercise-template';
 import {translateNodeToPostgresqlName} from 'src/utils/db/helper';
-import {IExerciseTemplateModel} from 'src/models/exercise-template';
+import ExerciseTemplateModel, {IExerciseTemplateModel} from 'src/models/exercise-template';
+import {getNotEmptyFields} from 'src/utils';
 
 export default class ExerciseService {
     static async createExerciseTemplate(template: IExerciseTemplateModel): Promise<any[]> {
@@ -22,12 +23,13 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async updateExerciseTemplate(templateId: number, fields: string[], obj: any): Promise<any[]> {
+    static async updateExerciseTemplate(templateId: number, template: ExerciseTemplateModel): Promise<any[]> {
+        const fields = getNotEmptyFields(template) as (keyof IExerciseTemplateModel)[];
         const result = await query({
             text: updateExerciseTemplateQuery(fields.map(translateNodeToPostgresqlName)),
             values: [
                 templateId,
-                ...fields.map((field) => obj[field])
+                ...fields.map((field) => template[field])
             ]
         });
 

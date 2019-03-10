@@ -39,7 +39,7 @@ const insertUserSportLink = async (userId: number, sportId: number): Promise<IRe
                     return reject(error);
                 }
 
-                const result = formResponse<LinkUserSportModel>(response, LinkUserSportModel);
+                const result = formResponse<ILinkUserSportModel>(response, LinkUserSportModel);
                 resolve(result);
             });
     });
@@ -56,7 +56,7 @@ const deleteUserSportLink = async (userId: number, sportId: number): Promise<IRe
                     return reject(error);
                 }
 
-                const result = formResponse<LinkUserSportModel>(response, LinkUserSportModel);
+                const result = formResponse<ILinkUserSportModel>(response, LinkUserSportModel);
                 resolve(result);
             });
     });

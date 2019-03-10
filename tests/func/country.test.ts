@@ -3,6 +3,7 @@ import {expect} from 'chai';
 import {dbActions as countryDbActions} from 'tests/helpers/country';
 import {dbActions as userDbActions} from 'tests/helpers/user';
 import {CREATED_USERS_COUNT, COUNTRIES_COUNT} from 'tests/const';
+import {checkOrder} from 'tests/utils';
 
 const {getAllCountries, getUsersByCountry} = countryDbActions;
 const {getUsers} = userDbActions;
@@ -30,13 +31,7 @@ describe('Country:', () => {
             expect(users.length).be.greaterThan(0);
             users.forEach((user) => expect(user.countryId).to.be.not.ok);
 
-            const checkAsc = users.every((user, i) => {
-                if (i === 0) {
-                    return true;
-                }
-
-                return user.registeredDate! >= users[i - 1].registeredDate!;
-            });
+            const checkAsc = checkOrder(users, 'ASC', (user) => user.registeredDate);
             expect(checkAsc).to.be.true;
         });
 
@@ -45,13 +40,7 @@ describe('Country:', () => {
             expect(users.length).be.greaterThan(0);
             users.forEach((user) => expect(user.countryId).to.be.not.ok);
 
-            const checkDesc = users.every((user, i) => {
-                if (i === 0) {
-                    return true;
-                }
-
-                return user.registeredDate! <= users[i - 1].registeredDate!;
-            });
+            const checkDesc = checkOrder(users, 'DESC', (user) => user.registeredDate);
             expect(checkDesc).to.be.true;
         });
 

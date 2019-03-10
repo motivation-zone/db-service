@@ -22,6 +22,9 @@ const VALIDATION_SCHEMES = Joi.object().keys({
     createdDate: Joi.date()
 });
 
+export const NOT_UPDATED_FIELDS: (keyof IExerciseTemplateModel)[] = ['id', 'userId', 'createdDate'];
+export const REQUIRED_FIELDS: (keyof IExerciseTemplateModel)[] = ['title', 'description', 'userId', 'sportId'];
+
 export default class ExerciseTemplateModel implements IExerciseTemplateModel {
     public id?: number;
     public title?: string;
@@ -47,5 +50,9 @@ export default class ExerciseTemplateModel implements IExerciseTemplateModel {
         } catch (e) {
             HttpResponse.throwError(Boom.badRequest, joiValidationErrorToString(e));
         }
+    }
+
+    clearNotUpdatedFields(): void {
+        NOT_UPDATED_FIELDS.forEach((field) => delete this[field]);
     }
 }

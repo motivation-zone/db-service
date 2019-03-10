@@ -28,7 +28,7 @@ const insertUser = async (user: IUserModel): Promise<IResponse<IUserModel[]>> =>
     });
 };
 
-export const updateUser = async (id: number, data: any): Promise<IResponse<IUserModel[]>> => {
+const updateUser = async (id: number, data: any): Promise<IResponse<IUserModel[]>> => {
     return await new Promise((resolve, reject) => {
         request(app)
             .post(`${urls.prefix}${urls.updateById.replace(':id', String(id))}`)
@@ -45,7 +45,7 @@ export const updateUser = async (id: number, data: any): Promise<IResponse<IUser
     });
 };
 
-export const getUserById = async (id: number): Promise<IResponse<IUserModel[]>> => {
+const getUserById = async (id: number): Promise<IResponse<IUserModel[]>> => {
     return await new Promise((resolve, reject) => {
         request(app)
             .get(`${urls.prefix}${urls.getById.replace(':id', String(id))}`)
@@ -61,7 +61,7 @@ export const getUserById = async (id: number): Promise<IResponse<IUserModel[]>> 
     });
 };
 
-export const getUserByLogin = async (login: string, strict = true): Promise<IResponse<IUserModel[]>> => {
+const getUserByLogin = async (login: string, strict = true): Promise<IResponse<IUserModel[]>> => {
     return await new Promise((resolve, reject) => {
         request(app)
             .get(`${urls.prefix}/${urls.getByLogin.replace(':login', login)}?${!strict ? `strict=${strict}` : ''}`)
@@ -77,7 +77,7 @@ export const getUserByLogin = async (login: string, strict = true): Promise<IRes
     });
 };
 
-export const checkUserPassword = async (login: string, password: string): Promise<IResponse<IUserModel[]>> => {
+const checkUserPassword = async (login: string, password: string): Promise<IResponse<IUserModel[]>> => {
     return await new Promise((resolve, reject) => {
         request(app)
             .post(`${urls.prefix}/${urls.checkPassword}`)
@@ -94,7 +94,7 @@ export const checkUserPassword = async (login: string, password: string): Promis
     });
 };
 
-export const getUsers = async (queryParams: IGetLimitTest): Promise<IResponse<IUserModel[]>> => {
+const getUsers = async (queryParams: IGetLimitTest): Promise<IResponse<IUserModel[]>> => {
     return await new Promise((resolve, reject) => {
         request(app)
             .get(`${urls.prefix}${urls.get}?${formQueryString(queryParams)}`)
@@ -110,7 +110,7 @@ export const getUsers = async (queryParams: IGetLimitTest): Promise<IResponse<IU
     });
 };
 
-export const deleteUserById = async (id: number): Promise<IResponse<IUserModel[]>> => {
+const deleteUserById = async (id: number): Promise<IResponse<IUserModel[]>> => {
     return await new Promise((resolve, reject) => {
         request(app)
             .delete(`${urls.prefix}/${urls.deleteById.replace(':id', String(id))}`)

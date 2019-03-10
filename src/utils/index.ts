@@ -66,6 +66,8 @@ export const checkRequiredFields = (fields: string[], obj: any): boolean => {
  * Checker for get request limit params {limit, skip, order}
  */
 export const checkGetLimitParameters = async (data: any): Promise<IGetLimit> => {
+    const {limit, skip, order} = data;
+    const validateData = {limit, skip, order};
     const schema = {
         limit: Joi.number().required(),
         skip: Joi.number().required(),
@@ -73,13 +75,12 @@ export const checkGetLimitParameters = async (data: any): Promise<IGetLimit> => 
     };
 
     try {
-        await Joi.validate(data, schema);
+        await Joi.validate(validateData, schema);
     } catch (e) {
         HttpResponse.throwError(Boom.badRequest, joiValidationErrorToString(e));
     }
 
-    const {limit, skip, order} = data;
-    return {limit, skip, order};
+    return validateData;
 };
 
 /**
@@ -94,13 +95,15 @@ export const removeNotUpdatedFields = (fields: string[], notUpdateFields: string
 /**
  * Return all fields of objects which not empty (has a value)
  */
-export const getNotEmptyFields = (obj: any, notUpdateFields: string[] = []): string[] => {
+export const getNotEmptyFields = (obj: any): string[] => {
     const types = ['boolean', 'number'];
     return Object.keys(obj).filter((field) => {
-        return !notUpdateFields.includes(field);
-    }).filter((field) => {
         if (types.includes(typeof obj[field])) {
             return true;
+        }
+
+        if (typeof obj[field] === 'function') {
+            return false;
         }
 
         return Boolean(obj[field]);

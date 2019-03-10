@@ -2,16 +2,19 @@ import {readFileSync} from 'fs';
 import {exec} from 'child_process';
 
 import {dbActions as userDbActions, generateUser} from 'tests/helpers/user';
+import {dbActions as sportDbActions} from 'tests/helpers/sport';
+import {dbActions as countryDbActions} from 'tests/helpers/country';
+import {dbActions as exerciseDbActions, generateExerciseTemplate} from 'tests/helpers/exercise-template';
+
 import {query} from 'src/lib/db/client';
 import {getAbsolutePath} from 'src/utils/fs';
 import {CREATED_USERS_COUNT} from 'tests/const';
-import {dbActions as sportDbActions} from 'tests/helpers/sport';
 import {intervalRandom} from 'src/utils';
-import {dbActions as countryDbActions} from 'tests/helpers/country';
 
 const {getAllCountries} = countryDbActions;
 const {getAllSports, insertUserSportLink} = sportDbActions;
 const {insertUser} = userDbActions;
+const {insertExerciseTemplate} = exerciseDbActions;
 
 const concatMigrations = async () => {
     await new Promise((resolve, reject) => {
@@ -67,6 +70,14 @@ const clearDatabase = async () => {
     await Promise.all(users.map(async (user) => {
         const sportId = intervalRandom(sports[0].id!, sports[sports.length - 1].id!);
         await insertUserSportLink(user.id!, sportId);
+    }));
+
+    await Promise.all(users.map(async (user) => {
+        await Promise.all(new Array(intervalRandom(5, 10)).fill(true).map(async () => {
+            const sportId = intervalRandom(sports[0].id!, sports[sports.length - 1].id!);
+            const template = generateExerciseTemplate(user.id!, sportId);
+            await insertExerciseTemplate(template);
+        }));
     }));
 
     process.exit();

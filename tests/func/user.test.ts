@@ -2,13 +2,14 @@ import {expect, assert} from 'chai';
 import pMap from 'p-map';
 
 import {IUserModel, REQUIRED_FIELDS, NOT_UPDATED_FIELDS} from 'src/models/user';
-import {checkAssertion} from 'tests/utils';
+import {checkAssertion, checkOrder} from 'tests/utils';
 import {USER_RETURNING_FIELDS} from 'src/query-creators/user';
 import {translatePostgresqlNameToNode} from 'src/utils/db/helper';
 import {checkRequiredFields, removeNotUpdatedFields} from 'src/utils';
 import {generateUser, dbActions as userDbActions} from 'tests/helpers/user';
 import {dbActions as countryDbActions} from 'tests/helpers/country';
 import {dbActions as sportDbActions} from 'tests/helpers/sport';
+import {dbActions as exerciseTemplatesDbActions} from 'tests/helpers/exercise-template';
 
 const {getAllCountries} = countryDbActions;
 const {
@@ -21,6 +22,7 @@ const {
     deleteUserById
 } = userDbActions;
 const {getUserSports} = sportDbActions;
+const {getExerciseTemplates} = exerciseTemplatesDbActions;
 
 describe('User:', (): void => {
     describe('Create user', () => {
@@ -182,26 +184,14 @@ describe('User:', (): void => {
 
         it('with default order param = ASC', async () => {
             const {data: users, status} = await getUsers({limit: 100, skip: 0});
-            const checkAsc = users.every((user, i) => {
-                if (i === 0) {
-                    return true;
-                }
-
-                return user.registeredDate! >= users[i - 1].registeredDate!;
-            });
+            const checkAsc = checkOrder(users, 'ASC', (user) => user.registeredDate);
             expect(checkAsc).to.be.true;
             expect(status).to.equal(200);
         });
 
         it('with order param = DESC', async () => {
             const {data: users, status} = await getUsers({limit: 100, skip: 0, order: 'DESC'});
-            const checkDesc = users.every((user, i) => {
-                if (i === 0) {
-                    return true;
-                }
-
-                return user.registeredDate! <= users[i - 1].registeredDate!;
-            });
+            const checkDesc = checkOrder(users, 'DESC', (user) => user.registeredDate);
             expect(checkDesc).to.be.true;
             expect(status).to.equal(200);
         });
@@ -250,16 +240,31 @@ describe('User:', (): void => {
         it('by id', async () => {
             const {data: [user]} = await getUsers({limit: 1, skip: 10});
             const {data: sports} = await getUserSports(user.id!);
-            expect(sports.length > 0).to.be.true;
+            const {data: exerciseTemplates} = await getExerciseTemplates(
+                {userId: user.id!},
+                {limit: 100, skip: 0}
+            );
 
+            // CASCADE predeletions
+            expect(sports.length > 0).to.be.true;
+            expect(exerciseTemplates.length > 0).to.be.true;
+
+            // Delete
             const {data: [deletedUser]} = await deleteUserById(user.id!);
             expect(user).to.deep.equal(deletedUser);
 
             const {data: users} = await getUserById(user.id!);
             expect(users.length === 0).to.be.true;
 
+            // CASCADE deletions
             const {data: deletedSports} = await getUserSports(user.id!);
             expect(deletedSports.length === 0).to.be.true;
+
+            const {data: deletedExerciseTemplates} = await getExerciseTemplates(
+                {userId: user.id!},
+                {limit: 100, skip: 0}
+            );
+            expect(deletedExerciseTemplates.length === 0).to.be.true;
         });
     });
 });

@@ -18,7 +18,7 @@ const getAllDifficultyLevels = async (): Promise<IResponse<IDifficultyLevelModel
                     return reject(error);
                 }
 
-                const result = formResponse<DifficultyLevelModel>(response, DifficultyLevelModel);
+                const result = formResponse<IDifficultyLevelModel>(response, DifficultyLevelModel);
                 resolve(result);
             });
     });

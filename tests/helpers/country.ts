@@ -21,7 +21,7 @@ const getAllCountries = async (): Promise<IResponse<ICountryModel[]>> => {
                     return reject(error);
                 }
 
-                const result = formResponse<CountryModel>(response, CountryModel);
+                const result = formResponse<ICountryModel>(response, CountryModel);
                 resolve(result);
             });
     });

@@ -1,8 +1,9 @@
 import {expect} from 'chai';
 
 import {dbActions as sportDbActions} from 'tests/helpers/sport';
-import {SPORTS_COUNT} from 'tests/const';
 import {dbActions as userDbActions, generateUser} from 'tests/helpers/user';
+import {SPORTS_COUNT} from 'tests/const';
+import {checkOrder} from 'tests/utils';
 
 const {insertUser} = userDbActions;
 const {
@@ -26,13 +27,7 @@ describe('Sport:', () => {
             const {data: users} = await getUsersBySport(sport.id!, {limit: 10, skip: 0});
             expect(users.length).be.greaterThan(0);
 
-            const checkAsc = users.every((user, i) => {
-                if (i === 0) {
-                    return true;
-                }
-
-                return user.registeredDate! >= users[i - 1].registeredDate!;
-            });
+            const checkAsc = checkOrder(users, 'ASC', (user) => user.registeredDate);
             expect(checkAsc).to.be.true;
         });
 
@@ -41,13 +36,7 @@ describe('Sport:', () => {
             const {data: users} = await getUsersBySport(sport.id!, {limit: 10, skip: 0, order: 'DESC'});
             expect(users.length).be.greaterThan(0);
 
-            const checkDesc = users.every((user, i) => {
-                if (i === 0) {
-                    return true;
-                }
-
-                return user.registeredDate! <= users[i - 1].registeredDate!;
-            });
+            const checkDesc = checkOrder(users, 'DESC', (user) => user.registeredDate);
             expect(checkDesc).to.be.true;
         });
 
