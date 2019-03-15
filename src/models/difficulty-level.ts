@@ -3,37 +3,29 @@ import Boom from 'boom';
 
 import HttpResponse from 'src/utils/http/response';
 
-export interface ICountryModel {
+export interface IDifficultyLevelModel {
     id: number;
+    level: number;
     name: string;
-    alpha2: string;
-    alpha3: string;
-    unCode: string;
 }
 
 const VALIDATION_SCHEMES = Joi.object().keys({
     id: Joi.number().integer().required(),
-    name: Joi.string().required(),
-    alpha2: Joi.string().required(),
-    alpha3: Joi.string().required(),
-    unCode: Joi.string().required()
+    level: Joi.number().integer().required(),
+    name: Joi.string().required()
 });
 
-export default class CountryModel implements ICountryModel{
+export default class DifficultyLevelModel implements IDifficultyLevelModel {
     public id: number;
+    public level: number;
     public name: string;
-    public alpha2: string;
-    public alpha3: string;
-    public unCode: string;
 
-    constructor(data: ICountryModel) {
-        const {id, name, alpha2, alpha3, unCode} = data;
+    constructor(data: IDifficultyLevelModel) {
+        const {id, name, level} = data;
 
         this.id = id && Number(id);
         this.name = name;
-        this.alpha2 = alpha2;
-        this.alpha3 = alpha3;
-        this.unCode = unCode;
+        this.level = level && Number(level);
     }
 
     async validate(): Promise<void> {

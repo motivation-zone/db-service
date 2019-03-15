@@ -1,10 +1,25 @@
+import qs from 'querystring';
 import Boom from 'boom';
 import Joi from 'joi';
 import {Request, Response, NextFunction} from 'express';
 
 import {IGetLimit} from 'src/services/base';
-import {ORDER_TYPES} from 'src/query-creators/base';
+import {ORDER_TYPES, OrderType} from 'src/query-creators/base';
 import HttpResponse from 'src/utils/http/response';
+
+export const parseDate = (date: Date | string | undefined): Date | undefined => {
+    if (!date) {
+        return;
+    }
+
+    if (date instanceof Date) {
+        return date;
+    }
+
+    if (typeof date === 'string') {
+        return new Date(Date.parse(date));
+    }
+};
 
 /**
  * It's neccessary for parsing boolean keys from query
@@ -52,20 +67,21 @@ export const checkRequiredFields = (fields: string[], obj: any): boolean => {
  * Checker for get request limit params {limit, skip, order}
  */
 export const checkGetLimitParameters = async (data: any): Promise<IGetLimit> => {
+    const {limit, skip, order} = data;
+    const validateData = {limit, skip, order: order || OrderType.ASC};
     const schema = {
         limit: Joi.number().required(),
         skip: Joi.number().required(),
-        order: Joi.string().valid(ORDER_TYPES)
+        order: Joi.string().valid(ORDER_TYPES).required()
     };
 
     try {
-        await Joi.validate(data, schema);
+        await Joi.validate(validateData, schema);
     } catch (e) {
-        HttpResponse.throwError(Boom.badRequest, e.details.map((d: any) => d.message).join(', '));
+        HttpResponse.throwError(Boom.badRequest, joiValidationErrorToString(e));
     }
 
-    const {limit, skip, order} = data;
-    return {limit, skip, order};
+    return validateData;
 };
 
 /**
@@ -79,14 +95,17 @@ export const removeNotUpdatedFields = (fields: string[], notUpdateFields: string
 
 /**
  * Return all fields of objects which not empty (has a value)
+ * 'function' removes too (it's neccessary to get only fields without methods)
  */
-export const getNotEmptyFields = (obj: any, notUpdateFields: string[] = []): string[] => {
+export const getNotEmptyFields = (obj: any): string[] => {
     const types = ['boolean', 'number'];
     return Object.keys(obj).filter((field) => {
-        return !notUpdateFields.includes(field);
-    }).filter((field) => {
         if (types.includes(typeof obj[field])) {
             return true;
+        }
+
+        if (typeof obj[field] === 'function') {
+            return false;
         }
 
         return Boolean(obj[field]);
@@ -106,5 +125,13 @@ export const createMapData = (nameFields: string[], valueFields: any[]) => {
 };
 
 export const formQueryString = (data: any): string => {
-    return getNotEmptyFields(data).map((key) => `${key}=${data[key]}`).join('&');
+    const query = getNotEmptyFields(data).reduce((result: any, field: string) => {
+        result[field] = data[field];
+        return result;
+    }, {});
+    return qs.stringify(query);
+};
+
+export const joiValidationErrorToString = (error: Joi.ValidationError): string => {
+    return error.details.map((d: any) => d.message).join(', ');
 };

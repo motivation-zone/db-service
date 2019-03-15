@@ -7,7 +7,7 @@ export default class SportModel implements ISportModel {
     public id?: number;
     public name?: string;
 
-    constructor(data: any) {
+    constructor(data: ISportModel) {
         const {id, name} = data;
 
         this.id = id && Number(id);

@@ -13,13 +13,9 @@ export const deleteUser = () => {
     return 'DELETE FROM user_sport WHERE (user_id, sport_id) = ($1, $2) RETURNING *';
 };
 
-export const getUsers = (order: OrderType = OrderType.ASC) => {
-    const userFields = USER_RETURNING_FIELDS.split(', ').map((f) => {
-        return ['id', 'name'].indexOf(f) !== -1 ? `users.${f}` : f;
-    }).join(', ');
-
+export const getUsers = (order: OrderType) => {
     return `
-        SELECT ${userFields} FROM users
+        SELECT ${USER_RETURNING_FIELDS.map((x) => `users.${x}`).join(', ')} FROM users
         INNER JOIN user_sport ON users.id = user_sport.user_id
         INNER JOIN sport ON user_sport.sport_id = sport.id
         WHERE sport.id = $3

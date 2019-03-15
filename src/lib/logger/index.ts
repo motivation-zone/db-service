@@ -1,5 +1,5 @@
-import consoleLogger, {LevelType, IDebugTarget} from 'src/lib/logger/console-logger';
-import fileLogger, {ILogger} from 'src/lib/logger/file-logger';
+import consoleLogger, {LevelType} from 'src/lib/logger/console-logger';
+import fileLogger from 'src/lib/logger/file-logger';
 import env from 'src/lib/env';
 
 type LoggerType = 'app' | 'db';
@@ -12,5 +12,5 @@ export default (level: LevelType, type: LoggerType, msg: string) => {
     const msgResult = formMessage(type, msg);
 
     const f = env === 'development' ? consoleLogger : fileLogger;
-    (f as ILogger | IDebugTarget)[level](msgResult);
+    (f as any)[level](msgResult);
 };

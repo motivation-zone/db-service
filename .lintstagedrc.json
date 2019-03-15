@@ -1,5 +1,5 @@
 {
 	"src/**/*.ts": "make lint.main",
 	"tests/**/*.ts": "make lint.tests",
-	"*": "make test"
+	"*": "make test.func"
 }

@@ -2,12 +2,20 @@ OUT_DIR := build
 NODE ?= node
 NPM ?= npm
 
-build = node_modules/.bin/tsc $(1)
+BUILD = node_modules/.bin/tsc $(1)
+MOCHA = node_modules/.bin/mocha
+TSLINT = node_modules/.bin/tslint
+LINT_STAGED = node_modules/.bin/lint-staged
+NODEMON = node_modules/.bin/nodemon
+TSNODE = node_modules/.bin/ts-node
+
+DEBUG = dbservice:*
+TZ = UTC
 
 # Build
-.PHONY: install
-install:
-	$(NPM) install --no-save
+.PHONY: deps
+deps:
+	$(NPM) install
 
 .PHONY: prune
 prune:
@@ -15,11 +23,11 @@ prune:
 
 .PHONY: build
 build:
-	$(call build)
+	$(call BUILD)
 
 .PHONY: build.watch
 build.watch:
-	$(call build,--watch)
+	$(call BUILD,--watch)
 
 .PHONY: clean
 clean:
@@ -28,45 +36,47 @@ clean:
 # Linting
 .PHONY: lint.staged
 lint.staged:
-	node_modules/.bin/lint-staged -c .lintstagedrc.json
+	$(LINT_STAGED) -c .lintstagedrc.json
 
 .PHONY: lint.main
 lint.main:
-	node_modules/.bin/tslint -c tslint.json 'src/**/*.ts'
+	$(TSLINT) -c tslint.json 'src/**/*.ts'
 
 .PHONY: lint.tests
 lint.tests:
-	node_modules/.bin/tslint -c tslint.tests.json 'tests/**/*.ts'
+	$(TSLINT) -c tslint.tests.json 'tests/**/*.ts'
 
-# Run the application in development mode
-.PHONY: dev
-dev:
-	DEBUG=dbservice:* \
+# Server
+.PHONY: server.dev
+server.dev:
+	$(NODEMON) --exec "export DEBUG=$(DEBUG) && $(TSNODE) -r tsconfig-paths/register src/app.ts" -w src -w configs -e "ts"
+
+.PHONY: server.run
+server.run:
+	DEBUG=$(DEBUG) \
 	NODE_PATH=$(OUT_DIR) \
-	TZ=UTC \
-	node_modules/.bin/supervisor \
-		--non-interactive \
-		--quiet \
-		--no-restart-on exit \
-		--watch $(OUT_DIR)/configs,$(OUT_DIR)/src \
-		-- $(OUT_DIR)/src/app.js
+	TZ=$(TZ) \
+	$(NODE) $(OUT_DIR)/src/app.js
 
 # Tests
-.PHONY: test.fill
-test.fill:
-	NODE_PATH=$(OUT_DIR) \
-	DEBUG=dbservice:* \
-	node build/tests/fill/index.js
+.PHONY: test.func.fill
+test.func.fill:
+	make build && \
+	export NODE_PATH=$(OUT_DIR) && \
+	export TZ=$(TZ) && \
+	$(NODE) $(OUT_DIR)/tests/func/fill/index.js && \
+	make clean
 
 .PHONY: test.func
 test.func:
-	NODE_PATH=$(OUT_DIR) \
-	DEBUG=dbservice:* \
-	node_modules/.bin/mocha build/tests/**/*.test.js --exit
+	make build && \
+	export DEBUG=dbservice:tests && \
+	export NODE_PATH=$(OUT_DIR) && \
+	export TZ=$(TZ) && \
+	$(NODE) $(OUT_DIR)/tests/func/fill/index.js && \
+	$(MOCHA) $(OUT_DIR)/tests/**/*.test.js --exit && \
+	make clean
 
-.PHONY: test
-test:
-	make test.fill && make test.func
 
 # Deployment
 VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")

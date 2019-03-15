@@ -5,7 +5,7 @@ export const getCountries = () => {
     return `SELECT * FROM country`;
 };
 
-export const getUsers = (order: OrderType = OrderType.ASC) => {
+export const getUsers = (order: OrderType) => {
     return `
         SELECT
             ${USER_RETURNING_FIELDS}
@@ -16,7 +16,7 @@ export const getUsers = (order: OrderType = OrderType.ASC) => {
     `;
 };
 
-export const getUsersWithoutCountry = (order: OrderType = OrderType.ASC) => {
+export const getUsersWithoutCountry = (order: OrderType) => {
     return `
         SELECT
             ${USER_RETURNING_FIELDS}
