@@ -3,21 +3,21 @@ import express, {Request, Response} from 'express';
 import CountryService from 'src/services/country';
 import HttpResponse from 'src/utils/http/response';
 import {checkGetLimitParameters, asyncMiddlewareWrapper} from 'src/utils';
-import {API_URLS} from 'src/urls';
+import {apiUrls} from 'src/urls';
 
-const countryController = express();
-const urls = API_URLS.country;
+const controller = express();
+const urls = apiUrls.country;
 
-countryController.get(urls.get, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
+controller.get(urls.getCountries, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
     const result = await CountryService.getCountries();
     HttpResponse.ok(res, result);
 }));
 
-countryController.get(urls.getUsers, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
+controller.get(urls.getUsersByCountry, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const limitParameters = await checkGetLimitParameters(req.query);
     let {countryId} = req.params;
-    // if id === 'null' => will be returned users without countries
 
+    // if id === 'null' => will be returned users without countries
     if (countryId === 'null') {
         countryId = null;
     }
@@ -26,4 +26,4 @@ countryController.get(urls.getUsers, asyncMiddlewareWrapper(async (req: Request,
     HttpResponse.ok(res, result);
 }));
 
-export default countryController;
+export default controller;

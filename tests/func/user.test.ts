@@ -9,7 +9,8 @@ import {checkRequiredFields, removeNotUpdatedFields} from 'src/utils';
 import {generateUser, dbActions as userDbActions} from 'tests/helpers/user';
 import {dbActions as countryDbActions} from 'tests/helpers/country';
 import {dbActions as sportDbActions} from 'tests/helpers/sport';
-import {dbActions as exerciseTemplatesDbActions} from 'tests/helpers/exercise-template';
+import {dbActions as exerciseTemplateDbActions} from 'tests/helpers/exercise-template';
+import {dbActions as exerciseDbActions} from 'tests/helpers/exercise';
 
 const {getAllCountries} = countryDbActions;
 const {
@@ -22,7 +23,32 @@ const {
     deleteUserById
 } = userDbActions;
 const {getUserSports} = sportDbActions;
-const {getExerciseTemplates} = exerciseTemplatesDbActions;
+const {getExerciseTemplates, deleteExerciseTemplate} = exerciseTemplateDbActions;
+const {getUserExercises, deleteExercise} = exerciseDbActions;
+
+const LIMIT_PARAMS = {limit: 100, skip: 0};
+const NONEXISTENT_ID = 9999999999;
+
+const deleteUserExercisesAndTemplates = async (user: IUserModel) => {
+    const {data: exerciseTemplates} = await getExerciseTemplates({
+        userId: user.id,
+        limitParams: LIMIT_PARAMS
+    });
+
+    await pMap(exerciseTemplates, async (template) => {
+        const {data: exercises} = await getUserExercises({
+            templateId: template.id,
+            userId: user.id,
+            limitParams: LIMIT_PARAMS
+        });
+
+        await pMap(exercises, async (exercise) => {
+            await deleteExercise(exercise.id!);
+        }, {concurrency: 1});
+
+        await deleteExerciseTemplate(template.id!);
+    }, {concurrency: 1});
+};
 
 describe('User:', (): void => {
     describe('Create user', () => {
@@ -68,7 +94,7 @@ describe('User:', (): void => {
         });
 
         it('with same email', async () => {
-            const {data: [user]} = await getUsers({limit: 10, skip: 0});
+            const {data: [user]} = await getUsers(LIMIT_PARAMS);
             const newUser = generateUser();
             newUser.email = user.email;
 
@@ -79,7 +105,7 @@ describe('User:', (): void => {
         });
 
         it('with same login', async () => {
-            const {data: [user]} = await getUsers({limit: 10, skip: 0});
+            const {data: [user]} = await getUsers(LIMIT_PARAMS);
             const newUser = generateUser();
             newUser.login = user.login;
 
@@ -111,11 +137,11 @@ describe('User:', (): void => {
                 countryId: country.id
             });
 
-            const {data: [user]} = await getUsers({limit: 1, skip: 0});
+            const {data: [user]} = await getUsers(LIMIT_PARAMS);
             const updatedFields = removeNotUpdatedFields(Object.keys(user), NOT_UPDATED_FIELDS) as (keyof IUserModel)[];
 
-            await Promise.all(updatedFields.map(async (field) => {
-                const {data: [user]} = await getUsers({limit: 1, skip: 0});
+            await pMap(updatedFields, async (field) => {
+                const {data: [user]} = await getUsers(LIMIT_PARAMS);
                 const {data: [updatedUser]} = await updateUser(user.id!, {[field]: newUser[field]});
                 const {data: [checkUser]} = await getUserById(user.id!);
                 checkUser.password = updatedUser.password;
@@ -124,13 +150,13 @@ describe('User:', (): void => {
                     checkAssertion(checkUser[field], newUser[field]),
                     `${field}: ${checkUser[field]} != ${newUser[field]}`
                 );
-            }));
+            }, {concurrency: 1});
         });
 
         it('with not updated fields and some updated field', async () => {
             await pMap(NOT_UPDATED_FIELDS, async (field) => {
                 const newUser = generateUser();
-                const {data: [user]} = await getUsers({limit: 1, skip: 0});
+                const {data: [user]} = await getUsers(LIMIT_PARAMS);
 
                 await updateUser(user.id!, {
                     [field]: newUser[field],
@@ -151,15 +177,15 @@ describe('User:', (): void => {
         it('with only not updated fields', async () => {
             await Promise.all(NOT_UPDATED_FIELDS.map(async (field) => {
                 const newUser = generateUser();
-                const {data: [user]} = await getUsers({limit: 1, skip: 0});
+                const {data: [user]} = await getUsers(LIMIT_PARAMS);
 
                 const {status} = await updateUser(user.id!, {[field]: newUser[field]});
                 expect(status).to.equal(409);
             }));
         });
 
-        it('with not existing id', async () => {
-            const {data, status} = await updateUser(99999999, {name: 'name'});
+        it('with nonexistent id', async () => {
+            const {data, status} = await updateUser(NONEXISTENT_ID, {name: 'name'});
             expect(data).to.be.empty;
             expect(status).to.equal(200);
         });
@@ -167,11 +193,10 @@ describe('User:', (): void => {
 
     describe('Get users', () => {
         it('many', async () => {
-            const {data: users} = await getUsers({limit: 3, skip: 0});
+            const {data: users} = await getUsers(Object.assign({}, LIMIT_PARAMS, {limit: 3}));
             expect(users.length).to.equal(3);
 
-            const userReturningFields = USER_RETURNING_FIELDS.split(', ')
-                    .map(translatePostgresqlNameToNode);
+            const userReturningFields = USER_RETURNING_FIELDS.map(translatePostgresqlNameToNode);
 
             const [user] = users;
             expect(checkRequiredFields(userReturningFields, user)).to.be.true;
@@ -183,22 +208,22 @@ describe('User:', (): void => {
         });
 
         it('with default order param = ASC', async () => {
-            const {data: users, status} = await getUsers({limit: 100, skip: 0});
+            const {data: users, status} = await getUsers(LIMIT_PARAMS);
             const checkAsc = checkOrder(users, 'ASC', (user) => user.registeredDate);
             expect(checkAsc).to.be.true;
             expect(status).to.equal(200);
         });
 
         it('with order param = DESC', async () => {
-            const {data: users, status} = await getUsers({limit: 100, skip: 0, order: 'DESC'});
+            const {data: users, status} = await getUsers(Object.assign({}, LIMIT_PARAMS, {order: 'DESC'}));
             const checkDesc = checkOrder(users, 'DESC', (user) => user.registeredDate);
             expect(checkDesc).to.be.true;
             expect(status).to.equal(200);
         });
 
         it('with offset param', async () => {
-            const {data: users1} = await getUsers({limit: 100, skip: 1});
-            const {data: users2} = await getUsers({limit: 100, skip: 2});
+            const {data: users1} = await getUsers(Object.assign({}, LIMIT_PARAMS, {skip: 1}));
+            const {data: users2} = await getUsers(Object.assign({}, LIMIT_PARAMS, {skip: 2}));
 
             expect(users1[2]).to.deep.equal(users2[1]);
         });
@@ -206,13 +231,13 @@ describe('User:', (): void => {
 
     describe('Get user', () => {
         it('by id', async () => {
-            const {data: [checkUser]} = await getUsers({limit: 1, skip: 0});
+            const {data: [checkUser]} = await getUsers(LIMIT_PARAMS);
             const {data: [user]} = await getUserById(checkUser.id!);
             expect(user).to.deep.equal(checkUser);
         });
 
         it('by login (strict)', async () => {
-            const {data: [checkUser]} = await getUsers({limit: 1, skip: 1, order: 'DESC'});
+            const {data: [checkUser]} = await getUsers(Object.assign({}, LIMIT_PARAMS, {order: 'DESC'}));
             const {data: [user]} = await getUserByLogin(checkUser.login!);
             expect(user).to.deep.equal(checkUser);
         });
@@ -238,33 +263,32 @@ describe('User:', (): void => {
 
     describe('Delete user', () => {
         it('by id', async () => {
-            const {data: [user]} = await getUsers({limit: 1, skip: 10});
+            const {data: [user]} = await getUsers(LIMIT_PARAMS);
+            const {error: {message}, status} = await deleteUserById(user.id!);
+            expect(status).to.equal(409);
+            expect(message.includes('foreign key constraint "exercise_template_user_id_fkey"')).to.be.true;
+
+            await deleteUserExercisesAndTemplates(user);
+
+            const {data: [deletedUser], status: deletedStatus} = await deleteUserById(user.id!);
+            expect(deletedStatus).to.equal(200);
+            expect(deletedUser).to.deep.equal(user);
+            const {data: users} = await getUserById(user.id!);
+            expect(users.length === 0).to.be.true;
+        });
+
+        it('cascade user-sport link', async () => {
+            const {data: [user]} = await getUsers(LIMIT_PARAMS);
+            await deleteUserExercisesAndTemplates(user);
+
             const {data: sports} = await getUserSports(user.id!);
-            const {data: exerciseTemplates} = await getExerciseTemplates(
-                {userId: user.id!},
-                {limit: 100, skip: 0}
-            );
-
-            // CASCADE predeletions
             expect(sports.length > 0).to.be.true;
-            expect(exerciseTemplates.length > 0).to.be.true;
 
-            // Delete
             const {data: [deletedUser]} = await deleteUserById(user.id!);
             expect(user).to.deep.equal(deletedUser);
 
-            const {data: users} = await getUserById(user.id!);
-            expect(users.length === 0).to.be.true;
-
-            // CASCADE deletions
             const {data: deletedSports} = await getUserSports(user.id!);
             expect(deletedSports.length === 0).to.be.true;
-
-            const {data: deletedExerciseTemplates} = await getExerciseTemplates(
-                {userId: user.id!},
-                {limit: 100, skip: 0}
-            );
-            expect(deletedExerciseTemplates.length === 0).to.be.true;
         });
     });
 });

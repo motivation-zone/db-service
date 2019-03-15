@@ -1,50 +1,33 @@
-import request from 'supertest';
-
-import app from 'src/app';
-import {API_URLS} from 'src/urls';
+import {apiUrls} from 'src/urls';
 import CountryModel, {ICountryModel} from 'src/models/country';
-import {IResponse, formResponse} from 'src/utils/http/response';
 import {IGetLimitTest} from 'tests/utils';
 import UserModel, {IUserModel} from 'src/models/user';
 import {formQueryString} from 'src/utils';
+import {getRequest} from 'tests/helpers/common';
 
-const urls = API_URLS.country;
-const REQUEST_HEADERS = {Accept: 'application/json'};
+const urls = apiUrls.country;
 
-const getAllCountries = async (): Promise<IResponse<ICountryModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .get(`${urls.prefix}${urls.get}`)
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
+interface IGetUsersByCountryParams {
+    countryId?: number | null;
+    limitParams: IGetLimitTest;
+}
 
-                const result = formResponse<ICountryModel>(response, CountryModel);
-                resolve(result);
-            });
+const getAllCountries = async () => {
+    return await getRequest<ICountryModel>({
+        url: `${urls.prefix}${urls.getCountries}`,
+        ModelClass: CountryModel
     });
 };
 
-const getUsersByCountry = async (
-    countryId: number | null, queryParams: IGetLimitTest
-): Promise<IResponse<IUserModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .get([
-                `${urls.prefix}${urls.getUsers.replace(':countryId', String(countryId))}`,
-                `?${formQueryString(queryParams)}`
-            ].join(''))
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
+const getUsersByCountry = async ({countryId, limitParams}: IGetUsersByCountryParams) => {
+    const url = [
+        `${urls.prefix}${urls.getUsersByCountry.replace(':countryId', String(countryId))}`,
+        `?${formQueryString({...limitParams})}`
+    ].join('');
 
-                const result = formResponse<IUserModel>(response, UserModel);
-                resolve(result);
-            });
+    return await getRequest<IUserModel>({
+        url,
+        ModelClass: UserModel
     });
 };
 

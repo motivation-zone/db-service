@@ -13,6 +13,9 @@ export const checkAssertion = (a: any, b: any, strict = false): boolean => {
     return strict ? a === b : a == b; // tslint:disable-line
 };
 
+/**
+ * Checker for correct sorting from DB
+ */
 export const checkOrder = <T>(array: T[], order: 'ASC' | 'DESC', getValue: (obj: T) => any): boolean => {
     return array.every((obj, i) => {
         if (i === 0) {

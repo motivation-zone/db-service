@@ -26,7 +26,7 @@ export default class CountryModel implements ICountryModel{
     public alpha3: string;
     public unCode: string;
 
-    constructor(data: any) {
+    constructor(data: ICountryModel) {
         const {id, name, alpha2, alpha3, unCode} = data;
 
         this.id = id && Number(id);

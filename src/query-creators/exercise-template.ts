@@ -14,19 +14,10 @@ export const updateExerciseTemplate = (fields: string[]) => updateQuery(fields, 
 export const deleteExerciseTemplate = () => 'DELETE FROM exercise_template WHERE id = $1 RETURNING *';
 export const getExerciseTemplateById = () => 'SELECT * FROM exercise_template WHERE id = $1';
 
-export const getUserExerciseTemplatesBySport = (order: OrderType = OrderType.ASC) => {
+export const getUserExerciseTemplates = (order: OrderType, sportId?: number) => {
     return `
         SELECT * FROM exercise_template
-        WHERE user_id = $1 AND sport_id = $2
-        ORDER BY created_date ${order}
-        LIMIT $3 OFFSET $4
-    `;
-};
-
-export const getAllUserExerciseTemplates = (order: OrderType = OrderType.ASC) => {
-    return `
-        SELECT * FROM exercise_template
-        WHERE user_id = $1
+        WHERE user_id = $1 ${sportId ? 'AND sport_id = $4' : ''}
         ORDER BY created_date ${order}
         LIMIT $2 OFFSET $3
     `;

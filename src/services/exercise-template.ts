@@ -3,8 +3,7 @@ import {prepareDBResult, IGetLimit} from 'src/services/base';
 import {
     createExerciseTemplate as createExerciseTemplateQuery,
     updateExerciseTemplate as updateExerciseTemplateQuery,
-    getUserExerciseTemplatesBySport as getUserExerciseTemplatesBySportQuery,
-    getAllUserExerciseTemplates as getAllUserExerciseTemplatesQuery,
+    getUserExerciseTemplates as getUserExerciseTemplatesQuery,
     deleteExerciseTemplate as deleteExerciseTemplateQuery,
     getExerciseTemplateById as getExerciseTemplateByIdQuery
 } from 'src/query-creators/exercise-template';
@@ -36,14 +35,15 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async getUserExerciseTemplates(limitParams: IGetLimit, userId: number, sportId?: number): Promise<any[]> {
+    static async getUserExerciseTemplates(
+        limitParams: IGetLimit,
+        params: {userId: number, sportId?: number}
+    ): Promise<any[]> {
+        const {userId, sportId} = params;
+
         const result = await query({
-            text: sportId ?
-                getUserExerciseTemplatesBySportQuery(limitParams.order) :
-                getAllUserExerciseTemplatesQuery(limitParams.order),
-            values: [userId]
-                .concat(sportId ? [sportId] : [])
-                .concat([limitParams.limit, limitParams.skip])
+            text: getUserExerciseTemplatesQuery(limitParams.order, sportId),
+            values: [userId, limitParams.limit, limitParams.skip].concat(sportId ? [sportId] : [])
         });
 
         return prepareDBResult(result);

@@ -1,9 +1,10 @@
+import qs from 'querystring';
 import Boom from 'boom';
 import Joi from 'joi';
 import {Request, Response, NextFunction} from 'express';
 
 import {IGetLimit} from 'src/services/base';
-import {ORDER_TYPES} from 'src/query-creators/base';
+import {ORDER_TYPES, OrderType} from 'src/query-creators/base';
 import HttpResponse from 'src/utils/http/response';
 
 export const parseDate = (date: Date | string | undefined): Date | undefined => {
@@ -67,11 +68,11 @@ export const checkRequiredFields = (fields: string[], obj: any): boolean => {
  */
 export const checkGetLimitParameters = async (data: any): Promise<IGetLimit> => {
     const {limit, skip, order} = data;
-    const validateData = {limit, skip, order};
+    const validateData = {limit, skip, order: order || OrderType.ASC};
     const schema = {
         limit: Joi.number().required(),
         skip: Joi.number().required(),
-        order: Joi.string().valid(ORDER_TYPES)
+        order: Joi.string().valid(ORDER_TYPES).required()
     };
 
     try {
@@ -94,6 +95,7 @@ export const removeNotUpdatedFields = (fields: string[], notUpdateFields: string
 
 /**
  * Return all fields of objects which not empty (has a value)
+ * 'function' removes too (it's neccessary to get only fields without methods)
  */
 export const getNotEmptyFields = (obj: any): string[] => {
     const types = ['boolean', 'number'];
@@ -123,7 +125,11 @@ export const createMapData = (nameFields: string[], valueFields: any[]) => {
 };
 
 export const formQueryString = (data: any): string => {
-    return getNotEmptyFields(data).map((key) => `${key}=${data[key]}`).join('&');
+    const query = getNotEmptyFields(data).reduce((result: any, field: string) => {
+        result[field] = data[field];
+        return result;
+    }, {});
+    return qs.stringify(query);
 };
 
 export const joiValidationErrorToString = (error: Joi.ValidationError): string => {

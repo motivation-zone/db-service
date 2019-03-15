@@ -20,7 +20,7 @@ export default class DifficultyLevelModel implements IDifficultyLevelModel {
     public level: number;
     public name: string;
 
-    constructor(data: any) {
+    constructor(data: IDifficultyLevelModel) {
         const {id, name, level} = data;
 
         this.id = id && Number(id);

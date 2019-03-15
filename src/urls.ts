@@ -1,58 +1,54 @@
 const API_PREFIX = '/api';
+const PREFIXES = {
+    user: `${API_PREFIX}/user`,
+    country: `${API_PREFIX}/country`,
+    sport: `${API_PREFIX}/sport`,
+    difficultyLevel: `${API_PREFIX}/difficulty-level`,
+    exerciseTemplate: `${API_PREFIX}/exercise-template`,
+    exercise: `${API_PREFIX}/exercise`
+};
 
-export const API_URLS = {
+export const apiUrls = {
     user: {
-        prefix: `${API_PREFIX}/user`,
-        create: '/create',
-        get: '/get',
-        getById: '/get/id/:id',
-        getByLogin: '/get/login/:login',
-        updateById: '/update/:id',
-        checkPassword: '/check/password',
-        deleteById: '/delete/:id'
+        prefix: PREFIXES.user,
+        createUser: '/create',
+        getUsers: '/get-users',
+        getUserById: '/get-user/id/:userId',
+        getUserByLogin: '/get-user/login/:login',
+        updateUserById: '/update-user/:userId',
+        checkUserPassword: '/check-user-password',
+        deleteUserById: '/delete-user/:userId'
     },
     country: {
-        prefix: `${API_PREFIX}/country`,
-        get: '/get',
-        getUsers: '/get-users/:countryId'
+        prefix: PREFIXES.country,
+        getCountries: '/get-countries',
+        getUsersByCountry: '/get-users/:countryId'
     },
     sport: {
-        prefix: `${API_PREFIX}/sport`,
-        get: '/get',
+        prefix: PREFIXES.sport,
+        getSports: '/get-sports',
         getUsersBySport: '/get-users/:sportId',
         getUserSports: '/get-sports/:userId',
-        updateUserSport: '/update-user/:actionType'
+        updateUserSport: '/update-user-sport/:actionType'
     },
     difficultyLevel: {
-        prefix: `${API_PREFIX}/difficulty-level`,
-        get: '/get'
+        prefix: PREFIXES.difficultyLevel,
+        getDifficultyLevels: '/get-difficulty-levels'
     },
     exerciseTemplate: {
-        prefix: `${API_PREFIX}/exercise-template`,
-        get: '/get/:userId',
-        create: '/create',
-        getById: '/get/id/:templateId',
-        deleteById: '/delete/:templateId',
-        updateById: '/update/:templateId'
+        prefix: PREFIXES.exerciseTemplate,
+        createExerciseTemplate: '/create',
+        getUserExerciseTemplates: '/get-user-exercise-templates/:userId',
+        getExerciseTemplateById: '/get-exercise-template/:templateId',
+        deleteExerciseTemplateById: '/delete-exercise-template/:templateId',
+        updateExerciseTemplateById: '/update-exercise-template/:templateId'
     },
     exercise: {
-        prefix: `${API_PREFIX}/exercise`,
-        get: '/get/:userId',
-        getById: '/get/id/:exerciseId',
-        create: '/create',
-        updateById: '/update/:exerciseId',
-        deleteById: '/delete/:exerciseId'
-    },
-    program: {
-        prefix: `${API_PREFIX}/program`,
-        get: '/get'
-    },
-    trainingType: {
-        prefix: `${API_PREFIX}/training-type`,
-        get: '/get'
-    },
-    training: {
-        prefix: `${API_PREFIX}/training`,
-        get: '/get'
+        prefix: PREFIXES.exercise,
+        createExercise: '/create',
+        getUserExercises: '/get-user-exercises/:userId',
+        getExerciseById: '/get-exercise/:exerciseId',
+        updateExerciseById: '/update-exercise/:exerciseId',
+        deleteExerciseById: '/delete-exercise/:exerciseId'
     }
 };

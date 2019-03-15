@@ -1,109 +1,62 @@
-import request from 'supertest';
 import faker from 'faker';
 
-import app from 'src/app';
-import {API_URLS} from 'src/urls';
-import {IResponse, formResponse} from 'src/utils/http/response';
+import {apiUrls} from 'src/urls';
 import ExerciseTemplateModel, {IExerciseTemplateModel} from 'src/models/exercise-template';
 import {IGetLimitTest} from 'tests/utils';
+import {getRequest, postRequest, deleteRequest} from 'tests/helpers/common';
 import {formQueryString} from 'src/utils';
 
-const urls = API_URLS.exerciseTemplate;
-const REQUEST_HEADERS = {Accept: 'application/json'};
+const urls = apiUrls.exerciseTemplate;
 const TEMPLATE_ID = ':templateId';
 
-const insertExerciseTemplate = async (
-    template: IExerciseTemplateModel
-): Promise<IResponse<IExerciseTemplateModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .post(`${urls.prefix}${urls.create}`)
-            .send(template)
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
+interface IGetExerciseTemplates {
+    userId?: number;
+    sportId?: number;
+    limitParams: IGetLimitTest;
+}
 
-                const result = formResponse<IExerciseTemplateModel>(response, ExerciseTemplateModel);
-                resolve(result);
-            });
+const insertExerciseTemplate = async (template: IExerciseTemplateModel) => {
+    return await postRequest<IExerciseTemplateModel>({
+        url: `${urls.prefix}${urls.createExerciseTemplate}`,
+        ModelClass: ExerciseTemplateModel,
+        data: template
     });
 };
 
-const getExerciseTemplates = async (
-        params: {userId?: number, sportId?: number},
-        queryParams: IGetLimitTest
-): Promise<IResponse<IExerciseTemplateModel[]>> => {
-    const {userId, sportId} = params;
-    queryParams = Object.assign({sportId}, queryParams);
+const getExerciseTemplates = async ({userId, sportId, limitParams}: IGetExerciseTemplates) => {
+    const url = [
+        `${urls.prefix}${urls.getUserExerciseTemplates}`.replace(':userId', String(userId)),
+        `?${formQueryString({
+            ...limitParams,
+            sportId
+        })}`
+    ].join('');
 
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .get([
-                `${urls.prefix}${urls.get}`.replace(':userId', String(userId)),
-                `?${formQueryString(queryParams)}`
-            ].join(''))
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IExerciseTemplateModel>(response, ExerciseTemplateModel);
-                resolve(result);
-            });
+    return await getRequest<IExerciseTemplateModel>({
+        url,
+        ModelClass: ExerciseTemplateModel
     });
 };
 
-const getExerciseTemplate = async (templateId: number): Promise<IResponse<IExerciseTemplateModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .get(`${urls.prefix}${urls.getById}`.replace(TEMPLATE_ID, String(templateId)))
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IExerciseTemplateModel>(response, ExerciseTemplateModel);
-                resolve(result);
-            });
+const getExerciseTemplate = async (templateId: number) => {
+    return await getRequest<IExerciseTemplateModel>({
+        url: `${urls.prefix}${urls.getExerciseTemplateById}`.replace(TEMPLATE_ID, String(templateId)),
+        ModelClass: ExerciseTemplateModel
     });
 };
 
-const updateExerciseTemplate = async (
-    templateId: number, template: IExerciseTemplateModel
-): Promise<IResponse<IExerciseTemplateModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .post(`${urls.prefix}${urls.updateById}`.replace(TEMPLATE_ID, String(templateId)))
-            .send(template)
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IExerciseTemplateModel>(response, ExerciseTemplateModel);
-                resolve(result);
-            });
+const updateExerciseTemplate = async (templateId: number, template: IExerciseTemplateModel) => {
+    return await postRequest<IExerciseTemplateModel>({
+        url: `${urls.prefix}${urls.updateExerciseTemplateById}`.replace(TEMPLATE_ID, String(templateId)),
+        ModelClass: ExerciseTemplateModel,
+        data: template
     });
 };
 
-const deleteExerciseTemplate = async (templateId: number): Promise<IResponse<IExerciseTemplateModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .delete(`${urls.prefix}${urls.deleteById}`.replace(TEMPLATE_ID, String(templateId)))
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IExerciseTemplateModel>(response, ExerciseTemplateModel);
-                resolve(result);
-            });
+const deleteExerciseTemplate = async (templateId: number) => {
+    return await deleteRequest<IExerciseTemplateModel>({
+        url: `${urls.prefix}${urls.deleteExerciseTemplateById}`.replace(TEMPLATE_ID, String(templateId)),
+        ModelClass: ExerciseTemplateModel
     });
 };
 

@@ -7,6 +7,7 @@ import {
 } from 'src/query-creators/sport';
 import {query} from 'src/lib/db/client';
 import {prepareDBResult, IGetLimit} from 'src/services/base';
+import {ILinkUserSportModel} from 'src/models/link/user-sport';
 
 export enum UserSportActionType {
     DELETE = 'delete',
@@ -28,10 +29,10 @@ export default class SportService {
         return prepareDBResult(result);
     }
 
-    static async getUsers(data: IGetLimit, sportId: number): Promise<any[]> {
+    static async getUsers(limitParams: IGetLimit, sportId: number): Promise<any[]> {
         const result = await query({
-            text: getUsersQuery(data.order),
-            values: [data.limit, data.skip, sportId]
+            text: getUsersQuery(limitParams.order),
+            values: [limitParams.limit, limitParams.skip, sportId]
         });
 
         return prepareDBResult(result);
@@ -46,8 +47,9 @@ export default class SportService {
         return prepareDBResult(result);
     }
 
-    static async updateUser(actionType: UserSportActionType, userId: number, sportId: number): Promise<any[]> {
+    static async updateUser(actionType: UserSportActionType, linkUserSport: ILinkUserSportModel): Promise<any[]> {
         const text = actionType === UserSportActionType.DELETE ? deleteUserQuery() : addUserQuery();
+        const {userId, sportId} = linkUserSport;
         const result = await query({
             text,
             values: [userId, sportId]

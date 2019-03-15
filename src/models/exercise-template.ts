@@ -33,7 +33,7 @@ export default class ExerciseTemplateModel implements IExerciseTemplateModel {
     public sportId?: number;
     public createdDate?: Date;
 
-    constructor(data: any) {
+    constructor(data: IExerciseTemplateModel) {
         const {id, title, description, userId, sportId, createdDate} = data;
 
         this.id = id && Number(id);

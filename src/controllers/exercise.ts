@@ -1,69 +1,54 @@
 import express, {Request, Response} from 'express';
-import Boom from 'boom';
-import Joi from 'joi';
 
 import ExerciseService from 'src/services/exercise';
 import HttpResponse from 'src/utils/http/response';
 import {
-    getNotEmptyFields,
     checkGetLimitParameters,
-    asyncMiddlewareWrapper,
-    joiValidationErrorToString
+    asyncMiddlewareWrapper
 } from 'src/utils';
-import {API_URLS} from 'src/urls';
+import {apiUrls} from 'src/urls';
+import ExerciseModel from 'src/models/exercise';
 
-const exerciseController = express();
-const urls = API_URLS.exercise;
+const controller = express();
+const urls = apiUrls.exercise;
 
-exerciseController.get(urls.get, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
+controller.get(urls.getUserExercises, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
-    const {sportId} = req.query;
+    const {sportId, templateId} = req.query;
 
     const limitParameters = await checkGetLimitParameters(req.query);
-    const result = await ExerciseService.getUserExercises(limitParameters, userId, sportId);
+    const result = await ExerciseService.getUserExercises(limitParameters, userId, {sportId, templateId});
     HttpResponse.ok(res, result);
 }));
 
-exerciseController.get(urls.getById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
+controller.post(urls.createExercise, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
+    const exercise = new ExerciseModel(req.body);
+    await exercise.validateForCreate();
+
+    const result = await ExerciseService.createExercise(exercise);
+    HttpResponse.ok(res, result);
+}));
+
+controller.get(urls.getExerciseById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {exerciseId} = req.params;
     const result = await ExerciseService.getExerciseById(exerciseId);
     HttpResponse.ok(res, result);
 }));
 
-exerciseController.post(urls.create, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
-    const schema = {
-        exerciseTemplateId: Joi.number().required()
-    };
-
-    try {
-        await Joi.validate(req.body, schema);
-    } catch (e) {
-        HttpResponse.throwError(Boom.badRequest, joiValidationErrorToString(e));
-    }
-
-    const {exerciseTemplateId, duration, reps} = req.body;
-    const result = await ExerciseService.createExercise({
-        exerciseTemplateId, duration, reps
-    });
-    HttpResponse.ok(res, result);
-}));
-
-exerciseController.post(urls.updateById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
-    const fields = getNotEmptyFields(req.body);
+controller.post(urls.updateExerciseById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {exerciseId} = req.params;
 
-    const result = await ExerciseService.updateExercise(
-        exerciseId,
-        fields,
-        req.body
-    );
+    const exercise = new ExerciseModel(req.body);
+    exercise.clearNotUpdatedFields();
+
+    const result = await ExerciseService.updateExercise(exerciseId, exercise);
     HttpResponse.ok(res, result);
 }));
 
-exerciseController.delete(urls.deleteById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
+controller.delete(urls.deleteExerciseById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {exerciseId} = req.params;
     const result = await ExerciseService.deleteExercise(exerciseId);
     HttpResponse.ok(res, result);
 }));
 
-export default exerciseController;
+export default controller;

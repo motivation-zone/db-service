@@ -1,128 +1,62 @@
-import request from 'supertest';
 import faker from 'faker';
 
-import app from 'src/app';
 import UserModel, {IUserModel} from 'src/models/user';
-import {API_URLS} from 'src/urls';
-import {intervalRandom, formQueryString} from 'src/utils';
-import {IResponse, formResponse} from 'src/utils/http/response';
+import {apiUrls} from 'src/urls';
+import {intervalRandom, formQueryString, parseDate} from 'src/utils';
 import {IGetLimitTest} from 'tests/utils';
+import {getRequest, postRequest, deleteRequest} from 'tests/helpers/common';
 
-const urls = API_URLS.user;
-const REQUEST_HEADERS = {Accept: 'application/json'};
+const urls = apiUrls.user;
 
-const insertUser = async (user: IUserModel): Promise<IResponse<IUserModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .post(`${urls.prefix}${urls.create}`)
-            .send(user)
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IUserModel>(response, UserModel);
-                resolve(result);
-            });
+const insertUser = async (user: IUserModel) => {
+    return await postRequest<IUserModel>({
+        url: `${urls.prefix}${urls.createUser}`,
+        ModelClass: UserModel,
+        data: user
     });
 };
 
-const updateUser = async (id: number, data: any): Promise<IResponse<IUserModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .post(`${urls.prefix}${urls.updateById.replace(':id', String(id))}`)
-            .send(data)
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IUserModel>(response, UserModel);
-                resolve(result);
-            });
+const updateUser = async (userId: number, user: IUserModel) => {
+    return await postRequest<IUserModel>({
+        url: `${urls.prefix}${urls.updateUserById.replace(':userId', String(userId))}`,
+        ModelClass: UserModel,
+        data: user
     });
 };
 
-const getUserById = async (id: number): Promise<IResponse<IUserModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .get(`${urls.prefix}${urls.getById.replace(':id', String(id))}`)
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IUserModel>(response, UserModel);
-                resolve(result);
-            });
+const getUserById = async (userId: number) => {
+    return await getRequest<IUserModel>({
+        url: `${urls.prefix}${urls.getUserById.replace(':userId', String(userId))}`,
+        ModelClass: UserModel
     });
 };
 
-const getUserByLogin = async (login: string, strict = true): Promise<IResponse<IUserModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .get(`${urls.prefix}/${urls.getByLogin.replace(':login', login)}?${!strict ? `strict=${strict}` : ''}`)
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IUserModel>(response, UserModel);
-                resolve(result);
-            });
+const getUserByLogin = async (login: string, strict = true) => {
+    return await getRequest<IUserModel>({
+        url: `${urls.prefix}/${urls.getUserByLogin.replace(':login', login)}?${!strict ? `strict=${strict}` : ''}`,
+        ModelClass: UserModel
     });
 };
 
-const checkUserPassword = async (login: string, password: string): Promise<IResponse<IUserModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .post(`${urls.prefix}/${urls.checkPassword}`)
-            .send({login, password})
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IUserModel>(response, UserModel);
-                resolve(result);
-            });
+const checkUserPassword = async (login: string, password: string) => {
+    return await postRequest<IUserModel>({
+        url: `${urls.prefix}/${urls.checkUserPassword}`,
+        ModelClass: UserModel,
+        data: {login, password}
     });
 };
 
-const getUsers = async (queryParams: IGetLimitTest): Promise<IResponse<IUserModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .get(`${urls.prefix}${urls.get}?${formQueryString(queryParams)}`)
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IUserModel>(response, UserModel);
-                resolve(result);
-            });
+const getUsers = async (limitParams: IGetLimitTest) => {
+    return await getRequest<IUserModel>({
+        url: `${urls.prefix}${urls.getUsers}?${formQueryString(limitParams)}`,
+        ModelClass: UserModel
     });
 };
 
-const deleteUserById = async (id: number): Promise<IResponse<IUserModel[]>> => {
-    return await new Promise((resolve, reject) => {
-        request(app)
-            .delete(`${urls.prefix}/${urls.deleteById.replace(':id', String(id))}`)
-            .set(REQUEST_HEADERS)
-            .end((error, response) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                const result = formResponse<IUserModel>(response, UserModel);
-                resolve(result);
-            });
+const deleteUserById = async (userId: number) => {
+    return await deleteRequest<IUserModel>({
+        url: `${urls.prefix}/${urls.deleteUserById.replace(':userId', String(userId))}`,
+        ModelClass: UserModel
     });
 };
 
@@ -143,10 +77,10 @@ const generatePhone = () => {
 };
 
 export const generateUser = (overrites: IUserModel = {}): IUserModel => {
-    const {internet, name, random, lorem, date} = faker;
+    const {internet, name, random, lorem, date, finance} = faker;
 
     const user = new UserModel({
-        login: internet.userName(),
+        login: `${internet.userName()}_${finance.account()}`,
         name: name.findName(),
         password: internet.password(),
         email: internet.email(),
@@ -157,7 +91,7 @@ export const generateUser = (overrites: IUserModel = {}): IUserModel => {
         growth: intervalRandom(120, 250),
         instagram: internet.userName().toLowerCase(),
         phone: generatePhone(),
-        birthDate: date.past().toISOString().split('T')[0]
+        birthDate: parseDate(date.past().toISOString().split('T')[0])
     });
 
     Object.assign(user, overrites);

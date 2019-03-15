@@ -1,10 +1,11 @@
 import debug from 'debug';
 
-export type LevelType = 'error' | 'info';
+export type LevelType = 'error' | 'info' | 'tests';
 
 export interface IDebugTarget {
     error: (msg: string) => void;
     info: (msg: string) => void;
+    tests: (msg: string) => void;
 }
 
 /**

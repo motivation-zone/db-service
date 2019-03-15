@@ -60,10 +60,10 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async getUsers(data: IGetLimit): Promise<any[]> {
+    static async getUsers(limitParams: IGetLimit): Promise<any[]> {
         const result = await query({
-            text: getUsersQuery(data.order),
-            values: [data.limit, data.skip]
+            text: getUsersQuery(limitParams.order),
+            values: [limitParams.limit, limitParams.skip]
         });
 
         return prepareDBResult(result);

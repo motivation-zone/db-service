@@ -11,14 +11,11 @@ const {
     DifficultyLevelController,
     ExerciseController,
     ExerciseTemplateController,
-    ProgramController,
     SportController,
-    TrainingTypeController,
-    TrainingController,
     UserController
 } = controllers;
 
-import {API_URLS} from './urls';
+import {apiUrls} from './urls';
 
 const {
     user,
@@ -26,11 +23,8 @@ const {
     sport,
     difficultyLevel,
     exercise,
-    exerciseTemplate,
-    program,
-    trainingType,
-    training
-} = API_URLS;
+    exerciseTemplate
+} = apiUrls;
 
 const app = express()
     .disable('x-powered-by')
@@ -43,9 +37,6 @@ const app = express()
     .use(difficultyLevel.prefix, DifficultyLevelController)
     .use(exercise.prefix, ExerciseController)
     .use(exerciseTemplate.prefix, ExerciseTemplateController)
-    .use(program.prefix, ProgramController)
-    .use(trainingType.prefix, TrainingTypeController)
-    .use(training.prefix, TrainingController)
     .use(notFoundMiddleware)
     .use(errorMiddleware);
 

@@ -70,6 +70,7 @@ test.func.fill:
 .PHONY: test.func
 test.func:
 	make build && \
+	export DEBUG=dbservice:tests && \
 	export NODE_PATH=$(OUT_DIR) && \
 	export TZ=$(TZ) && \
 	$(NODE) $(OUT_DIR)/tests/func/fill/index.js && \

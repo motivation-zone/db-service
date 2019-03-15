@@ -1,21 +1,20 @@
 import express, {Request, Response} from 'express';
-import Boom from 'boom';
-import Joi from 'joi';
 
-import SportService, {SPORT_USER_ACTION_TYPES} from 'src/services/sport';
+import SportService from 'src/services/sport';
 import HttpResponse from 'src/utils/http/response';
-import {checkGetLimitParameters, asyncMiddlewareWrapper, joiValidationErrorToString} from 'src/utils';
-import {API_URLS} from 'src/urls';
+import {checkGetLimitParameters, asyncMiddlewareWrapper} from 'src/utils';
+import {apiUrls} from 'src/urls';
+import LinkUserSportModel from 'src/models/link/user-sport';
 
-const sportController = express();
-const urls = API_URLS.sport;
+const controller = express();
+const urls = apiUrls.sport;
 
-sportController.get(urls.get, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
+controller.get(urls.getSports, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
     const result = await SportService.getSports();
     HttpResponse.ok(res, result);
 }));
 
-sportController.get(urls.getUsersBySport, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
+controller.get(urls.getUsersBySport, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const limitParameters = await checkGetLimitParameters(req.query);
     const {sportId} = req.params;
 
@@ -23,33 +22,21 @@ sportController.get(urls.getUsersBySport, asyncMiddlewareWrapper(async (req: Req
     HttpResponse.ok(res, result);
 }));
 
-sportController.get(urls.getUserSports, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
+controller.get(urls.getUserSports, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
 
     const result = await SportService.getUserSports(userId);
     HttpResponse.ok(res, result);
 }));
 
-sportController.post(urls.updateUserSport, asyncMiddlewareWrapper(
-    async (req: Request, res: Response) => {
-        const {userId, sportId} = req.body;
-        const {actionType} = req.params;
+controller.post(urls.updateUserSport, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
+    const {actionType} = req.params;
 
-        const schema = {
-            userId: Joi.number().required(),
-            sportId: Joi.number().required(),
-            actionType: Joi.string().valid(SPORT_USER_ACTION_TYPES).required()
-        };
+    const userSport = new LinkUserSportModel(req.body);
+    await userSport.validateForCreate(actionType);
 
-        try {
-            await Joi.validate({userId, sportId, actionType}, schema);
-        } catch (e) {
-            HttpResponse.throwError(Boom.badRequest, joiValidationErrorToString(e));
-        }
+    const result = await SportService.updateUser(actionType, userSport);
+    HttpResponse.ok(res, result);
+}));
 
-        const result = await SportService.updateUser(actionType, userId, sportId);
-        HttpResponse.ok(res, result);
-    }
-));
-
-export default sportController;
+export default controller;

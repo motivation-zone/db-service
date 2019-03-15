@@ -4,24 +4,18 @@ import {
     createExercise as createExerciseQuery,
     updateExercise as updateExerciseQuery,
     getExerciseById as getExerciseByIdQuery,
-    getUserExercisesBySport as getUserExercisesBySportQuery,
-    getAllUserExercises as getAllUserExercisesQuery,
-    deleteExercise as deleteExerciseQuery
+    getUserExercises as getUserExercisesQuery,
+    deleteExercise as deleteExerciseQuery,
+    IGetUserExercisesQuery
 } from 'src/query-creators/exercise';
 import {translateNodeToPostgresqlName} from 'src/utils/db/helper';
-import {createMapData} from 'src/utils';
-
-interface IExercise {
-    exerciseTemplateId: number;
-    duration?: number;
-    reps?: number;
-}
+import {IExerciseModel} from 'src/models/exercise';
+import {createMapData, getNotEmptyFields} from 'src/utils';
 
 export default class ExerciseService {
-    static async createExercise(params: IExercise): Promise<any[]> {
-        const {duration, reps, exerciseTemplateId} = params;
-        const fields = createMapData(['duration', 'reps'], [duration, reps]);
-
+    static async createExercise(exercise: IExerciseModel): Promise<any[]> {
+        const {type, value, exerciseTemplateId} = exercise;
+        const fields = createMapData(['type', 'value'], [type, value]);
         const result = await query({
             text: createExerciseQuery(fields.map((f) => f.name)),
             values: [exerciseTemplateId].concat(fields.map((f) => f.value))
@@ -30,12 +24,13 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async updateExercise(exerciseId: number, fields: string[], obj: any): Promise<any[]> {
+    static async updateExercise(exerciseId: number, exercise: IExerciseModel): Promise<any[]> {
+        const fields = getNotEmptyFields(exercise) as (keyof IExerciseModel)[];
         const result = await query({
             text: updateExerciseQuery(fields.map(translateNodeToPostgresqlName)),
             values: [
                 exerciseId,
-                ...fields.map((field) => obj[field])
+                ...fields.map((field) => exercise[field])
             ]
         });
 
@@ -51,14 +46,20 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async getUserExercises(limitParams: IGetLimit, userId: number, sportId?: number): Promise<any[]> {
+    static async getUserExercises(
+        limitParams: IGetLimit,
+        userId: number,
+        params: {sportId?: number, templateId?: number}
+    ): Promise<any[]> {
+        const {sportId, templateId} = params;
+        const fields = createMapData(['sportId', 'templateId'], [sportId, templateId]);
+
         const result = await query({
-            text: sportId ?
-                getUserExercisesBySportQuery(limitParams.order) :
-                getAllUserExercisesQuery(limitParams.order),
-            values: [userId]
-                .concat(sportId ? [sportId] : [])
-                .concat([limitParams.limit, limitParams.skip])
+            text: getUserExercisesQuery(
+                limitParams.order,
+                fields.map((x) => x.name) as (keyof IGetUserExercisesQuery)[]
+            ),
+            values: [userId, limitParams.limit, limitParams.skip, ...fields.map((x) => x.value)]
         });
 
         return prepareDBResult(result);

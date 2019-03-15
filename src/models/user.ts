@@ -67,7 +67,7 @@ export default class UserModel implements IUserModel {
     public phone?: string;
     public registeredDate?: Date;
 
-    constructor(data: any) {
+    constructor(data: IUserModel) {
         const {
             id, login, name, password, email, selfInfo, gender,
             isAthlete, isBanned, weight, growth, birthDate,
@@ -87,7 +87,7 @@ export default class UserModel implements IUserModel {
         this.instagram = instagram;
         this.phone = phone;
         this.isBanned = isBanned;
-        this.countryId = countryId ? Number(countryId) : undefined;
+        this.countryId = countryId && Number(countryId);
         this.birthDate = parseDate(birthDate);
         this.registeredDate = parseDate(registeredDate);
     }

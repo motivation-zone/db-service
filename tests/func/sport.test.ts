@@ -4,6 +4,7 @@ import {dbActions as sportDbActions} from 'tests/helpers/sport';
 import {dbActions as userDbActions, generateUser} from 'tests/helpers/user';
 import {SPORTS_COUNT} from 'tests/const';
 import {checkOrder} from 'tests/utils';
+import LinkUserSportModel from 'src/models/link/user-sport';
 
 const {insertUser} = userDbActions;
 const {
@@ -12,6 +13,8 @@ const {
     getUsersBySport,
     deleteUserSportLink
 } = sportDbActions;
+
+const LIMIT_PARAMS = {limit: 100, skip: 0};
 
 describe('Sport:', () => {
     describe('Get sports', () => {
@@ -24,7 +27,7 @@ describe('Sport:', () => {
     describe('Get users', () => {
         it('by sports with order param = ASC', async () => {
             const {data: [sport]} = await getAllSports();
-            const {data: users} = await getUsersBySport(sport.id!, {limit: 10, skip: 0});
+            const {data: users} = await getUsersBySport(sport.id!, LIMIT_PARAMS);
             expect(users.length).be.greaterThan(0);
 
             const checkAsc = checkOrder(users, 'ASC', (user) => user.registeredDate);
@@ -33,7 +36,7 @@ describe('Sport:', () => {
 
         it('by sports with order param = DESC', async () => {
             const {data: [sport]} = await getAllSports();
-            const {data: users} = await getUsersBySport(sport.id!, {limit: 10, skip: 0, order: 'DESC'});
+            const {data: users} = await getUsersBySport(sport.id!, Object.assign({}, LIMIT_PARAMS, {order: 'DESC'}));
             expect(users.length).be.greaterThan(0);
 
             const checkDesc = checkOrder(users, 'DESC', (user) => user.registeredDate);
@@ -50,10 +53,11 @@ describe('Sport:', () => {
     describe('Update user-sport link', () => {
         it('delete', async () => {
             const {data: [sport]} = await getAllSports();
-            const {data: [deletedUser]} = await getUsersBySport(sport.id!, {limit: 10, skip: 0});
-            await deleteUserSportLink(deletedUser.id!, sport.id!);
+            const {data: [deletedUser]} = await getUsersBySport(sport.id!, LIMIT_PARAMS);
+            const linkUserSport = new LinkUserSportModel({sportId: sport.id, userId: deletedUser.id});
+            await deleteUserSportLink(linkUserSport);
 
-            const {data: users} = await getUsersBySport(sport.id!, {limit: 10, skip: 0});
+            const {data: users} = await getUsersBySport(sport.id!, LIMIT_PARAMS);
             const checkUser = users.find((user) => deletedUser.id === user.id);
             expect(checkUser).to.be.not.ok;
         });
@@ -62,8 +66,9 @@ describe('Sport:', () => {
             const {data: [sport]} = await getAllSports();
             const userData = await generateUser();
             const {data: [newUser]} = await insertUser(userData);
-            await insertUserSportLink(newUser.id!, sport.id!);
-            const {data: users} = await getUsersBySport(sport.id!, {limit: 100, skip: 0});
+            const linkUserSport = new LinkUserSportModel({sportId: sport.id, userId: newUser.id});
+            await insertUserSportLink(linkUserSport);
+            const {data: users} = await getUsersBySport(sport.id!, LIMIT_PARAMS);
 
             const checkUser = users.find((user) => newUser.id === user.id);
             expect(checkUser!.id).to.equal(newUser.id);
