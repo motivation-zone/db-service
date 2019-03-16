@@ -6,6 +6,7 @@ try {
 } catch (e) {}
 
 const fileNames = [
+    'extensions',
     'training-type', 'country', 'sport', 'difficulty-level',
     'user', 'user-sport', 'exercise',
     'program', 'training', 'bought-program', 'user-program-saved'

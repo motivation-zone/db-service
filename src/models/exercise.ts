@@ -11,8 +11,8 @@ export enum ExerciseValueType {
 }
 
 export interface IExerciseModel {
-    id?: number;
-    exerciseTemplateId?: number;
+    id?: string;
+    exerciseTemplateId?: string;
     value?: number;
     type?: ExerciseValueType;
     createdDate?: Date;
@@ -23,20 +23,20 @@ export interface IExerciseModel {
 interface IExerciseModelParams extends IExerciseModel {
     tempTitle?: string;
     tempDescription?: string;
-    tempUserId?: number;
+    tempUserId?: string;
     tempSportId?: number;
 }
 
 const VALIDATION_SCHEMES = Joi.object().keys({
-    id: Joi.number().integer(),
-    exerciseTemplateId: Joi.number().required(),
+    id: Joi.string(),
+    exerciseTemplateId: Joi.string().required(),
     value: Joi.number().required(),
     type: Joi.string().valid([ExerciseValueType.REPS, ExerciseValueType.DURATION]).required(),
     createdDate: Joi.date(),
     exerciseTemplate: Joi.object().keys({
         title: Joi.string(),
         description: Joi.string(),
-        userId: Joi.number(),
+        userId: Joi.string(),
         sportId: Joi.number()
     })
 });
@@ -47,8 +47,8 @@ export const NOT_UPDATED_FIELDS: (keyof IExerciseModel)[] = [
 export const REQUIRED_FIELDS: (keyof IExerciseModel)[] = ['exerciseTemplateId', 'value', 'type'];
 
 export default class ExerciseModel implements IExerciseModel {
-    public id?: number;
-    public exerciseTemplateId?: number;
+    public id?: string;
+    public exerciseTemplateId?: string;
     public value?: number;
     public type?: ExerciseValueType;
     public createdDate?: Date;
@@ -61,8 +61,8 @@ export default class ExerciseModel implements IExerciseModel {
             tempTitle, tempDescription, tempUserId, tempSportId
         } = data;
 
-        this.id = id && Number(id);
-        this.exerciseTemplateId = exerciseTemplateId && Number(exerciseTemplateId);
+        this.id = id;
+        this.exerciseTemplateId = exerciseTemplateId;
         this.value = value;
         this.type = type;
         this.createdDate = parseDate(createdDate);
@@ -70,7 +70,7 @@ export default class ExerciseModel implements IExerciseModel {
         this.exerciseTemplate = {
             title: tempTitle,
             description: tempDescription,
-            userId: tempUserId && Number(tempUserId),
+            userId: tempUserId,
             sportId: tempSportId && Number(tempSportId)
         };
     }

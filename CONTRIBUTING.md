@@ -18,6 +18,12 @@ make build - build project
 make build.watch - build project with watch mode
 ```
 
+# Run
+```
+make server.dev - run server by node-ts without creating "build" dir
+make server.run - run server from "build" dir by nodejs
+```
+
 # Linting
 Two different commands, because tests rules code style a little bit difference.
 ```
@@ -28,9 +34,8 @@ make lint.tests - linting /tests folter
 # Test
 ## Functional
 ```
-make test - common command (fill && func)
-make test.fill - clear all public schemas and create it again
-make test.func - run functional tests
+make test.func - common command (fill && func)
+make test.func.fill - clear all public schemas and create it again -> fill db by faker data
 ```
 
 ## Load

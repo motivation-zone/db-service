@@ -19,7 +19,7 @@ const {
 const {getUsers} = userDbActions;
 const {getExerciseTemplates} = exerciseTemplateDbActions;
 
-const NONEXISTENT_ID = 9999999999;
+const NONEXISTENT_ID = '9607957f-9f02-4e55-bd36-8961dba1f694';
 const LIMIT_PARAMS = {limit: 100, skip: 0};
 
 describe('Exercise:', () => {

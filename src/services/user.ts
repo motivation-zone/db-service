@@ -29,12 +29,12 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async updateUser(id: number, user: UserModel): Promise<any[]> {
+    static async updateUser(userId: string, user: UserModel): Promise<any[]> {
         const fields = getNotEmptyFields(user) as (keyof IUserModel)[];
         const result = await query({
             text: updateUserQuery(fields.map(translateNodeToPostgresqlName)),
             values: [
-                id,
+                userId,
                 ...fields.map((field) => user[field])
             ]
         });
@@ -42,10 +42,10 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async getUserById(id: number): Promise<any[]> {
+    static async getUserById(userId: string): Promise<any[]> {
         const result = await query({
             text: getUserByIdQuery(),
-            values: [id]
+            values: [userId]
         });
 
         return prepareDBResult(result);
@@ -69,10 +69,10 @@ export default class UserService {
         return prepareDBResult(result);
     }
 
-    static async deleteUser(id: number): Promise<any[]> {
+    static async deleteUser(userId: string): Promise<any[]> {
         const result = await query({
             text: deleteUserQuery(),
-            values: [id]
+            values: [userId]
         });
 
         return prepareDBResult(result);

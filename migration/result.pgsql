@@ -1,11 +1,12 @@
-CREATE TABLE IF NOT EXISTS training_type (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE
-);
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- CREATE TABLE IF NOT EXISTS training_type (
+--   id SERIAL PRIMARY KEY,
+--   name TEXT NOT NULL UNIQUE
+-- );
 
-INSERT INTO training_type (name) VALUES ('fat burning') ON CONFLICT DO NOTHING;
-INSERT INTO training_type (name) VALUES ('rep building') ON CONFLICT DO NOTHING;
-INSERT INTO training_type (name) VALUES ('strength building') ON CONFLICT DO NOTHING;
+-- INSERT INTO training_type (name) VALUES ('fat burning') ON CONFLICT DO NOTHING;
+-- INSERT INTO training_type (name) VALUES ('rep building') ON CONFLICT DO NOTHING;
+-- INSERT INTO training_type (name) VALUES ('strength building') ON CONFLICT DO NOTHING;
 CREATE TABLE IF NOT EXISTS country (
   id BIGSERIAL PRIMARY KEY,
   name TEXT UNIQUE,
@@ -280,7 +281,7 @@ INSERT INTO difficulty_level (level, name) VALUES (2, 'intermediate') ON CONFLIC
 INSERT INTO difficulty_level (level, name) VALUES (3, 'advance') ON CONFLICT DO NOTHING;
 INSERT INTO difficulty_level (level, name) VALUES (4, 'monster') ON CONFLICT DO NOTHING;
 CREATE TABLE IF NOT EXISTS users (
-  id BIGSERIAL PRIMARY KEY,
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   login TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
   password TEXT NOT NULL,
@@ -298,16 +299,16 @@ CREATE TABLE IF NOT EXISTS users (
   registered_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 CREATE TABLE IF NOT EXISTS user_sport (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   sport_id BIGINT REFERENCES sport(id) ON DELETE CASCADE,
   UNIQUE (user_id, sport_id)
 );
 CREATE TABLE IF NOT EXISTS exercise_template (
-  id BIGSERIAL PRIMARY KEY,
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
-  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+  user_id UUID REFERENCES users(id) ON DELETE RESTRICT,
   sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
   created_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
   UNIQUE(title, description, user_id, sport_id)
@@ -315,99 +316,99 @@ CREATE TABLE IF NOT EXISTS exercise_template (
 
 CREATE DOMAIN VALUE_TYPE AS TEXT NOT NULL CHECK (VALUE='reps' OR VALUE='duration');
 CREATE TABLE IF NOT EXISTS exercise (
-  id BIGSERIAL PRIMARY KEY,
-  exercise_template_id BIGINT REFERENCES exercise_template(id) ON DELETE RESTRICT,
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  exercise_template_id UUID REFERENCES exercise_template(id) ON DELETE RESTRICT,
   value INTEGER NOT NULL,
   type VALUE_TYPE,
   created_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
   UNIQUE(exercise_template_id, value, type)
 );
--- Программа тренировок создается по выбору на кол-во дней (max 30 дней за раз, minimum 1 день)
-CREATE TABLE IF NOT EXISTS program (
-  id BIGSERIAL PRIMARY KEY, -- identification for image
-  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
-  sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
-  price DECIMAL(19,2) DEFAULT 0,
-  difficulty_level INTEGER REFERENCES difficulty_level(level) ON DELETE RESTRICT,
-  modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
-);
+-- -- Программа тренировок создается по выбору на кол-во дней (max 30 дней за раз, minimum 1 день)
+-- CREATE TABLE IF NOT EXISTS program (
+--   id BIGSERIAL PRIMARY KEY, -- identification for image
+--   user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+--   sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
+--   price DECIMAL(19,2) DEFAULT 0,
+--   difficulty_level INTEGER REFERENCES difficulty_level(level) ON DELETE RESTRICT,
+--   modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+--   created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+-- );
 
 
-CREATE OR REPLACE FUNCTION update_program_modified_date() RETURNS TRIGGER AS
-  $BODY$
-    BEGIN
-      UPDATE program SET modified_date=now();
-      RETURN new;
-    END;
-  $BODY$
-  LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION update_program_modified_date() RETURNS TRIGGER AS
+--   $BODY$
+--     BEGIN
+--       UPDATE program SET modified_date=now();
+--       RETURN new;
+--     END;
+--   $BODY$
+--   LANGUAGE plpgsql;
 
-CREATE TRIGGER programUpdate AFTER UPDATE ON program FOR EACH ROW EXECUTE PROCEDURE update_program_modified_date();
-CREATE TABLE IF NOT EXISTS training (
-  id BIGSERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  description TEXT,
-  difficulty_level INTEGER REFERENCES difficulty_level(level) ON DELETE RESTRICT,
-  is_daily BOOLEAN DEFAULT FALSE,
-  is_hidden BOOLEAN DEFAULT TRUE,
-  type_id INTEGER REFERENCES training_type(id) ON DELETE RESTRICT,
-  user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
-  sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
-  duration INTEGER NOT NULL,
-  modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
-);
+-- CREATE TRIGGER programUpdate AFTER UPDATE ON program FOR EACH ROW EXECUTE PROCEDURE update_program_modified_date();
+-- CREATE TABLE IF NOT EXISTS training (
+--   id BIGSERIAL PRIMARY KEY,
+--   title TEXT NOT NULL,
+--   description TEXT,
+--   difficulty_level INTEGER REFERENCES difficulty_level(level) ON DELETE RESTRICT,
+--   is_daily BOOLEAN DEFAULT FALSE,
+--   is_hidden BOOLEAN DEFAULT TRUE,
+--   type_id INTEGER REFERENCES training_type(id) ON DELETE RESTRICT,
+--   user_id BIGINT REFERENCES users(id) ON DELETE RESTRICT,
+--   sport_id BIGINT REFERENCES sport(id) ON DELETE RESTRICT,
+--   duration INTEGER NOT NULL,
+--   modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+--   created_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+-- );
 
-CREATE TABLE IF NOT EXISTS training_round (
-  id BIGSERIAL PRIMARY KEY,
-  training_id BIGINT REFERENCES training(id) ON DELETE CASCADE,
-  exercise_id BIGINT REFERENCES exercise(id) ON DELETE RESTRICT,
-  sets INTEGER DEFAULT 1,
-  round_position_in_training INTEGER NOT NULL,
-  exercise_position_in_round INTEGER NOT NULL,
-  UNIQUE(training_id, exercise_id, round_position_in_training, exercise_position_in_round),
-  UNIQUE(training_id, exercise_id, round_position_in_training)
-);
+-- CREATE TABLE IF NOT EXISTS training_round (
+--   id BIGSERIAL PRIMARY KEY,
+--   training_id BIGINT REFERENCES training(id) ON DELETE CASCADE,
+--   exercise_id BIGINT REFERENCES exercise(id) ON DELETE RESTRICT,
+--   sets INTEGER DEFAULT 1,
+--   round_position_in_training INTEGER NOT NULL,
+--   exercise_position_in_round INTEGER NOT NULL,
+--   UNIQUE(training_id, exercise_id, round_position_in_training, exercise_position_in_round),
+--   UNIQUE(training_id, exercise_id, round_position_in_training)
+-- );
 
-CREATE TABLE IF NOT EXISTS training_program (
-  id BIGSERIAL PRIMARY KEY,
-  program_id BIGINT REFERENCES program(id) ON DELETE CASCADE,
-  training_id BIGINT REFERENCES training(id) ON DELETE RESTRICT,
-  day INTEGER NOT NULL,
-  UNIQUE(program_id, training_id, day)
-);
+-- CREATE TABLE IF NOT EXISTS training_program (
+--   id BIGSERIAL PRIMARY KEY,
+--   program_id BIGINT REFERENCES program(id) ON DELETE CASCADE,
+--   training_id BIGINT REFERENCES training(id) ON DELETE RESTRICT,
+--   day INTEGER NOT NULL,
+--   UNIQUE(program_id, training_id, day)
+-- );
 
-CREATE OR REPLACE FUNCTION update_training_modified_date() RETURNS TRIGGER AS
-  $BODY$
-    BEGIN
-      UPDATE training SET modified_date=now();
-      RETURN new;
-    END;
-  $BODY$
-  LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION update_training_modified_date() RETURNS TRIGGER AS
+--   $BODY$
+--     BEGIN
+--       UPDATE training SET modified_date=now();
+--       RETURN new;
+--     END;
+--   $BODY$
+--   LANGUAGE plpgsql;
 
-CREATE TRIGGER trainingUpdate AFTER UPDATE ON training FOR EACH ROW EXECUTE PROCEDURE update_training_modified_date();
-CREATE TABLE IF NOT EXISTS bought_program (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-  program_id BIGINT REFERENCES program(id) ON DELETE RESTRICT,
-  transaction TEXT NOT NULL,
-  bought_date TIMESTAMP WITH TIME ZONE DEFAULT now()
-);
-CREATE TABLE IF NOT EXISTS user_program_saved (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-  program_id BIGINT REFERENCES program(id) ON DELETE CASCADE,
-  save_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  UNIQUE (user_id, program_id)
-);
+-- CREATE TRIGGER trainingUpdate AFTER UPDATE ON training FOR EACH ROW EXECUTE PROCEDURE update_training_modified_date();
+-- CREATE TABLE IF NOT EXISTS bought_program (
+--   id BIGSERIAL PRIMARY KEY,
+--   user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+--   program_id BIGINT REFERENCES program(id) ON DELETE RESTRICT,
+--   transaction TEXT NOT NULL,
+--   bought_date TIMESTAMP WITH TIME ZONE DEFAULT now()
+-- );
+-- CREATE TABLE IF NOT EXISTS user_program_saved (
+--   id BIGSERIAL PRIMARY KEY,
+--   user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+--   program_id BIGINT REFERENCES program(id) ON DELETE CASCADE,
+--   save_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+--   UNIQUE (user_id, program_id)
+-- );
 
-CREATE TABLE IF NOT EXISTS user_training_saved (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-  training_id BIGINT REFERENCES training(id) ON DELETE CASCADE,
-  save_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  UNIQUE (user_id, training_id)
-);
+-- CREATE TABLE IF NOT EXISTS user_training_saved (
+--   id BIGSERIAL PRIMARY KEY,
+--   user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+--   training_id BIGINT REFERENCES training(id) ON DELETE CASCADE,
+--   save_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+--   UNIQUE (user_id, training_id)
+-- );
 

@@ -22,7 +22,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async updateExerciseTemplate(templateId: number, template: ExerciseTemplateModel): Promise<any[]> {
+    static async updateExerciseTemplate(templateId: string, template: ExerciseTemplateModel): Promise<any[]> {
         const fields = getNotEmptyFields(template) as (keyof IExerciseTemplateModel)[];
         const result = await query({
             text: updateExerciseTemplateQuery(fields.map(translateNodeToPostgresqlName)),
@@ -37,7 +37,7 @@ export default class ExerciseService {
 
     static async getUserExerciseTemplates(
         limitParams: IGetLimit,
-        params: {userId: number, sportId?: number}
+        params: {userId: string, sportId?: number}
     ): Promise<any[]> {
         const {userId, sportId} = params;
 
@@ -49,7 +49,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async getExerciseTemplate(templateId: number): Promise<any[]> {
+    static async getExerciseTemplate(templateId: string): Promise<any[]> {
         const result = await query({
             text: getExerciseTemplateByIdQuery(),
             values: [templateId]
@@ -58,7 +58,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async deleteExerciseTemplate(templateId: number): Promise<any[]> {
+    static async deleteExerciseTemplate(templateId: string): Promise<any[]> {
         const result = await query({
             text: deleteExerciseTemplateQuery(),
             values: [templateId]

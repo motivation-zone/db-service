@@ -40,9 +40,9 @@ const getUsersBySport = async (sportId: number, limitParams: IGetLimitTest) => {
     });
 };
 
-const getUserSports = async (userId: number) => {
+const getUserSports = async (userId: string) => {
     return await getRequest<ISportModel>({
-        url: `${urls.prefix}${urls.getUserSports.replace(':userId', String(userId))}`,
+        url: `${urls.prefix}${urls.getUserSports.replace(':userId', userId)}`,
         ModelClass: SportModel
     });
 };
