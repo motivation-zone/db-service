@@ -49,10 +49,13 @@ export default class ExerciseService {
     static async getUserExercises(
         limitParams: IGetLimit,
         userId: number,
-        params: {sportId?: number, templateId?: string}
+        params: {sportId?: number, templateId?: string, difficultyLevelId?: number}
     ): Promise<any[]> {
-        const {sportId, templateId} = params;
-        const fields = createMapData(['sportId', 'templateId'], [sportId, templateId]);
+        const {sportId, templateId, difficultyLevelId} = params;
+        const fields = createMapData(
+            ['sportId', 'templateId', 'difficultyLevelId'],
+            [sportId, templateId, difficultyLevelId]
+        );
 
         const result = await query({
             text: getUserExercisesQuery(

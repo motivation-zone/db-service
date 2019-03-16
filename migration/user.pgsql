@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS users (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  login TEXT NOT NULL UNIQUE,
+  login TEXT UNIQUE NOT NULL ,
   name TEXT NOT NULL,
   password TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE,
+  email TEXT UNIQUE NOT NULL,
   is_athlete BOOLEAN DEFAULT FALSE,
   gender BOOLEAN NOT NULL,
   self_info TEXT,

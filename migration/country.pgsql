@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS country (
   id BIGSERIAL PRIMARY KEY,
-  name TEXT UNIQUE,
-  alpha2 TEXT UNIQUE,
-  alpha3 TEXT UNIQUE,
-  un_code TEXT UNIQUE,
+  name TEXT UNIQUE NOT NULL,
+  alpha2 TEXT UNIQUE NOT NULL,
+  alpha3 TEXT UNIQUE NOT NULL,
+  un_code TEXT UNIQUE NOT NULL,
   UNIQUE (name, alpha2, alpha3, un_code)
 );
 

@@ -5,3 +5,4 @@
 /build
 /logs
 /configs/db/db.yaml
+/migration/result.pgsql

@@ -12,6 +12,7 @@ const TEMPLATE_ID = ':templateId';
 interface IGetExerciseTemplates {
     userId?: string;
     sportId?: number;
+    difficultyLevelId?: number;
     limitParams: IGetLimitTest;
 }
 
@@ -23,12 +24,13 @@ const insertExerciseTemplate = async (template: IExerciseTemplateModel) => {
     });
 };
 
-const getExerciseTemplates = async ({userId, sportId, limitParams}: IGetExerciseTemplates) => {
+const getUserExerciseTemplates = async ({userId, sportId, difficultyLevelId, limitParams}: IGetExerciseTemplates) => {
     const url = [
         `${urls.prefix}${urls.getUserExerciseTemplates}`.replace(':userId', userId!),
         `?${formQueryString({
             ...limitParams,
-            sportId
+            sportId,
+            difficultyLevelId
         })}`
     ].join('');
 
@@ -62,19 +64,27 @@ const deleteExerciseTemplate = async (templateId: string) => {
 
 export const dbActions = {
     insertExerciseTemplate,
-    getExerciseTemplates,
+    getUserExerciseTemplates,
     getExerciseTemplate,
     updateExerciseTemplate,
     deleteExerciseTemplate
 };
 
-export const generateExerciseTemplate = (userId: string, sportId: number): IExerciseTemplateModel => {
+interface IGenerateParams {
+    userId: string;
+    sportId: number;
+    difficultyLevelId: number;
+}
+
+export const generateExerciseTemplate = (params: IGenerateParams): IExerciseTemplateModel => {
     const {lorem, finance} = faker;
+    const {userId, sportId, difficultyLevelId} = params;
 
     return new ExerciseTemplateModel({
         userId,
         sportId,
         title: `${lorem.words()}${finance.account()}`,
+        difficultyLevelId,
         description: lorem.sentences()
     });
 };

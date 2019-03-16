@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS difficulty_level (
   id BIGSERIAL PRIMARY KEY,
-  level INTEGER NOT NULL UNIQUE,
-  name TEXT NOT NULL UNIQUE
+  level INTEGER UNIQUE NOT NULL,
+  name TEXT UNIQUE NOT NULL
 );
 
 INSERT INTO difficulty_level (level, name) VALUES (1, 'beginner') ON CONFLICT DO NOTHING;

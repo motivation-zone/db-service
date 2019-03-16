@@ -23,14 +23,14 @@ const {
     deleteUserById
 } = userDbActions;
 const {getUserSports} = sportDbActions;
-const {getExerciseTemplates, deleteExerciseTemplate} = exerciseTemplateDbActions;
+const {getUserExerciseTemplates, deleteExerciseTemplate} = exerciseTemplateDbActions;
 const {getUserExercises, deleteExercise} = exerciseDbActions;
 
 const LIMIT_PARAMS = {limit: 100, skip: 0};
 const NONEXISTENT_ID = '9607957f-9f02-4e55-bd36-8961dba1f694';
 
 const deleteUserExercisesAndTemplates = async (user: IUserModel) => {
-    const {data: exerciseTemplates} = await getExerciseTemplates({
+    const {data: exerciseTemplates} = await getUserExerciseTemplates({
         userId: user.id,
         limitParams: LIMIT_PARAMS
     });

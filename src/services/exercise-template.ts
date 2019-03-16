@@ -5,18 +5,19 @@ import {
     updateExerciseTemplate as updateExerciseTemplateQuery,
     getUserExerciseTemplates as getUserExerciseTemplatesQuery,
     deleteExerciseTemplate as deleteExerciseTemplateQuery,
-    getExerciseTemplateById as getExerciseTemplateByIdQuery
+    getExerciseTemplateById as getExerciseTemplateByIdQuery,
+    IGetUserExerciseTemplatesQuery
 } from 'src/query-creators/exercise-template';
 import {translateNodeToPostgresqlName} from 'src/utils/db/helper';
 import ExerciseTemplateModel, {IExerciseTemplateModel} from 'src/models/exercise-template';
-import {getNotEmptyFields} from 'src/utils';
+import {getNotEmptyFields, createMapData} from 'src/utils';
 
 export default class ExerciseService {
     static async createExerciseTemplate(template: IExerciseTemplateModel): Promise<any[]> {
-        const {title, description, userId, sportId} = template;
+        const {title, description, userId, sportId, difficultyLevelId} = template;
         const result = await query({
             text: createExerciseTemplateQuery(),
-            values: [title, description, userId, sportId]
+            values: [title, description, userId, sportId, difficultyLevelId]
         });
 
         return prepareDBResult(result);
@@ -37,13 +38,20 @@ export default class ExerciseService {
 
     static async getUserExerciseTemplates(
         limitParams: IGetLimit,
-        params: {userId: string, sportId?: number}
+        params: {userId: string, sportId?: number, difficultyLevelId?: number}
     ): Promise<any[]> {
-        const {userId, sportId} = params;
+        const {userId, sportId, difficultyLevelId} = params;
+        const fields = createMapData(
+            ['sportId', 'difficultyLevelId'],
+            [sportId, difficultyLevelId]
+        );
 
         const result = await query({
-            text: getUserExerciseTemplatesQuery(limitParams.order, sportId),
-            values: [userId, limitParams.limit, limitParams.skip].concat(sportId ? [sportId] : [])
+            text: getUserExerciseTemplatesQuery(
+                limitParams.order,
+                fields.map((x) => x.name) as (keyof IGetUserExerciseTemplatesQuery)[]
+            ),
+            values: [userId, limitParams.limit, limitParams.skip, ...fields.map((x) => x.value)]
         });
 
         return prepareDBResult(result);

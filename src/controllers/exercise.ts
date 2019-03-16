@@ -14,10 +14,14 @@ const urls = apiUrls.exercise;
 
 controller.get(urls.getUserExercises, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
-    const {sportId, templateId} = req.query;
+    const {sportId, templateId, difficultyLevelId} = req.query;
 
     const limitParameters = await checkGetLimitParameters(req.query);
-    const result = await ExerciseService.getUserExercises(limitParameters, userId, {sportId, templateId});
+    const result = await ExerciseService.getUserExercises(
+        limitParameters,
+        userId,
+        {sportId, templateId, difficultyLevelId}
+    );
     HttpResponse.ok(res, result);
 }));
 

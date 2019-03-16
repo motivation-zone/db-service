@@ -13,6 +13,7 @@ interface IGetExercisesParams {
     limitParams: IGetLimitTest;
     userId?: string;
     sportId?: number;
+    difficultyLevelId?: number;
     templateId?: string;
 }
 
@@ -24,13 +25,16 @@ const insertExercise = async (exercise: IExerciseModel) => {
     });
 };
 
-const getUserExercises = async ({userId, sportId, templateId, limitParams}: IGetExercisesParams) => {
+const getUserExercises = async ({
+    userId, sportId, templateId, difficultyLevelId, limitParams
+}: IGetExercisesParams) => {
     const url = [
         `${urls.prefix}${urls.getUserExercises}`.replace(':userId', userId!),
         `?${formQueryString({
             ...limitParams,
             templateId,
-            sportId
+            sportId,
+            difficultyLevelId
         })}`
     ].join('');
 
