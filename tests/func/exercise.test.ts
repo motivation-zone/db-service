@@ -46,7 +46,7 @@ describe('Exercise:', () => {
             expect(message.includes('already exist')).to.be.true;
         });
 
-        it('with nonexistent exerciseTemplateId', async () => {
+        it('with nonexistent exercise template id', async () => {
             const exercise = generateExercise(NONEXISTENT_ID);
             const {error: {message}, status} = await insertExercise(exercise);
             expect(status).to.equal(409);
@@ -100,7 +100,29 @@ describe('Exercise:', () => {
             });
         });
 
-        it('all by difficulty level with order DESC', async () => {
+        it('all by sport', async () => {
+            const {data: [user]} = await getUsers(LIMIT_PARAMS);
+            const {data: [template]} = await getUserExerciseTemplates({
+                userId: user.id,
+                limitParams: LIMIT_PARAMS
+            });
+
+            const sportId = template.sportId;
+            const {data: exercisesBySport} = await getUserExercises({
+                userId: user.id!,
+                sportId,
+                limitParams: LIMIT_PARAMS
+            });
+
+            expect(exercisesBySport.length > 0).to.be.true;
+            const check = exercisesBySport.every((exercise) => {
+                expect(exercise.exerciseTemplate!.userId).to.equal(user.id!);
+                return exercise.exerciseTemplate!.sportId === sportId;
+            });
+            expect(check).to.be.true;
+        });
+
+        it('all by difficulty level', async () => {
             const {data: [user]} = await getUsers(LIMIT_PARAMS);
             const {data: [template]} = await getUserExerciseTemplates({
                 userId: user.id,
@@ -116,9 +138,6 @@ describe('Exercise:', () => {
             exercisesByFilter.forEach((exercise) => {
                 expect(exercise.exerciseTemplate!.difficultyLevelId).to.equal(difficultyLevelId);
             });
-
-            const checkAsc = checkOrder(exercisesByFilter, 'DESC', (exercise) => exercise.createdDate);
-            expect(checkAsc).to.be.true;
         });
 
         it('all by difficulty level & sport', async () => {
@@ -196,56 +215,6 @@ describe('Exercise:', () => {
 
             const checkAsc = checkOrder(exercises, 'DESC', (exercise) => exercise.createdDate);
             expect(checkAsc).to.be.true;
-        });
-
-        it('all by sport with order param = ASC', async () => {
-            const {data: [user]} = await getUsers(LIMIT_PARAMS);
-            const {data: [template]} = await getUserExerciseTemplates({
-                userId: user.id,
-                limitParams: LIMIT_PARAMS
-            });
-
-            const sportId = template.sportId;
-            const {data: exercisesBySport} = await getUserExercises({
-                userId: user.id!,
-                sportId,
-                limitParams: LIMIT_PARAMS
-            });
-
-            expect(exercisesBySport.length > 0).to.be.true;
-            const check = exercisesBySport.every((exercise) => {
-                expect(exercise.exerciseTemplate!.userId).to.equal(user.id!);
-                return exercise.exerciseTemplate!.sportId === sportId;
-            });
-            expect(check).to.be.true;
-
-            const checkAsc = checkOrder(exercisesBySport, 'ASC', (exercise) => exercise.createdDate);
-            expect(checkAsc).to.be.true;
-        });
-
-        it('all by sport with order param = DESC', async () => {
-            const {data: [user]} = await getUsers(LIMIT_PARAMS);
-            const {data: [template]} = await getUserExerciseTemplates({
-                userId: user.id,
-                limitParams: LIMIT_PARAMS
-            });
-
-            const sportId = template.sportId;
-            const {data: exercisesBySport} = await getUserExercises({
-                userId: user.id,
-                sportId,
-                limitParams: Object.assign({}, LIMIT_PARAMS, {order: 'DESC'})
-            });
-
-            expect(exercisesBySport.length > 0).to.be.true;
-            const check = exercisesBySport.every((exercise) => {
-                expect(exercise.exerciseTemplate!.userId).to.equal(user.id!);
-                return exercise.exerciseTemplate!.sportId === sportId;
-            });
-            expect(check).to.be.true;
-
-            const checkDesc = checkOrder(exercisesBySport, 'DESC', (exercise) => exercise.createdDate);
-            expect(checkDesc).to.be.true;
         });
     });
 

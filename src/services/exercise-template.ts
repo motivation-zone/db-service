@@ -41,7 +41,10 @@ export default class ExerciseService {
         params: {userId: string, sportId?: number, difficultyLevelId?: number}
     ): Promise<any[]> {
         const {userId, sportId, difficultyLevelId} = params;
-        const fields = createMapData(['sportId', 'difficultyLevelId'], [sportId, difficultyLevelId]);
+        const fields = createMapData(
+            ['sportId', 'difficultyLevelId'],
+            [sportId, difficultyLevelId]
+        );
 
         const result = await query({
             text: getUserExerciseTemplatesQuery(
