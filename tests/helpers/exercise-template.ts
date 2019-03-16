@@ -10,7 +10,7 @@ const urls = apiUrls.exerciseTemplate;
 const TEMPLATE_ID = ':templateId';
 
 interface IGetExerciseTemplates {
-    userId?: number;
+    userId?: string;
     sportId?: number;
     limitParams: IGetLimitTest;
 }
@@ -25,7 +25,7 @@ const insertExerciseTemplate = async (template: IExerciseTemplateModel) => {
 
 const getExerciseTemplates = async ({userId, sportId, limitParams}: IGetExerciseTemplates) => {
     const url = [
-        `${urls.prefix}${urls.getUserExerciseTemplates}`.replace(':userId', String(userId)),
+        `${urls.prefix}${urls.getUserExerciseTemplates}`.replace(':userId', userId!),
         `?${formQueryString({
             ...limitParams,
             sportId
@@ -38,24 +38,24 @@ const getExerciseTemplates = async ({userId, sportId, limitParams}: IGetExercise
     });
 };
 
-const getExerciseTemplate = async (templateId: number) => {
+const getExerciseTemplate = async (templateId: string) => {
     return await getRequest<IExerciseTemplateModel>({
-        url: `${urls.prefix}${urls.getExerciseTemplateById}`.replace(TEMPLATE_ID, String(templateId)),
+        url: `${urls.prefix}${urls.getExerciseTemplateById}`.replace(TEMPLATE_ID, templateId),
         ModelClass: ExerciseTemplateModel
     });
 };
 
-const updateExerciseTemplate = async (templateId: number, template: IExerciseTemplateModel) => {
+const updateExerciseTemplate = async (templateId: string, template: IExerciseTemplateModel) => {
     return await postRequest<IExerciseTemplateModel>({
-        url: `${urls.prefix}${urls.updateExerciseTemplateById}`.replace(TEMPLATE_ID, String(templateId)),
+        url: `${urls.prefix}${urls.updateExerciseTemplateById}`.replace(TEMPLATE_ID, templateId),
         ModelClass: ExerciseTemplateModel,
         data: template
     });
 };
 
-const deleteExerciseTemplate = async (templateId: number) => {
+const deleteExerciseTemplate = async (templateId: string) => {
     return await deleteRequest<IExerciseTemplateModel>({
-        url: `${urls.prefix}${urls.deleteExerciseTemplateById}`.replace(TEMPLATE_ID, String(templateId)),
+        url: `${urls.prefix}${urls.deleteExerciseTemplateById}`.replace(TEMPLATE_ID, templateId),
         ModelClass: ExerciseTemplateModel
     });
 };
@@ -68,7 +68,7 @@ export const dbActions = {
     deleteExerciseTemplate
 };
 
-export const generateExerciseTemplate = (userId: number, sportId: number): IExerciseTemplateModel => {
+export const generateExerciseTemplate = (userId: string, sportId: number): IExerciseTemplateModel => {
     const {lorem, finance} = faker;
 
     return new ExerciseTemplateModel({

@@ -5,7 +5,7 @@ import HttpResponse from 'src/utils/http/response';
 import {parseDate, joiValidationErrorToString} from 'src/utils';
 
 export interface IUserModel {
-    id?: number;
+    id?: string;
     login?: string;
     name?: string;
     password?: string;
@@ -27,7 +27,7 @@ export interface IUserModel {
 const phoneRegexp = /^\+[0-9]{1,4}\([0-9]{3}\)[0-9]{3}\-[0-9]{2}\-[0-9]{2}$/;
 const VALIDATION_SCHEMES = {
     create: {
-        id: Joi.number(),
+        id: Joi.string(),
         login: Joi.string().required(),
         name: Joi.string().required(),
         password: Joi.string().required(),
@@ -50,7 +50,7 @@ export const NOT_UPDATED_FIELDS: (keyof IUserModel)[] = ['id', 'login', 'registe
 export const REQUIRED_FIELDS: (keyof IUserModel)[] = ['login', 'name', 'password', 'email', 'gender'];
 
 export default class UserModel implements IUserModel {
-    public id?: number;
+    public id?: string;
     public login?: string;
     public name?: string;
     public password?: string;
@@ -74,7 +74,7 @@ export default class UserModel implements IUserModel {
             countryId, instagram, phone, registeredDate
         } = data;
 
-        this.id = id && Number(id);
+        this.id = id;
         this.login = login;
         this.name = name;
         this.password = password;

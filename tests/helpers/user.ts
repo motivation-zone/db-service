@@ -16,17 +16,17 @@ const insertUser = async (user: IUserModel) => {
     });
 };
 
-const updateUser = async (userId: number, user: IUserModel) => {
+const updateUser = async (userId: string, user: IUserModel) => {
     return await postRequest<IUserModel>({
-        url: `${urls.prefix}${urls.updateUserById.replace(':userId', String(userId))}`,
+        url: `${urls.prefix}${urls.updateUserById.replace(':userId', userId)}`,
         ModelClass: UserModel,
         data: user
     });
 };
 
-const getUserById = async (userId: number) => {
+const getUserById = async (userId: string) => {
     return await getRequest<IUserModel>({
-        url: `${urls.prefix}${urls.getUserById.replace(':userId', String(userId))}`,
+        url: `${urls.prefix}${urls.getUserById.replace(':userId', userId)}`,
         ModelClass: UserModel
     });
 };
@@ -53,9 +53,9 @@ const getUsers = async (limitParams: IGetLimitTest) => {
     });
 };
 
-const deleteUserById = async (userId: number) => {
+const deleteUserById = async (userId: string) => {
     return await deleteRequest<IUserModel>({
-        url: `${urls.prefix}/${urls.deleteUserById.replace(':userId', String(userId))}`,
+        url: `${urls.prefix}/${urls.deleteUserById.replace(':userId', userId)}`,
         ModelClass: UserModel
     });
 };

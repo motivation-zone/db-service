@@ -21,7 +21,7 @@ const {getUserExercises, deleteExercise} = exerciseDbActions;
 const {getAllSports} = sportDbActions;
 const {getUsers} = userDbActions;
 
-const NONEXISTENT_ID = 9999999999;
+const NONEXISTENT_ID = '9607957f-9f02-4e55-bd36-8961dba1f694';
 const LIMIT_PARAMS = {limit: 100, skip: 0};
 
 describe('Exercise-template:', () => {
@@ -48,7 +48,7 @@ describe('Exercise-template:', () => {
         it('with nonexistent sportId', async () => {
             const {data: [user]} = await getUsers(LIMIT_PARAMS);
 
-            const template = generateExerciseTemplate(user.id!, NONEXISTENT_ID);
+            const template = generateExerciseTemplate(user.id!, 99999999);
             const {error: {message}, status} = await insertExerciseTemplate(template);
             expect(status).to.equal(409);
             expect(message.includes('is not present in table "sport"')).to.be.true;

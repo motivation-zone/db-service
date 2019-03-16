@@ -7,19 +7,19 @@ import {joiValidationErrorToString} from 'src/utils';
 
 export interface ILinkUserSportModel {
     id?: number;
-    userId?: number;
+    userId?: string;
     sportId?: number;
 }
 
 const VALIDATION_SCHEMES = {
-    userId: Joi.number().required(),
+    userId: Joi.string().required(),
     sportId: Joi.number().required(),
     actionType: Joi.string().valid(SPORT_USER_ACTION_TYPES).required()
 };
 
 export default class LinkUserSportModel implements ILinkUserSportModel {
     public id?: number;
-    public userId?: number;
+    public userId?: string;
     public sportId?: number;
 
     constructor(data: ILinkUserSportModel) {

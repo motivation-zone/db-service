@@ -24,7 +24,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async updateExercise(exerciseId: number, exercise: IExerciseModel): Promise<any[]> {
+    static async updateExercise(exerciseId: string, exercise: IExerciseModel): Promise<any[]> {
         const fields = getNotEmptyFields(exercise) as (keyof IExerciseModel)[];
         const result = await query({
             text: updateExerciseQuery(fields.map(translateNodeToPostgresqlName)),
@@ -37,7 +37,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async getExerciseById(exerciseId: number): Promise<any[]> {
+    static async getExerciseById(exerciseId: string): Promise<any[]> {
         const result = await query({
             text: getExerciseByIdQuery(),
             values: [exerciseId]
@@ -49,7 +49,7 @@ export default class ExerciseService {
     static async getUserExercises(
         limitParams: IGetLimit,
         userId: number,
-        params: {sportId?: number, templateId?: number}
+        params: {sportId?: number, templateId?: string}
     ): Promise<any[]> {
         const {sportId, templateId} = params;
         const fields = createMapData(['sportId', 'templateId'], [sportId, templateId]);
@@ -65,7 +65,7 @@ export default class ExerciseService {
         return prepareDBResult(result);
     }
 
-    static async deleteExercise(exerciseId: number): Promise<any[]> {
+    static async deleteExercise(exerciseId: string): Promise<any[]> {
         const result = await query({
             text: deleteExerciseQuery(),
             values: [exerciseId]

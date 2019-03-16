@@ -11,9 +11,9 @@ const EXERCISE_ID = ':exerciseId';
 
 interface IGetExercisesParams {
     limitParams: IGetLimitTest;
-    userId?: number;
+    userId?: string;
     sportId?: number;
-    templateId?: number;
+    templateId?: string;
 }
 
 const insertExercise = async (exercise: IExerciseModel) => {
@@ -26,7 +26,7 @@ const insertExercise = async (exercise: IExerciseModel) => {
 
 const getUserExercises = async ({userId, sportId, templateId, limitParams}: IGetExercisesParams) => {
     const url = [
-        `${urls.prefix}${urls.getUserExercises}`.replace(':userId', String(userId)),
+        `${urls.prefix}${urls.getUserExercises}`.replace(':userId', userId!),
         `?${formQueryString({
             ...limitParams,
             templateId,
@@ -40,24 +40,24 @@ const getUserExercises = async ({userId, sportId, templateId, limitParams}: IGet
     });
 };
 
-const getExercise = async (exerciseId: number) => {
+const getExercise = async (exerciseId: string) => {
     return await getRequest<IExerciseModel>({
-        url: `${urls.prefix}${urls.getExerciseById}`.replace(EXERCISE_ID, String(exerciseId)),
+        url: `${urls.prefix}${urls.getExerciseById}`.replace(EXERCISE_ID, exerciseId),
         ModelClass: ExerciseModel
     });
 };
 
-const updateExercise = async (exerciseId: number, exercise: IExerciseModel) => {
+const updateExercise = async (exerciseId: string, exercise: IExerciseModel) => {
     return await postRequest<IExerciseModel>({
-        url: `${urls.prefix}${urls.updateExerciseById}`.replace(EXERCISE_ID, String(exerciseId)),
+        url: `${urls.prefix}${urls.updateExerciseById}`.replace(EXERCISE_ID, exerciseId),
         ModelClass: ExerciseModel,
         data: exercise
     });
 };
 
-const deleteExercise = async (exerciseId: number) => {
+const deleteExercise = async (exerciseId: string) => {
     return await deleteRequest<IExerciseModel>({
-        url: `${urls.prefix}${urls.deleteExerciseById}`.replace(EXERCISE_ID, String(exerciseId)),
+        url: `${urls.prefix}${urls.deleteExerciseById}`.replace(EXERCISE_ID, exerciseId),
         ModelClass: ExerciseModel
     });
 };
@@ -70,7 +70,7 @@ export const dbActions = {
     deleteExercise
 };
 
-export const generateExercise = (templateId: number): IExerciseModel => {
+export const generateExercise = (templateId: string): IExerciseModel => {
     const {random} = faker;
     const types = [ExerciseValueType.DURATION, ExerciseValueType.REPS];
 

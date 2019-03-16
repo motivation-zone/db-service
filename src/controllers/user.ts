@@ -38,6 +38,7 @@ controller.get(urls.getUserByLogin, asyncMiddlewareWrapper(async (req: Request, 
 
 controller.post(urls.updateUserById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
+
     const user = new UserModel(req.body);
     user.clearNotUpdatedFields();
 
