@@ -10,20 +10,22 @@ export interface IExerciseTemplateModel {
     description?: string;
     userId?: string;
     sportId?: number;
+    difficultyLevelId?: number;
     createdDate?: Date;
 }
 
 const VALIDATION_SCHEMES = Joi.object().keys({
     id: Joi.string(),
     title: Joi.string().required(),
-    description: Joi.string().required(),
+    description: Joi.string(),
     userId: Joi.string().required(),
     sportId: Joi.number().required(),
+    difficultyLevelId: Joi.number().required(),
     createdDate: Joi.date()
 });
 
 export const NOT_UPDATED_FIELDS: (keyof IExerciseTemplateModel)[] = ['id', 'userId', 'createdDate'];
-export const REQUIRED_FIELDS: (keyof IExerciseTemplateModel)[] = ['title', 'description', 'userId', 'sportId'];
+export const REQUIRED_FIELDS: (keyof IExerciseTemplateModel)[] = ['title', 'userId', 'sportId', 'difficultyLevelId'];
 
 export default class ExerciseTemplateModel implements IExerciseTemplateModel {
     public id?: string;
@@ -31,16 +33,22 @@ export default class ExerciseTemplateModel implements IExerciseTemplateModel {
     public description?: string;
     public userId?: string;
     public sportId?: number;
+    public difficultyLevelId?: number;
     public createdDate?: Date;
 
     constructor(data: IExerciseTemplateModel) {
-        const {id, title, description, userId, sportId, createdDate} = data;
+        const {
+            id, title, description, userId,
+            difficultyLevelId, sportId, createdDate
+        } = data;
 
         this.id = id;
         this.title = title;
         this.description = description;
         this.userId = userId;
         this.sportId = sportId && Number(sportId);
+        this.sportId = sportId && Number(sportId);
+        this.difficultyLevelId = difficultyLevelId && Number(difficultyLevelId);
         this.createdDate = parseDate(createdDate);
     }
 

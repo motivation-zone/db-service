@@ -21,10 +21,12 @@ export interface IExerciseModel {
 }
 
 interface IExerciseModelParams extends IExerciseModel {
+    tempId?: string;
     tempTitle?: string;
     tempDescription?: string;
     tempUserId?: string;
     tempSportId?: number;
+    tempDifficultyLevelId?: number;
 }
 
 const VALIDATION_SCHEMES = Joi.object().keys({
@@ -34,10 +36,12 @@ const VALIDATION_SCHEMES = Joi.object().keys({
     type: Joi.string().valid([ExerciseValueType.REPS, ExerciseValueType.DURATION]).required(),
     createdDate: Joi.date(),
     exerciseTemplate: Joi.object().keys({
+        id: Joi.string(),
         title: Joi.string(),
         description: Joi.string(),
         userId: Joi.string(),
-        sportId: Joi.number()
+        sportId: Joi.number(),
+        difficultyLevelId: Joi.number()
     })
 });
 
@@ -58,7 +62,8 @@ export default class ExerciseModel implements IExerciseModel {
     constructor(data: IExerciseModelParams) {
         const {
             id, exerciseTemplateId, value, type, createdDate,
-            tempTitle, tempDescription, tempUserId, tempSportId
+            tempId, tempTitle, tempDescription, tempUserId,
+            tempSportId, tempDifficultyLevelId
         } = data;
 
         this.id = id;
@@ -68,10 +73,12 @@ export default class ExerciseModel implements IExerciseModel {
         this.createdDate = parseDate(createdDate);
 
         this.exerciseTemplate = {
+            id: tempId,
             title: tempTitle,
             description: tempDescription,
             userId: tempUserId,
-            sportId: tempSportId && Number(tempSportId)
+            sportId: tempSportId && Number(tempSportId),
+            difficultyLevelId: tempDifficultyLevelId && Number(tempDifficultyLevelId)
         };
     }
 

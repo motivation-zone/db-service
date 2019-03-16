@@ -3,10 +3,12 @@ import {OrderType, updateQuery} from 'src/query-creators/base';
 export const EXERCISE_RETURNING_FIELDS = [
     ...['id', 'value', 'type', 'created_date', 'exercise_template_id'].map((x) => `exercise.${x}`),
     ...[
+        'id as temp_id',
         'title as temp_title',
         'description as temp_description',
         'user_id as temp_user_id',
-        'sport_id as temp_sport_id'
+        'sport_id as temp_sport_id',
+        'difficulty_level_id as temp_difficulty_level_id'
     ].map((x) => `exercise_template.${x}`)
 ].join(', ');
 
@@ -34,11 +36,13 @@ export const getExerciseById = () => {
 export interface IGetUserExercisesQuery {
     sportId: string;
     templateId: string;
+    difficultyLevelId: string;
 }
 
 export const getUserExercises = (order: OrderType, fieldsKeys: (keyof IGetUserExercisesQuery)[]) => {
     const table: IGetUserExercisesQuery = {
         sportId: 'exercise_template.sport_id',
+        difficultyLevelId: 'exercise_template.difficulty_level_id',
         templateId: 'exercise.exercise_template_id'
     };
 

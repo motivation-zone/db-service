@@ -5,6 +5,7 @@ import pMap from 'p-map';
 import {dbActions as userDbActions, generateUser} from 'tests/helpers/user';
 import {dbActions as sportDbActions} from 'tests/helpers/sport';
 import {dbActions as countryDbActions} from 'tests/helpers/country';
+import {dbActions as difficultyLevelDbActions} from 'tests/helpers/difficulty-level';
 import {
     dbActions as exerciseTemplateDbActions, generateExerciseTemplate
 } from 'tests/helpers/exercise-template';
@@ -24,6 +25,7 @@ const {getAllSports, insertUserSportLink} = sportDbActions;
 const {insertUser} = userDbActions;
 const {insertExerciseTemplate} = exerciseTemplateDbActions;
 const {insertExercise} = exerciseDbActions;
+const {getAllDifficultyLevels} = difficultyLevelDbActions;
 
 const log = (msg: string) => logger('tests', 'app', msg);
 
@@ -73,6 +75,8 @@ const clearDatabase = async () => {
     log(`Countries: ${countries.length}`);
     const {data: sports} = await getAllSports();
     log(`Sports: ${sports.length}`);
+    const {data: difficultyLevels} = await getAllDifficultyLevels();
+    log(`Difficulty levels: ${difficultyLevels.length}`);
 
     // User
     const users = await pMap(countsArray, async (isCountryExist) => {
@@ -98,7 +102,15 @@ const clearDatabase = async () => {
     const exerciseTemplatesNotFlatten = await pMap(users, async (user) => {
         return await pMap(new Array(intervalRandom(2, 5)).fill(true), async () => {
             const sportId = intervalRandom(sports[0].id!, sports[sports.length - 1].id!);
-            const newTemplate = generateExerciseTemplate(user.id!, sportId);
+            const difficultyLevelId = intervalRandom(
+                difficultyLevels[0].id,
+                difficultyLevels[difficultyLevels.length - 1].id
+            );
+            const newTemplate = generateExerciseTemplate({
+                userId: user.id!,
+                sportId,
+                difficultyLevelId
+            });
             const {data: [template]} = await insertExerciseTemplate(newTemplate);
             return template;
         }, {concurrency: 1});
