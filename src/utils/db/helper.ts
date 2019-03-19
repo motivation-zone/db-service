@@ -10,3 +10,13 @@ export const translatePostgresqlNameToNode = (field: string): string => {
         return `${part.charAt(0).toUpperCase()}${part.slice(1)}`;
     }).join('');
 };
+
+export const createDbWhereText = (keys: string[], startIndex: number): string | null => {
+    if (keys.length === 0) {
+        return null;
+    }
+
+    return keys.map((key, i) => {
+        return `${key}=$${i + startIndex}`;
+    }).join(' AND ');
+};

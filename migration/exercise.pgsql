@@ -9,12 +9,11 @@ CREATE TABLE IF NOT EXISTS exercise_template (
   UNIQUE(title, description, user_id, sport_id)
 );
 
-CREATE DOMAIN VALUE_TYPE AS TEXT NOT NULL CHECK (VALUE='reps' OR VALUE='duration');
 CREATE TABLE IF NOT EXISTS exercise (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   exercise_template_id UUID REFERENCES exercise_template(id) ON DELETE RESTRICT NOT NULL,
   value INTEGER NOT NULL,
-  type VALUE_TYPE NOT NULL,
+  type EXERCISE_VALUE_TYPE NOT NULL,
   created_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
   UNIQUE(exercise_template_id, value, type)
 );

@@ -5,10 +5,9 @@ import {
     updateExerciseTemplate as updateExerciseTemplateQuery,
     getUserExerciseTemplates as getUserExerciseTemplatesQuery,
     deleteExerciseTemplate as deleteExerciseTemplateQuery,
-    getExerciseTemplateById as getExerciseTemplateByIdQuery,
-    IGetUserExerciseTemplatesQuery
+    getExerciseTemplateById as getExerciseTemplateByIdQuery
 } from 'src/query-creators/exercise-template';
-import {translateNodeToPostgresqlName} from 'src/utils/db/helper';
+import {translateNodeToPostgresqlName, createDbWhereText} from 'src/utils/db/helper';
 import ExerciseTemplateModel, {IExerciseTemplateModel} from 'src/models/exercise-template';
 import {getNotEmptyFields, createMapData} from 'src/utils';
 
@@ -41,15 +40,17 @@ export default class ExerciseService {
         params: {userId: string, sportId?: number, difficultyLevelId?: number}
     ): Promise<any[]> {
         const {userId, sportId, difficultyLevelId} = params;
+
         const fields = createMapData(
             ['sportId', 'difficultyLevelId'],
             [sportId, difficultyLevelId]
         );
 
+        const whereText = createDbWhereText(fields.map((x) => translateNodeToPostgresqlName(x.name)), 4);
         const result = await query({
             text: getUserExerciseTemplatesQuery(
                 limitParams.order,
-                fields.map((x) => x.name) as (keyof IGetUserExerciseTemplatesQuery)[]
+                whereText
             ),
             values: [userId, limitParams.limit, limitParams.skip, ...fields.map((x) => x.value)]
         });

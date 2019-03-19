@@ -33,24 +33,11 @@ export const getExerciseById = () => {
     `;
 };
 
-export interface IGetUserExercisesQuery {
-    sportId: string;
-    templateId: string;
-    difficultyLevelId: string;
-}
-
-export const getUserExercises = (order: OrderType, fieldsKeys: (keyof IGetUserExercisesQuery)[]) => {
-    const table: IGetUserExercisesQuery = {
-        sportId: 'exercise_template.sport_id',
-        difficultyLevelId: 'exercise_template.difficulty_level_id',
-        templateId: 'exercise.exercise_template_id'
-    };
-
-    const fields = fieldsKeys.map((key) => table[key]).map((field, i) => `${field}=$${i + 4}`).join(' AND ');
+export const getUserExercises = (order: OrderType, whereText: string | null) => {
     return `
         SELECT ${EXERCISE_RETURNING_FIELDS} FROM exercise
         INNER JOIN exercise_template ON exercise.exercise_template_id = exercise_template.id
-        WHERE exercise_template.user_id = $1 ${fields && `AND ${fields}`}
+        WHERE exercise_template.user_id = $1 ${whereText && `AND ${whereText}` || ''}
         ORDER BY exercise.created_date ${order} LIMIT $2 OFFSET $3
     `;
 };
