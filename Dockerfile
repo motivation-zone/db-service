@@ -3,7 +3,7 @@ LABEL maintainer="Denis Stepanov"
 
 WORKDIR /usr/local/app
 ENV WORKDIR /usr/local/app
-RUN mkdir /config_templates
+RUN mkdir /config-templates
 
 RUN apt-get update
 RUN apt-get install -fy wget git vim gettext-base net-tools
@@ -13,18 +13,21 @@ RUN apt-get install -fy curl
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 RUN apt-get install -fy nodejs
 RUN apt-get install -fy supervisor
-RUN apt-get install -fy postgresql postgresql-contrib
 
-COPY package.json package-lock.json Makefile ./
-RUN make install
-
-COPY . .
-
+COPY package.json package-lock.json Makefile tsconfig.json ./
+RUN make deps
+COPY src ./src
+COPY configs ./configs
+COPY deploy ./deploy
+COPY tests ./tests
+COPY @types ./@types
 RUN make build
-RUN cp $WORKDIR/deploy/nginx.template.conf /config_templates/nginx.template.conf
-RUN cp $WORKDIR/deploy/supervisord.template.conf /config_templates/supervisord.template.conf
+
+RUN cp $WORKDIR/deploy/config-templates/nginx.template.conf /config-templates/nginx.template.conf
+RUN cp $WORKDIR/deploy/config-templates/supervisord.template.conf /config-templates/supervisord.template.conf
+RUN cp $WORKDIR/deploy/start.sh /
 
 RUN make prune
 RUN mkdir $WORKDIR/logs
 
-CMD NODEJS_APP=$WORKDIR/build/src/app.js ./deploy/start.sh
+CMD NODEJS_APP=$WORKDIR/build/src/app.js NODE_PATH=$WORKDIR/build /start.sh

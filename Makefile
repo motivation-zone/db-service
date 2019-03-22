@@ -80,14 +80,21 @@ test.func:
 
 
 # Deployment
+PWD = $(shell pwd)
 VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
 DOCKER_HUB := motivationzone/dbservice
 .PHONY: docker.build
 docker.build:
 	docker build -t $(DOCKER_HUB):$(VERSION) .
 
+.PHONY: docker.run.local
+docker.run.local:
+	docker run -d -e "NODEJS_ENV=testing" \
+		-v $(PWD)/configs/db/db.yaml:/usr/local/app/configs/db/db.yaml \
+		-p 5000:80 $(image_id)
+
 .PHONY: docker.run.testing
 docker.run.testing:
-	docker run -d -e "ENVIRONMENT=testing" \
-		-v /usr/share/motivation_zone/db/db.yaml:/usr/local/app/configs/db/db.yaml \
+	docker run -d -e "NODEJS_ENV=testing" \
+		-v /usr/share/motivation-zone/db/db.yaml:/usr/local/app/configs/db/db.yaml \
 		-p 5000:80 $(image_id)
