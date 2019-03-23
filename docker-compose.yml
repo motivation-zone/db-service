@@ -1,0 +1,11 @@
+version: '3'
+services:
+  db-service:
+    build:
+      context: .
+    environment:
+      NODEJS_ENV: testing
+    volumes:
+     - ./configs/db/db.yaml:/usr/local/app/configs/db/db.yaml
+    ports:
+     - 5000:80

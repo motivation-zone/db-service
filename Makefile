@@ -80,14 +80,45 @@ test.func:
 
 
 # Deployment
+PWD = $(shell pwd)
 VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
 DOCKER_HUB := motivationzone/dbservice
+DOCKER_TAG := $(DOCKER_HUB):$(VERSION)
+DOCKER_NAME := mz-db-service
 .PHONY: docker.build
 docker.build:
-	docker build -t $(DOCKER_HUB):$(VERSION) .
+	docker build --name DOCKER_HUB -t $(DOCKER_TAG) .
+
+.PHONY: docker.login
+docker.login:
+	docker login -u $(MZ_DB_SERVICE_DOCKER_USER) -p $(MZ_DB_SERVICE_DOCKER_PASS)
+
+.PHONY: docker.push
+docker.push:
+	docker push $(DOCKER_TAG)
+
+.PHONY: docker.pull
+docker.pull:
+	docker pull $(DOCKER_TAG)
+
+.PHONY: docker.run.local
+docker.run.local:
+	docker run -d -e "NODEJS_ENV=testing" \
+		--name $(DOCKER_NAME) \
+		-v $(PWD)/configs/db/db.yaml:/usr/local/app/configs/db/db.yaml \
+		-p 5000:80 $(image_id)
 
 .PHONY: docker.run.testing
 docker.run.testing:
-	docker run -d -e "ENVIRONMENT=testing" \
-		-v /usr/share/motivation_zone/db/db.yaml:/usr/local/app/configs/db/db.yaml \
+	docker run -d -e "NODEJS_ENV=testing" \
+		--name $(DOCKER_NAME) \
+		-v /usr/share/motivation-zone/db/db.yaml:/usr/local/app/configs/db/db.yaml \
 		-p 5000:80 $(image_id)
+
+.PHONY: deploy.testing
+deploy.testing:
+	$(NODE) deploy/deploy-testing.js
+
+.PHONY: deploy.production
+deploy.production:
+	$(NODE) deploy/deploy-production.js
