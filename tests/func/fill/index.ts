@@ -40,6 +40,7 @@ const concatMigrations = async () => {
             resolve();
         });
     });
+    log(`Migrations were concated`);
 };
 
 const reloadPublicSchema = async () => {
@@ -47,6 +48,7 @@ const reloadPublicSchema = async () => {
         text: 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;',
         values: []
     });
+    log(`Public schema was reloaded`);
 };
 
 const createTables = async () => {
@@ -55,12 +57,17 @@ const createTables = async () => {
         text: resultFile,
         values: []
     });
+    log(`Tables were created`);
 };
 
 const clearDatabase = async () => {
-    await reloadPublicSchema();
-    await concatMigrations();
-    await createTables();
+    try {
+        await reloadPublicSchema();
+        await concatMigrations();
+        await createTables();
+    } catch (err) {
+        log(err);
+    }
 };
 
 (async () => {
