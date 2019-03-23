@@ -39,3 +39,6 @@ make test.func.fill - clear all public schemas and create it again -> fill db by
 ```
 
 ## Load
+
+# Deployment
+Checkout [DEPLOY.md](DEPLOY.md) for tips on how to deploy project.

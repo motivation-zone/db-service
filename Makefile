@@ -83,9 +83,20 @@ test.func:
 PWD = $(shell pwd)
 VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
 DOCKER_HUB := motivationzone/dbservice
+DOCKER_TAG := $(DOCKER_HUB):$(VERSION)
 .PHONY: docker.build
 docker.build:
-	docker build -t $(DOCKER_HUB):$(VERSION) .
+	docker build -t $(DOCKER_TAG) .
+
+.PHONY: docker.push
+docker.push:
+	docker login -u ${MZ_DB_SERVICE_DOCKER_USER} -p ${MZ_DB_SERVICE_DOCKER_PASS} && \
+	docker push $(DOCKER_TAG)
+
+.PHONY: docker.pull
+docker.pull:
+	docker login -u ${MZ_DB_SERVICE_DOCKER_USER} -p ${MZ_DB_SERVICE_DOCKER_PASS} && \
+	docker pull $(DOCKER_TAG)
 
 .PHONY: docker.run.local
 docker.run.local:

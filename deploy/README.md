@@ -6,6 +6,11 @@
 | Testing db-service | 176.99.11.253/db |
 | Testing postgres | 176.99.11.253:5432 |
 
+## Route
+request: (176.99.11.253/db/smth) -> nginx:80 -> localhost:5000/smth ->
+proxy to docker -> docker.localhost:80/smth -> docker.localhost:${NODEJS_PORT}/smth ->
+db on remote host
+
 ## Production
 | Production db-service | ${url}/db |
 | Production postgres | ${url}:5432 |
@@ -20,6 +25,8 @@
 ```
     export NODEJS_ENV="testing"; # or "production"
     export TZ="UTC";
+    export MZ_DB_SERVICE_DOCKER_USER=${value};
+    export MZ_DB_SERVICE_DOCKER_PASS=${value};
 ```
 
 ### OS preparation

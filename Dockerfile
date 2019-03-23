@@ -1,5 +1,5 @@
 FROM ubuntu:16.04
-LABEL maintainer="Denis Stepanov"
+LABEL maintainer="Denis Stepanov dondiego4697@mail.ru"
 
 WORKDIR /usr/local/app
 ENV WORKDIR /usr/local/app
