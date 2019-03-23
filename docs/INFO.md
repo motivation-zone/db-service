@@ -1,21 +1,19 @@
 # Server information
 
-## Testing
 | Environment | URL |
 |---|---|
 | Testing db-service | 176.99.11.253/db |
-| Testing postgres | 176.99.11.253:5432 |
+| Testing database | manny.db.elephantsql.com:5432 |
 
-## Route
-request: (176.99.11.253/db/smth) -> nginx:80 -> localhost:5000/smth ->
-proxy to docker -> docker.localhost:80/smth -> docker.localhost:${NODEJS_PORT}/smth ->
-db on remote host
+## Service routing (testing)
+1. ${host}/db/smth - request on this address
+2. nginx:80 - nginx rewrite /db and proxies request
+3. localhost:5000/smth - is a mapping for docker
+4. docker-container: localhost:80/smth - docker has nginx in and proxy request too
+5. docker-container: localhost:${NODEJS_PORT}/smth - analyse request and form response
+6. nodejs request the database on manny.db.elephantsql.com:5432
 
-## Production
-| Production db-service | ${url}/db |
-| Production postgres | ${url}:5432 |
-
-### Dirs
+### Server dirs
 ```
     /usr/share/motivation-zone - common files
     /usr/local/www - projects folder
@@ -69,7 +67,7 @@ db on remote host
 ### NGINX installation
 ```
     sudo apt-get install -fy nginx-full
-    # u can find nginx template in /deploy/config-templates
+    # u can find nginx template in /deploy/docker/config-templates
 ```
 
 ### Docker installation

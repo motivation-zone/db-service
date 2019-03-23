@@ -23,9 +23,9 @@ COPY tests ./tests
 COPY @types ./@types
 RUN make build
 
-RUN cp $WORKDIR/deploy/config-templates/nginx.template.conf /config-templates/nginx.template.conf
-RUN cp $WORKDIR/deploy/config-templates/supervisord.template.conf /config-templates/supervisord.template.conf
-RUN cp $WORKDIR/deploy/start.sh /
+RUN cp $WORKDIR/deploy/docker/config-templates/nginx.template.conf /config-templates/nginx.template.conf
+RUN cp $WORKDIR/deploy/docker/config-templates/supervisord.template.conf /config-templates/supervisord.template.conf
+RUN cp $WORKDIR/deploy/docker/start.sh /
 
 RUN make prune
 RUN mkdir $WORKDIR/logs
