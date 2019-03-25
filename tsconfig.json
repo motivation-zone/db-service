@@ -20,6 +20,9 @@
             "tests/*": [
                 "./tests/*"
             ],
+            "tools/*": [
+                "./tools/*"
+            ],
             "*": [
                 "./node_modules/@types/*",
                 "./@types/*"
@@ -40,6 +43,7 @@
         "src/**/*",
         "configs/**/*",
         "@types/**/*",
-        "tests/**/*"
+        "tests/**/*",
+        "tools/**/*",
     ]
 }

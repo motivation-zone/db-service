@@ -78,6 +78,10 @@ test.func:
 	$(MOCHA) $(OUT_DIR)/tests/**/*.test.js --exit && \
 	make clean
 
+# Tools
+.PHONY: api.doc
+make api.doc:
+	$(TSNODE) -r tsconfig-paths/register tools/create-api-doc.ts
 
 # Deployment
 PWD = $(shell pwd)
