@@ -10,7 +10,7 @@ export const limitQueryParams: IApiParam[] = [{
     def: 'ASC'
 }];
 
-interface IApiParam {
+export interface IApiParam {
     name: string;
     type: string;
     def?: string;
@@ -19,8 +19,10 @@ interface IApiParam {
 interface IApiDescription {
    method: 'post' | 'get' | 'delete';
    url: string;
+   returns?: string | IApiParam[];
    body?: string | IApiParam[];
    query?: IApiParam[];
+   params?: IApiParam[];
 }
 
 export interface IApiInterface {
