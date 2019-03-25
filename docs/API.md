@@ -26,7 +26,7 @@
 ## /api/difficulty-level
 | Method | Url | Body | Query | Return |
 |---|---|---|---|---|
-| get | **/get-difficulty-levels** |  |  |  |
+| get | **/get-difficulty-levels** |  |  | [DifficultyLevelModel[]](#DifficultyLevelModel) |
 
 ## UserModel
 ```json

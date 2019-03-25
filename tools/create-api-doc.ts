@@ -52,6 +52,10 @@ const createParam = (params: IApiParam[]): string[] => {
     return result;
 };
 
+const fixText = (text: string): string => {
+    return text.replace('|', '\|');
+}
+
 const resultControllers = controllers.map((controller) => {
     const result = [`## ${controller.prefix}`, header];
 
@@ -90,7 +94,8 @@ const resultControllers = controllers.map((controller) => {
             }
         }
 
-        result.push(`| ${method} | **${url}** | ${bodyData.join(', ')} | ${queryData.join(', ')} | ${returnData.join(', ')} |`);
+        result.push(`| ${method} | **${url}** | ${fixText(bodyData.join(', '))} | ` +
+            `${fixText(queryData.join(', '))} | ${fixText(returnData.join(', '))} |`);
     });
     return result.join('\n');
 });
