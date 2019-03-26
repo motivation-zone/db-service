@@ -5,6 +5,21 @@ import HttpResponse from 'src/utils/http/response';
 import {SPORT_USER_ACTION_TYPES} from 'src/services/sport';
 import {joiValidationErrorToString} from 'src/utils';
 
+/**
+ * @apiDoc
+ * @type model
+ * @name LinkUserSportModel
+ * @object [[{
+ *  "name": "id",
+ *  "type": "number"
+ * }, {
+ *  "name": "userId",
+ *  "name": "string"
+ * }, {
+ *  "name": "sportId",
+ *  "type": "number"
+ * }]]
+ */
 export interface ILinkUserSportModel {
     id?: number;
     userId?: string;

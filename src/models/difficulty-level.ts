@@ -3,6 +3,21 @@ import Boom from 'boom';
 
 import HttpResponse from 'src/utils/http/response';
 
+/**
+ * @apiDoc
+ * @type model
+ * @name DifficultyLevelModel
+ * @object [[{
+ *  "name": "id",
+ *  "type": "number"
+ * }, {
+ *  "name": "level",
+ *  "type": "number"
+ * }, {
+ *  "name": "name",
+ *  "type": "string"
+ * }]]
+ */
 export interface IDifficultyLevelModel {
     id: number;
     level: number;

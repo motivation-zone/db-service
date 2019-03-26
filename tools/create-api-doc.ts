@@ -19,20 +19,29 @@ const wrapText = (value: string) => {
     return value;
 };
 
+const isArrayCheck = (value: string): {isArray: boolean, value: string} => {
+    const isArray = value.includes('[]');
+    return {
+        isArray,
+        value: value.replace('[]', '')
+    };
+};
+
+const makeLink = (key: string, isArray: boolean): string => {
+    return `[${key}${isArray && '[]' || ''}](#${key})`;
+};
+
 const createParams = (params: any): string => {
     if (!params) {
         return 'null';
     }
 
     if (typeof params === 'string') {
-        let isArray = '';
-        if (params.includes('[]')) {
-            params = params.replace('[]', '');
-            isArray = '[]';
-        }
-        return `[${params}${isArray}](#${params})`;
+        const {isArray, value} = isArrayCheck(params);
+        return makeLink(value, isArray);
     }
-    return wrapText(`json\n${JSON.stringify(params)}\n`);
+
+    return wrapText(`${JSON.stringify(params)}`);
 };
 
 (async () => {

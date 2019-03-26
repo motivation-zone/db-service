@@ -12,6 +12,23 @@ import ExerciseModel from 'src/models/exercise';
 const controller = express();
 const urls = apiUrls.exercise;
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exercise.getUserExercises
+ * @method get
+ * @query [[{
+ *  "name": "sportId",
+ *  "type": "number"
+ * }, {
+ *  "name": "templateId",
+ *  "type": "string"
+ * }, {
+ *  "name": "difficultyLevelId",
+ *  "type": "number"
+ * }]]
+ * @returns ExerciseModel[]
+ */
 controller.get(urls.getUserExercises, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
     const {sportId, templateId, difficultyLevelId} = req.query;
@@ -25,6 +42,14 @@ controller.get(urls.getUserExercises, asyncMiddlewareWrapper(async (req: Request
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exercise.createExercise
+ * @method post
+ * @body ExerciseModel
+ * @returns ExerciseModel[]
+ */
 controller.post(urls.createExercise, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const exercise = new ExerciseModel(req.body);
     await exercise.validateForCreate();
@@ -33,12 +58,27 @@ controller.post(urls.createExercise, asyncMiddlewareWrapper(async (req: Request,
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exercise.getExerciseById
+ * @method get
+ * @returns ExerciseModel[]
+ */
 controller.get(urls.getExerciseById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {exerciseId} = req.params;
     const result = await ExerciseService.getExerciseById(exerciseId);
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exercise.updateExerciseById
+ * @method post
+ * @body ExerciseModel
+ * @returns ExerciseModel[]
+ */
 controller.post(urls.updateExerciseById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {exerciseId} = req.params;
 
@@ -49,6 +89,13 @@ controller.post(urls.updateExerciseById, asyncMiddlewareWrapper(async (req: Requ
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exercise.deleteExerciseById
+ * @method delete
+ * @returns ExerciseModel[]
+ */
 controller.delete(urls.deleteExerciseById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {exerciseId} = req.params;
     const result = await ExerciseService.deleteExercise(exerciseId);

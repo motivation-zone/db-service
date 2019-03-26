@@ -12,6 +12,20 @@ import ExerciseTemplateModel from 'src/models/exercise-template';
 const controller = express();
 const urls = apiUrls.exerciseTemplate;
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exerciseTemplate.getUserExerciseTemplates
+ * @method get
+ * @query [[{
+ *  "name": "sportId",
+ *  "type": "number"
+ * }, {
+ *  "name": "difficultyLevelId",
+ *  "type": "number"
+ * }]]
+ * @returns ExerciseTemplateModel[]
+ */
 controller.get(urls.getUserExerciseTemplates, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
     const {sportId, difficultyLevelId} = req.query;
@@ -24,6 +38,14 @@ controller.get(urls.getUserExerciseTemplates, asyncMiddlewareWrapper(async (req:
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exerciseTemplate.createExerciseTemplate
+ * @method post
+ * @body ExerciseTemplateModel
+ * @returns ExerciseTemplateModel[]
+ */
 controller.post(urls.createExerciseTemplate, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const exerciseTemplate = new ExerciseTemplateModel(req.body);
     await exerciseTemplate.validateForCreate();
@@ -31,12 +53,27 @@ controller.post(urls.createExerciseTemplate, asyncMiddlewareWrapper(async (req: 
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exerciseTemplate.getExerciseTemplateById
+ * @method get
+ * @returns ExerciseTemplateModel[]
+ */
 controller.get(urls.getExerciseTemplateById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {templateId} = req.params;
     const result = await ExerciseTemplateService.getExerciseTemplate(templateId);
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exerciseTemplate.updateExerciseTemplateById
+ * @method post
+ * @body ExerciseTemplateModel
+ * @returns ExerciseTemplateModel[]
+ */
 controller.post(urls.updateExerciseTemplateById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {templateId} = req.params;
     const template = new ExerciseTemplateModel(req.body);
@@ -46,6 +83,13 @@ controller.post(urls.updateExerciseTemplateById, asyncMiddlewareWrapper(async (r
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url exerciseTemplate.deleteExerciseTemplateById
+ * @method delete
+ * @returns ExerciseTemplateModel[]
+ */
 controller.delete(urls.deleteExerciseTemplateById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {templateId} = req.params;
     const result = await ExerciseTemplateService.deleteExerciseTemplate(templateId);

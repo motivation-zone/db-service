@@ -10,6 +10,31 @@ export enum ExerciseValueType {
     DURATION = 'duration'
 }
 
+/**
+ * @apiDoc
+ * @type model
+ * @name ExerciseModel
+ * @object [[{
+ *  "name": "id",
+ *  "type": "number"
+ * }, {
+ *  "name": "exerciseTemplateId",
+ *  "type": "string"
+ * }, {
+ *  "name": "value",
+ *  "type": "number"
+ * }, {
+ *  "name": "type",
+ *  "type": "reps | duration"
+ * }, {
+ *  "name": "createdDate",
+ *  "type": "Date"
+ * }, {
+ *  "name": "exerciseTemplate",
+ *  "type": "ExerciseTemplateModel"
+ * }]]
+ */
+
 export interface IExerciseModel {
     id?: string;
     exerciseTemplateId?: string;

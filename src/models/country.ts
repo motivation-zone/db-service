@@ -12,7 +12,7 @@ import HttpResponse from 'src/utils/http/response';
  *  "type": "number"
  * }, {
  *  "name": "name",
- *  "name": "string"
+ *  "type": "string"
  * }, {
  *  "name": "alpha2",
  *  "type": "string"
