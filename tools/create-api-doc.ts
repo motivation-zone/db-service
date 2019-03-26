@@ -9,7 +9,7 @@ try {
     fs.unlinkSync(filePath);
 } catch (e) {}
 
-const header = ['| Method | Url | Body | Query | Return |', '|---|---|---|---|---|'].join('\n');
+const header = ['| Method | Url | Body | Query | UrlParams | Return |', '|---|---|---|---|---|---|'].join('\n');
 
 const wrapText = (value: string) => {
     if (value) {
@@ -65,8 +65,9 @@ const createParams = (params: any): string => {
             const url = `*${c.url}*`;
             const body = createParams(c.body);
             const query = createParams(c.query);
+            const urlParams = createParams(c.urlParams);
             const returns = createParams(c.returns);
-            return `| ${[method, url, body, query, returns].join(' | ')} |`;
+            return `| ${[method, url, body, query, urlParams, returns].join(' | ')} |`;
         });
         return result.concat(...body).join('\n');
     });
