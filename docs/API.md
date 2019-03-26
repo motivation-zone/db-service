@@ -44,7 +44,7 @@
 | Method | Url | Body | Query | UrlParams | Return |
 |---|---|---|---|---|---|
 | **get** | */get-countries* | null | null | null | [CountryModel[]](#CountryModel) |
-| **get** | */get-users/:countryId* | null | [LimitQueryParams](#LimitQueryParams) | ```[{"name":"countryId","type":"number | null"}]``` | [UserModel[]](#UserModel) |
+| **get** | */get-users/:countryId* | null | [LimitQueryParams](#LimitQueryParams) | ```[{"name":"countryId","type":"number \| null"}]``` | [UserModel[]](#UserModel) |
 
 ## CountryModel
 ```{"id":"number","name":"string","alpha2":"string","alpha3":"string","unCode":"string"}```
