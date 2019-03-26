@@ -13,6 +13,7 @@ const header = ['| Method | Url | Body | Query | UrlParams | Return |', '|---|--
 
 const wrapText = (value: string) => {
     if (value) {
+        value = value.replace(/\|/gi, '\\|');
         return `\`\`\`${value}\`\`\``;
     }
 
@@ -33,7 +34,7 @@ const makeLink = (key: string, isArray: boolean): string => {
 
 const createParams = (params: any): string => {
     if (!params) {
-        return 'null';
+        return '';
     }
 
     if (typeof params === 'string') {
