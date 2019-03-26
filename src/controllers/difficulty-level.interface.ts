@@ -1,4 +1,4 @@
-import {IApiInterface} from 'tools/api-doc';
+/* import {IApiInterface} from 'tools/api-doc';
 import {apiUrls} from 'src/urls';
 import DifficultyLevelModelInterface from 'src/models/difficulty-level.interface';
 
@@ -14,3 +14,4 @@ export default {
         }
     ]
 } as IApiInterface;
+ */

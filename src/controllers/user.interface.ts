@@ -1,4 +1,4 @@
-import {IApiInterface, limitQueryParams} from 'tools/api-doc';
+/* import {IApiInterface, limitQueryParams} from 'tools/api-doc';
 import {apiUrls} from 'src/urls';
 import UserModelInterface from 'src/models/user.interface';
 
@@ -51,3 +51,4 @@ export default {
         }
     ]
 } as IApiInterface;
+ */

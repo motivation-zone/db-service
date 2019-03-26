@@ -40,7 +40,7 @@ lint.staged:
 
 .PHONY: lint.main
 lint.main:
-	$(TSLINT) -c tslint.json 'src/**/*.ts'
+	$(TSLINT) -c tslint.json 'src/**/*.ts' 'tools/**/*.ts'
 
 .PHONY: lint.tests
 lint.tests:

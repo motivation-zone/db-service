@@ -1,4 +1,4 @@
-import {IApiInterface, limitQueryParams} from 'tools/api-doc';
+/* import {IApiInterface, limitQueryParams} from 'tools/api-doc';
 import {apiUrls} from 'src/urls';
 import LinkUserSportModelInterface from 'src/models/link/user-sport.interface';
 
@@ -27,3 +27,4 @@ export default {
         }
     ]
 } as IApiInterface;
+ */
