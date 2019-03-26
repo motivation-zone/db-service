@@ -1,6 +1,22 @@
 import {translatePostgresqlNameToNode} from 'src/utils/db/helper';
 import {OrderType} from 'src/query-creators/base';
 
+/**
+ * @apiDoc
+ * @type model
+ * @name LimitQueryParams
+ * @object [[{
+ *  "name": "limit",
+ *  "type": "number"
+ * }, {
+ *  "name": "skip",
+ *  "type": "number"
+ * }, {
+ *  "name": "order",
+ *  "type": "ASC | DESC",
+ *  "default": "ASC"
+ * }]]
+ */
 export interface IGetLimit {
     limit: number;
     skip: number;

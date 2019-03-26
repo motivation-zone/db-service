@@ -8,11 +8,30 @@ import {apiUrls} from 'src/urls';
 const controller = express();
 const urls = apiUrls.country;
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url country.getCountries
+ * @method get
+ * @returns CountryModel[]
+ */
 controller.get(urls.getCountries, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
     const result = await CountryService.getCountries();
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url country.getUsersByCountry
+ * @method get
+ * @query LimitQueryParams
+ * @urlParams [[{
+ *  "name": "countryId",
+ *  "type": "number | null"
+ * }]]
+ * @returns UserModel[]
+ */
 controller.get(urls.getUsersByCountry, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const limitParameters = await checkGetLimitParameters(req.query);
     let {countryId} = req.params;

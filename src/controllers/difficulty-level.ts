@@ -8,6 +8,13 @@ import {asyncMiddlewareWrapper} from 'src/utils';
 const controller = express();
 const urls = apiUrls.difficultyLevel;
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url difficultyLevel.getDifficultyLevels
+ * @method get
+ * @returns DifficultyLevelModel[]
+ */
 controller.get(urls.getDifficultyLevels, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
     const result = await DifficultyLevelService.getDifficultyLevels();
     HttpResponse.ok(res, result);

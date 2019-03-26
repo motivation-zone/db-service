@@ -4,6 +4,33 @@ import Boom from 'boom';
 import HttpResponse from 'src/utils/http/response';
 import {parseDate, joiValidationErrorToString} from 'src/utils';
 
+/**
+ * @apiDoc
+ * @type model
+ * @name ExerciseTemplateModel
+ * @object [[{
+ *  "name": "id",
+ *  "type": "number"
+ * }, {
+ *  "name": "title",
+ *  "type": "string"
+ * }, {
+ *  "name": "description",
+ *  "type": "string"
+ * }, {
+ *  "name": "userId",
+ *  "type": "string"
+ * }, {
+ *  "name": "sportId",
+ *  "type": "number"
+ * }, {
+ *  "name": "difficultyLevelId",
+ *  "type": "number"
+ * }, {
+ *  "name": "createdDate",
+ *  "type": "Date"
+ * }]]
+ */
 export interface IExerciseTemplateModel {
     id?: string;
     title?: string;

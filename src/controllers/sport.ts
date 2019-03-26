@@ -9,11 +9,26 @@ import LinkUserSportModel from 'src/models/link/user-sport';
 const controller = express();
 const urls = apiUrls.sport;
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url sport.getSports
+ * @method get
+ * @returns SportModel[]
+ */
 controller.get(urls.getSports, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
     const result = await SportService.getSports();
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url sport.getUsersBySport
+ * @method get
+ * @query LimitQueryParams
+ * @returns UserModel[]
+ */
 controller.get(urls.getUsersBySport, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const limitParameters = await checkGetLimitParameters(req.query);
     const {sportId} = req.params;
@@ -22,6 +37,13 @@ controller.get(urls.getUsersBySport, asyncMiddlewareWrapper(async (req: Request,
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url sport.getUserSports
+ * @method get
+ * @returns SportModel[]
+ */
 controller.get(urls.getUserSports, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
 
@@ -29,6 +51,14 @@ controller.get(urls.getUserSports, asyncMiddlewareWrapper(async (req: Request, r
     HttpResponse.ok(res, result);
 }));
 
+/**
+ * @apiDoc
+ * @type controller
+ * @url sport.updateUserSport
+ * @method post
+ * @body LinkUserSportModel
+ * @returns LinkUserSportModel[]
+ */
 controller.post(urls.updateUserSport, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {actionType} = req.params;
 

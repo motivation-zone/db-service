@@ -3,6 +3,18 @@ export interface ISportModel {
     name?: string;
 }
 
+/**
+ * @apiDoc
+ * @type model
+ * @name SportModel
+ * @object [[{
+ *  "name": "id",
+ *  "type": "number"
+ * }, {
+ *  "name": "name",
+ *  "type": "string"
+ * }]]
+ */
 export default class SportModel implements ISportModel {
     public id?: number;
     public name?: string;
