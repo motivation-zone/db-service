@@ -5,31 +5,44 @@ import HttpResponse from 'src/utils/http/response';
 import {parseDate, joiValidationErrorToString} from 'src/utils';
 
 /**
- * @apiDoc
+ * @api
  * @type model
  * @name ExerciseTemplateModel
- * @object [[{
- *  "name": "id",
- *  "type": "number"
- * }, {
- *  "name": "title",
- *  "type": "string"
- * }, {
- *  "name": "description",
- *  "type": "string"
- * }, {
- *  "name": "userId",
- *  "type": "string"
- * }, {
- *  "name": "sportId",
- *  "type": "number"
- * }, {
- *  "name": "difficultyLevelId",
- *  "type": "number"
- * }, {
- *  "name": "createdDate",
- *  "type": "Date"
- * }]]
+ * @object {{
+ *  "type": "object",
+ *  "required": [
+ *      "title",
+ *      "userId",
+ *      "sportId",
+ *      "difficultyLevelId"
+ *  ],
+ *  "properties": [
+ *      {
+ *          "name": "id",
+ *          "type": "string",
+ *          "format": "uuid"
+ *      }, {
+ *          "name": "title",
+ *          "type": "string"
+ *      }, {
+ *          "name": "description",
+ *          "type": "string"
+ *      }, {
+ *          "name": "userId",
+ *          "type": "string"
+ *      }, {
+ *          "name": "sportId",
+ *          "type": "number"
+ *      }, {
+ *          "name": "difficultyLevelId",
+ *          "type": "number"
+ *      }, {
+ *          "name": "createdDate",
+ *          "type": "string",
+ *          "format": "date"
+ *      }
+ *  ]
+ * }}
  */
 export interface IExerciseTemplateModel {
     id?: string;

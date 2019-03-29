@@ -27,7 +27,8 @@ make server.run - run server from "build" dir by nodejs
 # Linting
 Two different commands, because tests rules code style a little bit difference.
 ```
-make lint.main - linting /src folder
+make lint.src - linting /src folder
+make lint.tools - linting /tools folder
 make lint.tests - linting /tests folter
 ```
 

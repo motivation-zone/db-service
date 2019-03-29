@@ -10,12 +10,26 @@ const controller = express();
 const urls = apiUrls.user;
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag user
  * @url user.createUser
  * @method post
- * @body UserModel
- * @returns UserModel[]
+ * @operationId user.createUser
+ * @parameters {[
+ *      {
+ *          "in": "body",
+ *          "name": "UserModel",
+ *          "required": true,
+ *          "schema": {
+ *          	"ref": "UserModel"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "UserModel",
+ *      "type": "array"
+ * }}
  */
 controller.post(urls.createUser, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const user = new UserModel(req.body);
@@ -26,12 +40,41 @@ controller.post(urls.createUser, asyncMiddlewareWrapper(async (req: Request, res
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag user
  * @url user.getUsers
  * @method get
- * @query LimitQueryParams
- * @returns UserModel[]
+ * @operationId user.getUsers
+ * @parameters {[
+ *      {
+ *          "in": "query",
+ *          "name": "order",
+ *          "description": "sorting order [desc, asd]",
+ *          "required": false,
+ *          "schema": {
+ *              "type": "string"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "limit",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "skip",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "UserModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getUsers, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const limitParameters = await checkGetLimitParameters(req.query);
@@ -40,11 +83,26 @@ controller.get(urls.getUsers, asyncMiddlewareWrapper(async (req: Request, res: R
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag user
  * @url user.getUserById
  * @method get
- * @returns UserModel[]
+ * @operationId user.getUserById
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "userId",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "string"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "UserModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getUserById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
@@ -53,15 +111,33 @@ controller.get(urls.getUserById, asyncMiddlewareWrapper(async (req: Request, res
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag user
  * @url user.getUserByLogin
  * @method get
- * @query [[{
- *  "name": "strict",
- *  "type": "boolean"
- * }]]
- * @returns UserModel[]
+ * @operationId user.getUserByLogin
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "login",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "string"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "strict",
+ *          "required": false,
+ *          "schema": {
+ *              "type": "boolean"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "UserModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getUserByLogin, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {login} = req.params;
@@ -71,12 +147,26 @@ controller.get(urls.getUserByLogin, asyncMiddlewareWrapper(async (req: Request, 
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag user
  * @url user.updateUserById
  * @method post
- * @body UserModel
- * @returns UserModel[]
+ * @operationId user.updateUserById
+ * @parameters {[
+ *      {
+ *          "in": "body",
+ *          "name": "UserModel",
+ *          "required": true,
+ *          "schema": {
+ *          	"ref": "UserModel"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "UserModel",
+ *      "type": "array"
+ * }}
  */
 controller.post(urls.updateUserById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
@@ -89,21 +179,32 @@ controller.post(urls.updateUserById, asyncMiddlewareWrapper(async (req: Request,
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag user
  * @url user.checkUserPassword
  * @method post
- * @body [[{
- *  "name": "login",
- *  "type": "string"
- * }, {
- *  "name": "password",
- *  "type": "string"
- * }]]
- * @returns [[{
- *  "name": "id",
- *  "type": "string"
- * }]]
+ * @operationId user.checkUserPassword
+ * @parameters {[
+ *      {
+ *          "in": "body",
+ *          "name": "login",
+ *          "required": true,
+ *          "schema": {
+ *          	"type": "string"
+ *          }
+ *      }, {
+ *          "in": "body",
+ *          "name": "password",
+ *          "required": true,
+ *          "schema": {
+ *          	"type": "string"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "type": "boolean"
+ * }}
  */
 controller.post(urls.checkUserPassword, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {login, password} = req.body;
@@ -112,11 +213,26 @@ controller.post(urls.checkUserPassword, asyncMiddlewareWrapper(async (req: Reque
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag user
  * @url user.deleteUserById
  * @method delete
- * @returns UserModel[]
+ * @operationId user.deleteUserById
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "userId",
+ *          "required": true,
+ *          "schema": {
+ *          	"type": "string"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "UserModel",
+ *      "type": "array"
+ * }}
  */
 controller.delete(urls.deleteUserById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;

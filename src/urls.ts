@@ -8,6 +8,15 @@ const PREFIXES = {
     exercise: `${API_PREFIX}/exercise`
 };
 
+export interface IApiUrls {
+    user: any;
+    country: any;
+    sport: any;
+    difficultyLevel: any;
+    exerciseTemplate: any;
+    exercise: any;
+}
+
 export const apiUrls = {
     user: {
         prefix: PREFIXES.user,

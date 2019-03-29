@@ -11,30 +11,43 @@ export enum ExerciseValueType {
 }
 
 /**
- * @apiDoc
+ * @api
  * @type model
  * @name ExerciseModel
- * @object [[{
- *  "name": "id",
- *  "type": "number"
- * }, {
- *  "name": "exerciseTemplateId",
- *  "type": "string"
- * }, {
- *  "name": "value",
- *  "type": "number"
- * }, {
- *  "name": "type",
- *  "type": "reps | duration"
- * }, {
- *  "name": "createdDate",
- *  "type": "Date"
- * }, {
- *  "name": "exerciseTemplate",
- *  "type": "ExerciseTemplateModel"
- * }]]
+ * @object {{
+ *  "type": "object",
+ *  "required": [
+ *      "id",
+ *      "exerciseTemplateId",
+ *      "value",
+ *      "type"
+ *  ],
+ *  "properties": [
+ *      {
+ *          "name": "id",
+ *          "type": "number"
+ *      }, {
+ *          "name": "exerciseTemplateId",
+ *          "type": "string",
+ *          "format": "uuid"
+ *      }, {
+ *          "name": "value",
+ *          "type": "number"
+ *      }, {
+ *          "name": "type",
+ *          "type": "string",
+ *          "format": "reps | duration"
+ *      }, {
+ *          "name": "createdDate",
+ *          "type": "string"
+ *      }, {
+ *          "name": "exerciseTemplate",
+ *          "type": "object",
+ *          "format": "ExerciseTemplateModel"
+ *      }
+ *  ]
+ * }}
  */
-
 export interface IExerciseModel {
     id?: string;
     exerciseTemplateId?: string;

@@ -9,11 +9,17 @@ const controller = express();
 const urls = apiUrls.difficultyLevel;
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag difficulty-level
  * @url difficultyLevel.getDifficultyLevels
  * @method get
- * @returns DifficultyLevelModel[]
+ * @operationId difficultyLevel.getDifficultyLevels
+ * @parameters {[]}
+ * @response {{
+ *      "schema": "DifficultyLevelModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getDifficultyLevels, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
     const result = await DifficultyLevelService.getDifficultyLevels();
