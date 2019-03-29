@@ -66,6 +66,8 @@ server.run:
 .PHONY: test.func.fill
 test.func.fill:
 	make build && \
+	export MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY} && \
+	export MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN} && \
 	export DEBUG=dbservice:tests && \
 	export NODE_PATH=$(OUT_DIR) && \
 	export TZ=$(TZ) && \
@@ -75,6 +77,8 @@ test.func.fill:
 .PHONY: test.func
 test.func:
 	make build && \
+	export MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY} && \
+	export MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN} && \
 	export DEBUG=dbservice:tests && \
 	export NODE_PATH=$(OUT_DIR) && \
 	export TZ=$(TZ) && \
@@ -87,6 +91,10 @@ test.func:
 make api.doc:
 	$(TSNODE) -r tsconfig-paths/register tools/api-generator/generate.ts
 
+.PHONY: generate.token
+make generate.token:
+	$(TSNODE) -r tsconfig-paths/register tools/generate-token.ts
+
 # Deployment
 PWD = $(shell pwd)
 VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
@@ -95,7 +103,7 @@ DOCKER_TAG := $(DOCKER_HUB):$(VERSION)
 DOCKER_NAME := mz-db-service
 .PHONY: docker.build
 docker.build:
-	docker build --name DOCKER_HUB -t $(DOCKER_TAG) .
+	docker build -t $(DOCKER_TAG) .
 
 .PHONY: docker.login
 docker.login:
@@ -118,7 +126,7 @@ docker.run.local:
 
 .PHONY: docker.run.testing
 docker.run.testing:
-	docker run -d -e "NODEJS_ENV=testing" \
+	docker run -d -e "NODEJS_ENV=testing" -e "MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY}" \
 		--name $(DOCKER_NAME) \
 		-v /usr/share/motivation-zone/db/db.yaml:/usr/local/app/configs/db/db.yaml \
 		-p 5000:80 $(image_id)

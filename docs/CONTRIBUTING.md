@@ -32,6 +32,12 @@ make lint.tools - linting /tools folder
 make lint.tests - linting /tests folter
 ```
 
+# Tools
+```
+make api.doc - generate api documentation by jsdoc comments
+make generate.token - generate token by key from env ${MZ_DB_SERVICE_PRIVATE_KEY}
+```
+
 # Test
 ## Functional
 ```

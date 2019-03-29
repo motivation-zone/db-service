@@ -11,6 +11,8 @@ For deploing project we use docker.
 ```Important: u have to ssh connect to host without password requiring!!!```
 
 ## Steps
+Don't forget to check version
+
 1. make docker.build
 2. make docker.login
 3. make docker.push
