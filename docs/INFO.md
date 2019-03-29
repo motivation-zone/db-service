@@ -25,6 +25,8 @@ export NODEJS_ENV="testing"; # or "production"
 export TZ="UTC";
 export MZ_DB_SERVICE_DOCKER_USER=${value};
 export MZ_DB_SERVICE_DOCKER_PASS=${value};
+export MZ_DB_SERVICE_PRIVATE_KEY=${value}; // for sign/verify token
+export MZ_DB_SERVICE_TOKEN=${value}; // token
 ```
 
 ### OS preparation

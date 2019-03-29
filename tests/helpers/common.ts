@@ -10,7 +10,10 @@ interface IParams<T> {
 }
 
 const agent = request.agent(app);
-const REQUEST_HEADERS = {Accept: 'application/json'};
+const REQUEST_HEADERS = {
+    Accept: 'application/json',
+    Authorization: process.env.MZ_DB_SERVICE_TOKEN
+};
 
 export const getRequest = async <T>(params: IParams<T>): Promise<IResponse<T[]>> => {
     const {url, ModelClass} = params;

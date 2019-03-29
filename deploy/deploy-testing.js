@@ -16,15 +16,13 @@ const makefile = fs.readFileSync(rootPath + '/Makefile').toString();
 const packagejson = fs.readFileSync(rootPath + '/package.json').toString();
 const version = JSON.parse(packagejson).version;
 
-const dockerUser = process.env.MZ_DB_SERVICE_DOCKER_USER;
-const dockerPassword = process.env.MZ_DB_SERVICE_DOCKER_PASS;
-
 const dockerPs = `$(docker ps --filter "name=${CONTAINER_NAME}" -q -a)`;
 const commands = [
+    `source ~/.profile`,
     `echo '${makefile}' > /tmp/Makefile`,
     `echo '${packagejson}' > /tmp/package.json`,
     'cd /tmp',
-    `docker login -u ${dockerUser} -p ${dockerPassword}`,
+    'make docker.login',
     `docker pull ${DOCKER_HUB}:${version}`,
     `docker kill ${dockerPs} || true`,
     `docker rm -f ${dockerPs} || true`,
