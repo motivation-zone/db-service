@@ -10,11 +10,17 @@ const controller = express();
 const urls = apiUrls.sport;
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag sport
  * @url sport.getSports
  * @method get
- * @returns SportModel[]
+ * @operationId sport.getSports
+ * @parameters {[]}
+ * @response {{
+ *      "schema": "SportModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getSports, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
     const result = await SportService.getSports();
@@ -22,12 +28,48 @@ controller.get(urls.getSports, asyncMiddlewareWrapper(async (_req: Request, res:
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag sport
  * @url sport.getUsersBySport
  * @method get
- * @query LimitQueryParams
- * @returns UserModel[]
+ * @operationId sport.getUsersBySport
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "sportId",
+ *          "required": true,
+ *          "schema": {
+ *  	        "type": "string"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "order",
+ *          "description": "sorting order [desc, asd]",
+ *          "required": false,
+ *          "schema": {
+ *              "type": "string"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "limit",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "skip",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "UserModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getUsersBySport, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const limitParameters = await checkGetLimitParameters(req.query);
@@ -38,11 +80,26 @@ controller.get(urls.getUsersBySport, asyncMiddlewareWrapper(async (req: Request,
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag sport
  * @url sport.getUserSports
  * @method get
- * @returns SportModel[]
+ * @operationId sport.getUserSports
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "userId",
+ *          "required": true,
+ *          "schema": {
+ *          	"type": "string"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "SportModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getUserSports, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
@@ -52,12 +109,26 @@ controller.get(urls.getUserSports, asyncMiddlewareWrapper(async (req: Request, r
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag sport
  * @url sport.updateUserSport
  * @method post
- * @body LinkUserSportModel
- * @returns LinkUserSportModel[]
+ * @operationId sport.updateUserSport
+ * @parameters {[
+ *      {
+ *          "in": "body",
+ *          "name": "LinkUserSportModel",
+ *          "required": true,
+ *          "schema": {
+ *          	"ref": "LinkUserSportModel"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "LinkUserSportModel",
+ *      "type": "array"
+ * }}
  */
 controller.post(urls.updateUserSport, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {actionType} = req.params;

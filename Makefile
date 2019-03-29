@@ -38,9 +38,13 @@ clean:
 lint.staged:
 	$(LINT_STAGED) -c .lintstagedrc.json
 
-.PHONY: lint.main
-lint.main:
-	$(TSLINT) -c tslint.json 'src/**/*.ts' 'tools/**/*.ts'
+.PHONY: lint.src
+lint.src:
+	$(TSLINT) -c tslint.json 'src/**/*.ts'
+
+.PHONY: lint.tools
+lint.tools:
+	$(TSLINT) -c tslint.json 'tools/**/*.ts'
 
 .PHONY: lint.tests
 lint.tests:
@@ -81,7 +85,7 @@ test.func:
 # Tools
 .PHONY: api.doc
 make api.doc:
-	$(TSNODE) -r tsconfig-paths/register tools/create-api-doc.ts
+	$(TSNODE) -r tsconfig-paths/register tools/api-generator/generate.ts
 
 # Deployment
 PWD = $(shell pwd)

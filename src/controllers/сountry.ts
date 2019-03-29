@@ -9,11 +9,18 @@ const controller = express();
 const urls = apiUrls.country;
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag country
  * @url country.getCountries
  * @method get
- * @returns CountryModel[]
+ * @summary
+ * @operationId country.getCountries
+ * @parameters {[]}
+ * @response {{
+ *      "schema": "CountryModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getCountries, asyncMiddlewareWrapper(async (_req: Request, res: Response) => {
     const result = await CountryService.getCountries();
@@ -21,16 +28,48 @@ controller.get(urls.getCountries, asyncMiddlewareWrapper(async (_req: Request, r
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag country
  * @url country.getUsersByCountry
  * @method get
- * @query LimitQueryParams
- * @urlParams [[{
- *  "name": "countryId",
- *  "type": "number | null"
- * }]]
- * @returns UserModel[]
+ * @operationId country.getUsersByCountry
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "countryId",
+ *          "required": true,
+ *          "schema": {
+ *          	"type": "string"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "order",
+ *          "description": "sorting order [desc, asd]",
+ *          "required": false,
+ *          "schema": {
+ *              "type": "string"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "limit",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "skip",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "UserModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getUsersByCountry, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const limitParameters = await checkGetLimitParameters(req.query);

@@ -1,0 +1,795 @@
+---
+  openapi: "3.0.0"
+  servers: []
+  info: 
+    description: "API"
+    version: "0.0.1"
+    title: "db-service"
+    contact: 
+      email: "dondiego4697@mail.ru"
+    license: 
+      name: "Apache 2.0"
+      url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+  paths: 
+    /api/difficulty-level/get-difficulty-levels: 
+      get: 
+        tags: 
+          - "difficulty-level"
+        parameters: []
+        operationId: "difficultyLevel.getDifficultyLevels"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/DifficultyLevelModel"
+    /api/exercise-template/get-user-exercise-templates/${userId}: 
+      get: 
+        tags: 
+          - "exercise-template"
+        parameters: 
+          - 
+            in: "path"
+            name: "userId"
+            required: true
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "sportId"
+            required: false
+            schema: 
+              type: "number"
+          - 
+            in: "query"
+            name: "difficultyLevelId"
+            required: false
+            schema: 
+              type: "number"
+          - 
+            in: "query"
+            name: "order"
+            description: "sorting order [desc, asd]"
+            required: false
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "limit"
+            required: true
+            schema: 
+              type: "number"
+          - 
+            in: "query"
+            name: "skip"
+            required: true
+            schema: 
+              type: "number"
+        operationId: "exerciseTemplate.getUserExerciseTemplates"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseTemplateModel"
+    /api/exercise-template/create: 
+      post: 
+        tags: 
+          - "exercise-template"
+        parameters: 
+          - 
+            in: "body"
+            name: "ExerciseTemplateModel"
+            required: true
+            schema: 
+              $ref: "#/components/schemas/ExerciseTemplateModel"
+        operationId: "exerciseTemplate.createExerciseTemplate"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseTemplateModel"
+    /api/exercise-template/get-exercise-template/${templateId}: 
+      get: 
+        tags: 
+          - "exercise-template"
+        parameters: 
+          - 
+            in: "path"
+            name: "templateId"
+            required: true
+            schema: 
+              type: "string"
+        operationId: "exerciseTemplate.getExerciseTemplateById"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseTemplateModel"
+    /api/exercise-template/update-exercise-template/${templateId}: 
+      post: 
+        tags: 
+          - "exercise-template"
+        parameters: 
+          - 
+            in: "path"
+            name: "templateId"
+            required: true
+            schema: 
+              type: "string"
+          - 
+            in: "body"
+            name: "ExerciseTemplateModel"
+            required: true
+            schema: 
+              $ref: "#/components/schemas/ExerciseTemplateModel"
+        operationId: "exerciseTemplate.updateExerciseTemplateById"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseTemplateModel"
+    /api/exercise-template/delete-exercise-template/${templateId}: 
+      delete: 
+        tags: 
+          - "exercise-template"
+        parameters: 
+          - 
+            in: "path"
+            name: "templateId"
+            required: true
+            schema: 
+              type: "string"
+        operationId: "exerciseTemplate.deleteExerciseTemplateById"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseTemplateModel"
+    /api/exercise/get-user-exercises/${userId}: 
+      get: 
+        tags: 
+          - "exercise"
+        parameters: 
+          - 
+            in: "path"
+            name: "userId"
+            required: true
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "sportId"
+            required: false
+            schema: 
+              type: "number"
+          - 
+            in: "query"
+            name: "templateId"
+            required: false
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "difficultyLevelId"
+            required: false
+            schema: 
+              type: "number"
+          - 
+            in: "query"
+            name: "order"
+            description: "sorting order [desc, asd]"
+            required: false
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "limit"
+            required: true
+            schema: 
+              type: "number"
+          - 
+            in: "query"
+            name: "skip"
+            required: true
+            schema: 
+              type: "number"
+        operationId: "exercise.getUserExercises"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseModel"
+    /api/exercise/create: 
+      post: 
+        tags: 
+          - "exercise"
+        parameters: 
+          - 
+            in: "body"
+            name: "ExerciseModel"
+            required: true
+            schema: 
+              $ref: "#/components/schemas/ExerciseModel"
+        operationId: "exercise.createExercise"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseModel"
+    /api/exercise/get-exercise/${exerciseId}: 
+      get: 
+        tags: 
+          - "exercise"
+        parameters: 
+          - 
+            in: "path"
+            name: "exerciseId"
+            required: true
+            schema: 
+              type: "string"
+        operationId: "exercise.getExerciseById"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseModel"
+    /api/exercise/update-exercise/${exerciseId}: 
+      post: 
+        tags: 
+          - "exercise"
+        parameters: 
+          - 
+            in: "path"
+            name: "exerciseId"
+            required: true
+            schema: 
+              type: "string"
+          - 
+            in: "body"
+            name: "ExerciseModel"
+            required: true
+            schema: 
+              $ref: "#/components/schemas/ExerciseModel"
+        operationId: "exercise.updateExerciseById"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseModel"
+    /api/exercise/delete-exercise/${exerciseId}: 
+      delete: 
+        tags: 
+          - "exercise"
+        parameters: 
+          - 
+            in: "path"
+            name: "exerciseId"
+            required: true
+            schema: 
+              type: "string"
+        operationId: "exercise.deleteExerciseById"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/ExerciseModel"
+    /api/sport/get-sports: 
+      get: 
+        tags: 
+          - "sport"
+        parameters: []
+        operationId: "sport.getSports"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/SportModel"
+    /api/sport/get-users/${sportId}: 
+      get: 
+        tags: 
+          - "sport"
+        parameters: 
+          - 
+            in: "path"
+            name: "sportId"
+            required: true
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "order"
+            description: "sorting order [desc, asd]"
+            required: false
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "limit"
+            required: true
+            schema: 
+              type: "number"
+          - 
+            in: "query"
+            name: "skip"
+            required: true
+            schema: 
+              type: "number"
+        operationId: "sport.getUsersBySport"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/UserModel"
+    /api/sport/get-sports/${userId}: 
+      get: 
+        tags: 
+          - "sport"
+        parameters: 
+          - 
+            in: "path"
+            name: "userId"
+            required: true
+            schema: 
+              type: "string"
+        operationId: "sport.getUserSports"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/SportModel"
+    /api/sport/update-user-sport/${actionType}: 
+      post: 
+        tags: 
+          - "sport"
+        parameters: 
+          - 
+            in: "body"
+            name: "LinkUserSportModel"
+            required: true
+            schema: 
+              $ref: "#/components/schemas/LinkUserSportModel"
+        operationId: "sport.updateUserSport"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/LinkUserSportModel"
+    /api/user/create: 
+      post: 
+        tags: 
+          - "user"
+        parameters: 
+          - 
+            in: "body"
+            name: "UserModel"
+            required: true
+            schema: 
+              $ref: "#/components/schemas/UserModel"
+        operationId: "user.createUser"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/UserModel"
+    /api/user/get-users: 
+      get: 
+        tags: 
+          - "user"
+        parameters: 
+          - 
+            in: "query"
+            name: "order"
+            description: "sorting order [desc, asd]"
+            required: false
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "limit"
+            required: true
+            schema: 
+              type: "number"
+          - 
+            in: "query"
+            name: "skip"
+            required: true
+            schema: 
+              type: "number"
+        operationId: "user.getUsers"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/UserModel"
+    /api/user/get-user/id/${userId}: 
+      get: 
+        tags: 
+          - "user"
+        parameters: 
+          - 
+            in: "path"
+            name: "userId"
+            required: true
+            schema: 
+              type: "string"
+        operationId: "user.getUserById"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/UserModel"
+    /api/user/get-user/login/${login}: 
+      get: 
+        tags: 
+          - "user"
+        parameters: 
+          - 
+            in: "path"
+            name: "login"
+            required: true
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "strict"
+            required: false
+            schema: 
+              type: "boolean"
+        operationId: "user.getUserByLogin"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/UserModel"
+    /api/user/update-user/${userId}: 
+      post: 
+        tags: 
+          - "user"
+        parameters: 
+          - 
+            in: "body"
+            name: "UserModel"
+            required: true
+            schema: 
+              $ref: "#/components/schemas/UserModel"
+        operationId: "user.updateUserById"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/UserModel"
+    /api/user/check-user-password: 
+      post: 
+        tags: 
+          - "user"
+        parameters: 
+          - 
+            in: "body"
+            name: "login"
+            required: true
+            schema: 
+              type: "string"
+          - 
+            in: "body"
+            name: "password"
+            required: true
+            schema: 
+              type: "string"
+        operationId: "user.checkUserPassword"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "boolean"
+                  items: 
+                    $ref: "#/components/schemas/undefined"
+    /api/user/delete-user/${userId}: 
+      delete: 
+        tags: 
+          - "user"
+        parameters: 
+          - 
+            in: "path"
+            name: "userId"
+            required: true
+            schema: 
+              type: "string"
+        operationId: "user.deleteUserById"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/UserModel"
+    /api/country/get-countries: 
+      get: 
+        tags: 
+          - "country"
+        parameters: []
+        operationId: "country.getCountries"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/CountryModel"
+    /api/country/get-users/${countryId}: 
+      get: 
+        tags: 
+          - "country"
+        parameters: 
+          - 
+            in: "path"
+            name: "countryId"
+            required: true
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "order"
+            description: "sorting order [desc, asd]"
+            required: false
+            schema: 
+              type: "string"
+          - 
+            in: "query"
+            name: "limit"
+            required: true
+            schema: 
+              type: "number"
+          - 
+            in: "query"
+            name: "skip"
+            required: true
+            schema: 
+              type: "number"
+        operationId: "country.getUsersByCountry"
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  type: "array"
+                  items: 
+                    $ref: "#/components/schemas/UserModel"
+  components: 
+    schemas: 
+      CountryModel: 
+        type: "object"
+        required: 
+          - "id"
+          - "name"
+          - "alpha2"
+          - "alpha3"
+          - "unCode"
+        properties: 
+          id: 
+            type: "number"
+          name: 
+            type: "string"
+          alpha2: 
+            type: "string"
+          alpha3: 
+            type: "string"
+          unCode: 
+            type: "string"
+      DifficultyLevelModel: 
+        type: "object"
+        required: 
+          - "id"
+          - "level"
+          - "name"
+        properties: 
+          id: 
+            type: "number"
+          level: 
+            type: "number"
+          name: 
+            type: "string"
+      ExerciseTemplateModel: 
+        type: "object"
+        required: 
+          - "title"
+          - "userId"
+          - "sportId"
+          - "difficultyLevelId"
+        properties: 
+          id: 
+            type: "number"
+          title: 
+            type: "string"
+          description: 
+            type: "string"
+          userId: 
+            type: "string"
+          sportId: 
+            type: "number"
+          difficultyLevelId: 
+            type: "number"
+          createdDate: 
+            type: "Date"
+      ExerciseModel: 
+        type: "object"
+        required: 
+          - "id"
+          - "exerciseTemplateId"
+          - "value"
+          - "type"
+        properties: 
+          id: 
+            type: "number"
+          exerciseTemplateId: 
+            type: "string"
+          value: 
+            type: "number"
+          type: 
+            type: "reps | duration"
+          createdDate: 
+            type: "Date"
+          exerciseTemplate: 
+            type: "ExerciseTemplateModel"
+      LinkUserSportModel: 
+        type: "object"
+        required: 
+          - "id"
+          - "userId"
+          - "sportId"
+        properties: 
+          id: 
+            type: "number"
+          userId: 
+            type: "string"
+          sportId: 
+            type: "number"
+      SportModel: 
+        type: "object"
+        required: 
+          - "id"
+          - "name"
+        properties: 
+          id: 
+            type: "number"
+          name: 
+            type: "string"
+      UserModel: 
+        type: "object"
+        required: 
+          - "login"
+          - "name"
+          - "password"
+          - "email"
+          - "gender"
+        properties: 
+          id: 
+            type: "number"
+          login: 
+            type: "string"
+          name: 
+            type: "string"
+          password: 
+            type: "string"
+          email: 
+            type: "string"
+          isAthlete: 
+            type: "boolean"
+          gender: 
+            type: "boolean"
+          selfInfo: 
+            type: "string"
+          weight: 
+            type: "number"
+          growth: 
+            type: "number"
+          countryId: 
+            type: "number"
+          birthDate: 
+            type: "Date"
+          isBanned: 
+            type: "boolean"
+          instagram: 
+            type: "string"
+          phone: 
+            type: "string"
+          registeredDate: 
+            type: "Date"
+  tags: 
+    - 
+      name: "difficulty-level"
+    - 
+      name: "exercise-template"
+    - 
+      name: "exercise"
+    - 
+      name: "sport"
+    - 
+      name: "user"
+    - 
+      name: "country"

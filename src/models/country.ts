@@ -4,25 +4,35 @@ import Boom from 'boom';
 import HttpResponse from 'src/utils/http/response';
 
 /**
- * @apiDoc
+ * @api
  * @type model
  * @name CountryModel
- * @object [[{
- *  "name": "id",
- *  "type": "number"
- * }, {
- *  "name": "name",
- *  "type": "string"
- * }, {
- *  "name": "alpha2",
- *  "type": "string"
- * }, {
- *  "name": "alpha3",
- *  "type": "string"
- * }, {
- *  "name": "unCode",
- *  "type": "string"
- * }]]
+ * @object {{
+ *  "type": "object",
+ *  "required": [
+ *      "id",
+ *      "name",
+ *      "alpha2",
+ *      "alpha3",
+ *      "unCode"
+ *  ],
+ *  "properties": [{
+ *      "name": "id",
+ *      "type": "number"
+ *  }, {
+ *      "name": "name",
+ *      "type": "string"
+ *  }, {
+ *      "name": "alpha2",
+ *      "type": "string"
+ *  }, {
+ *      "name": "alpha3",
+ *      "type": "string"
+ *  }, {
+ *      "name": "unCode",
+ *      "type": "string"
+ *  }]
+ * }}
  */
 export interface ICountryModel {
     id: number;

@@ -4,19 +4,29 @@ import Boom from 'boom';
 import HttpResponse from 'src/utils/http/response';
 
 /**
- * @apiDoc
+ * @api
  * @type model
  * @name DifficultyLevelModel
- * @object [[{
- *  "name": "id",
- *  "type": "number"
- * }, {
- *  "name": "level",
- *  "type": "number"
- * }, {
- *  "name": "name",
- *  "type": "string"
- * }]]
+ * @object {{
+ *  "type": "object",
+ *  "required": [
+ *      "id",
+ *      "level",
+ *      "name"
+ *  ],
+ *  "properties": [
+ *      {
+ *          "name": "id",
+ *          "type": "number"
+ *      }, {
+ *          "name": "level",
+ *          "type": "number"
+ *      }, {
+ *          "name": "name",
+ *          "type": "string"
+ *      }
+ *  ]
+ * }}
  */
 export interface IDifficultyLevelModel {
     id: number;

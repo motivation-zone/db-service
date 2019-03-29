@@ -5,58 +5,70 @@ import HttpResponse from 'src/utils/http/response';
 import {parseDate, joiValidationErrorToString} from 'src/utils';
 
 /**
- * @apiDoc
+ * @api
  * @type model
  * @name UserModel
- * @object [[{
- *  "name": "id",
- *  "type": "number"
- * }, {
- *  "name": "login",
- *  "type": "string"
- * }, {
- *  "name": "name",
- *  "type": "string"
- * }, {
- *  "name": "password",
- *  "type": "string"
- * }, {
- *  "name": "email",
- *  "type": "string"
- * }, {
- *  "name": "isAthlete",
- *  "type": "boolean"
- * }, {
- *  "name": "gender",
- *  "type": "boolean"
- * }, {
- *  "name": "selfInfo",
- *  "type": "string"
- * }, {
- *  "name": "weight",
- *  "type": "number"
- * }, {
- *  "name": "growth",
- *  "type": "number"
- * }, {
- *  "name": "countryId",
- *  "type": "number"
- * }, {
- *  "name": "birthDate",
- *  "type": "Date"
- * }, {
- *  "name": "isBanned",
- *  "type": "boolean"
- * }, {
- *  "name": "instagram",
- *  "type": "string"
- * }, {
- *  "name": "phone",
- *  "type": "string"
- * }, {
- *  "name": "registeredDate",
- *  "type": "Date"
- * }]]
+ * @object {{
+ *  "type": "object",
+ *  "required": [
+ *      "login",
+ *      "name",
+ *      "password",
+ *      "email",
+ *      "gender"
+ *  ],
+ *  "properties": [
+ *      {
+ *          "name": "id",
+ *          "type": "number"
+ *      }, {
+ *          "name": "login",
+ *          "type": "string"
+ *      }, {
+ *          "name": "name",
+ *          "type": "string"
+ *      }, {
+ *          "name": "password",
+ *          "type": "string"
+ *      }, {
+ *          "name": "email",
+ *          "type": "string"
+ *      }, {
+ *          "name": "isAthlete",
+ *          "type": "boolean"
+ *      }, {
+ *          "name": "gender",
+ *          "type": "boolean"
+ *      }, {
+ *          "name": "selfInfo",
+ *          "type": "string"
+ *      }, {
+ *          "name": "weight",
+ *          "type": "number"
+ *      }, {
+ *          "name": "growth",
+ *          "type": "number"
+ *      }, {
+ *          "name": "countryId",
+ *          "type": "number"
+ *      }, {
+ *          "name": "birthDate",
+ *          "type": "Date"
+ *      }, {
+ *          "name": "isBanned",
+ *          "type": "boolean"
+ *      }, {
+ *          "name": "instagram",
+ *          "type": "string"
+ *      }, {
+ *          "name": "phone",
+ *          "type": "string"
+ *      }, {
+ *          "name": "registeredDate",
+ *          "type": "Date"
+ *      }
+ *  ]
+ * }}
  */
 export interface IUserModel {
     id?: string;

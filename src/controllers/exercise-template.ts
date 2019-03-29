@@ -13,18 +13,62 @@ const controller = express();
 const urls = apiUrls.exerciseTemplate;
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag exercise-template
  * @url exerciseTemplate.getUserExerciseTemplates
  * @method get
- * @query [[{
- *  "name": "sportId",
- *  "type": "number"
- * }, {
- *  "name": "difficultyLevelId",
- *  "type": "number"
- * }]]
- * @returns ExerciseTemplateModel[]
+ * @operationId exerciseTemplate.getUserExerciseTemplates
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "userId",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "string"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "sportId",
+ *          "required": false,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "difficultyLevelId",
+ *          "required": false,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "order",
+ *          "description": "sorting order [desc, asd]",
+ *          "required": false,
+ *          "schema": {
+ *              "type": "string"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "limit",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }, {
+ *          "in": "query",
+ *          "name": "skip",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "number"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "ExerciseTemplateModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getUserExerciseTemplates, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {userId} = req.params;
@@ -39,12 +83,26 @@ controller.get(urls.getUserExerciseTemplates, asyncMiddlewareWrapper(async (req:
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag exercise-template
  * @url exerciseTemplate.createExerciseTemplate
  * @method post
- * @body ExerciseTemplateModel
- * @returns ExerciseTemplateModel[]
+ * @operationId exerciseTemplate.createExerciseTemplate
+ * @parameters {[
+ *      {
+ *          "in": "body",
+ *          "name": "ExerciseTemplateModel",
+ *          "required": true,
+ *          "schema": {
+ *          	"ref": "ExerciseTemplateModel"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "ExerciseTemplateModel",
+ *      "type": "array"
+ * }}
  */
 controller.post(urls.createExerciseTemplate, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const exerciseTemplate = new ExerciseTemplateModel(req.body);
@@ -54,11 +112,26 @@ controller.post(urls.createExerciseTemplate, asyncMiddlewareWrapper(async (req: 
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag exercise-template
  * @url exerciseTemplate.getExerciseTemplateById
  * @method get
- * @returns ExerciseTemplateModel[]
+ * @operationId exerciseTemplate.getExerciseTemplateById
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "templateId",
+ *          "required": true,
+ *          "schema": {
+ *              "type": "string"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "ExerciseTemplateModel",
+ *      "type": "array"
+ * }}
  */
 controller.get(urls.getExerciseTemplateById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {templateId} = req.params;
@@ -67,12 +140,33 @@ controller.get(urls.getExerciseTemplateById, asyncMiddlewareWrapper(async (req: 
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag exercise-template
  * @url exerciseTemplate.updateExerciseTemplateById
  * @method post
- * @body ExerciseTemplateModel
- * @returns ExerciseTemplateModel[]
+ * @operationId exerciseTemplate.updateExerciseTemplateById
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "templateId",
+ *          "required": true,
+ *          "schema": {
+ *          	"type": "string"
+ *          }
+ *      }, {
+ *          "in": "body",
+ *          "name": "ExerciseTemplateModel",
+ *          "required": true,
+ *          "schema": {
+ *          	"ref": "ExerciseTemplateModel"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "ExerciseTemplateModel",
+ *      "type": "array"
+ * }}
  */
 controller.post(urls.updateExerciseTemplateById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {templateId} = req.params;
@@ -84,11 +178,26 @@ controller.post(urls.updateExerciseTemplateById, asyncMiddlewareWrapper(async (r
 }));
 
 /**
- * @apiDoc
+ * @api
  * @type controller
+ * @tag exercise-template
  * @url exerciseTemplate.deleteExerciseTemplateById
  * @method delete
- * @returns ExerciseTemplateModel[]
+ * @operationId exerciseTemplate.deleteExerciseTemplateById
+ * @parameters {[
+ *      {
+ *          "in": "path",
+ *          "name": "templateId",
+ *          "required": true,
+ *          "schema": {
+ *          	"type": "string"
+ *          }
+ *      }
+ * ]}
+ * @response {{
+ *      "schema": "ExerciseTemplateModel",
+ *      "type": "array"
+ * }}
  */
 controller.delete(urls.deleteExerciseTemplateById, asyncMiddlewareWrapper(async (req: Request, res: Response) => {
     const {templateId} = req.params;
