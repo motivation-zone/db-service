@@ -22,7 +22,7 @@ const createLogger = (): winston.Logger => {
         transports: [
             new winston.transports.File({filename: `${logPath}/${name}.error.log`, level: 'error'}),
             new winston.transports.File({filename: `${logPath}/${name}.tests.log`, level: 'info'}),
-            new winston.transports.File({filename: `${logPath}/${name}.log`, level: 'emerg'})
+            new winston.transports.File({filename: `${logPath}/${name}.log`, level: 'debug'})
         ]
     });
 };
@@ -49,7 +49,7 @@ class FileLogger implements ILogger {
     }
 
     tests(msg: string): void {
-        this._logger.emerg(msg);
+        this._logger.debug(msg);
     }
 }
 

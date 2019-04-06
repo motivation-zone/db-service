@@ -6,3 +6,13 @@
 /logs
 /configs/db/db.yaml
 /migration/result.pgsql
+/tests/stress/ammo.txt
+/tests/stress/tank-token.txt
+
+# tank
+ammo.stpd
+ammo.stpd_si.json
+validation_error.yaml
+jobno_file.txt
+tank_errors.logs
+tank.logs

@@ -1,6 +1,7 @@
 import {readFileSync} from 'fs';
 import {exec} from 'child_process';
 import pMap from 'p-map';
+import cliProgress from 'cli-progress';
 
 import {dbActions as userDbActions, generateUser} from 'tests/helpers/user';
 import {dbActions as sportDbActions} from 'tests/helpers/sport';
@@ -10,7 +11,12 @@ import {
     dbActions as exerciseTemplateDbActions, generateExerciseTemplate
 } from 'tests/helpers/exercise-template';
 import {dbActions as exerciseDbActions, generateExercise} from 'tests/helpers/exercise';
-import {CREATED_USERS_COUNT} from 'tests/const';
+import {
+    CREATED_USERS_COUNT,
+    EXERCISE_TEMPLATES_PER_USER_COUNT,
+    EXERCISE_PER_TEMPLATE_COUNT,
+    SPORTS_COUNT
+} from 'tests/const';
 
 import {query} from 'src/lib/db/client';
 import logger from 'src/lib/logger';
@@ -29,9 +35,33 @@ const {getAllDifficultyLevels} = difficultyLevelDbActions;
 
 const log = (msg: string) => logger('tests', 'app', msg);
 
+const bar = new cliProgress.Bar({
+    format: '[{bar}] {percentage}% | ETA: {eta}s | {value}/{total} | Action: {action}'
+}, cliProgress.Presets.shades_classic);
+
+const barTotal = CREATED_USERS_COUNT +
+    CREATED_USERS_COUNT * EXERCISE_TEMPLATES_PER_USER_COUNT +
+    CREATED_USERS_COUNT * EXERCISE_TEMPLATES_PER_USER_COUNT * EXERCISE_PER_TEMPLATE_COUNT +
+    SPORTS_COUNT * CREATED_USERS_COUNT;
+let barCurrent = 0;
+const barUpdate = (diff: number, options: any) => {
+    barCurrent += diff;
+    bar.update(barCurrent, options);
+};
+
+const writeError = (err: any) => {
+    if (!(err instanceof Error)) {
+        err = JSON.stringify(err);
+    }
+    console.log(`\nERROR=${err}`); // tslint:disable-line
+};
+
 const concatMigrations = async () => {
+    barUpdate(0, {
+        action: 'Concat migration'
+    });
     await new Promise((resolve, reject) => {
-        const concatFile = getAbsolutePath('./migration/concat.js');
+        const concatFile = getAbsolutePath('./tools/database/pgsql-concat.js');
         exec(`node ${concatFile}`, (err) => {
             if (err) {
                 reject(err);
@@ -40,24 +70,31 @@ const concatMigrations = async () => {
             resolve();
         });
     });
-    log(`Migrations were concated`);
 };
 
 const reloadPublicSchema = async () => {
+    if (process.env.IS_REMOTE === 'true') {
+        return;
+    }
+
+    barUpdate(0, {
+        action: 'Reload public schema'
+    });
     await query({
         text: 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;',
         values: []
     });
-    log(`Public schema was reloaded`);
 };
 
 const createTables = async () => {
+    barUpdate(0, {
+        action: 'Create tables'
+    });
     const resultFile = readFileSync(getAbsolutePath('./migration/result.pgsql')).toString();
     await query({
         text: resultFile,
         values: []
     });
-    log(`Tables were created`);
 };
 
 const clearDatabase = async () => {
@@ -70,7 +107,8 @@ const clearDatabase = async () => {
     }
 };
 
-(async () => {
+const run = async () => {
+    bar.start(barTotal, barCurrent);
     await clearDatabase();
 
     const countsArray: boolean[] = [
@@ -79,35 +117,40 @@ const clearDatabase = async () => {
     ];
 
     const {data: countries} = await getAllCountries();
-    log(`Countries: ${countries.length}`);
     const {data: sports} = await getAllSports();
-    log(`Sports: ${sports.length}`);
     const {data: difficultyLevels} = await getAllDifficultyLevels();
-    log(`Difficulty levels: ${difficultyLevels.length}`);
 
     // User
     const users = await pMap(countsArray, async (isCountryExist) => {
         const countryId = intervalRandom(countries[0].id, countries[countries.length - 1].id);
         const newUser = generateUser({countryId: isCountryExist ? countryId : undefined});
-        const {data: [user]} = await insertUser(newUser);
-        return user;
-    }, {concurrency: 2});
-    log(`Users: ${users.length}`);
+        const {data: users, error} = await insertUser(newUser);
+        if (error) {
+            writeError(error);
+        }
+
+        barUpdate(1, {action: 'Create users'});
+        return users[0];
+    }, {concurrency: 1});
 
     // Link user-sport
     const linkUserSportNotFlatten = await pMap(users, async (user) => {
         return await pMap(sports, async (sport) => {
             const link = new LinkUserSportModel({userId: user.id, sportId: sport.id});
-            const {data: [userSportLink]} = await insertUserSportLink(link);
-            return userSportLink;
-        }, {concurrency: 2});
-    }, {concurrency: 2});
-    const linkUserSport: ILinkUserSportModel[] = [].concat.apply([], linkUserSportNotFlatten as any);
-    log(`Links user-sport: ${linkUserSport.length}`);
+            const {data: userSportLinks, error} = await insertUserSportLink(link);
+            if (error) {
+                writeError(error);
+            }
+
+            barUpdate(1, {action: 'Create links between sport and user'});
+            return userSportLinks[0];
+        }, {concurrency: 1});
+    }, {concurrency: 1});
+    const linkUserSport: ILinkUserSportModel[] = [].concat.apply([], linkUserSportNotFlatten as any); // tslint:disable-line
 
     // Exercise-template
     const exerciseTemplatesNotFlatten = await pMap(users, async (user) => {
-        return await pMap(new Array(intervalRandom(2, 5)).fill(true), async () => {
+        return await pMap(new Array(EXERCISE_TEMPLATES_PER_USER_COUNT).fill(true), async () => {
             const sportId = intervalRandom(sports[0].id!, sports[sports.length - 1].id!);
             const difficultyLevelId = intervalRandom(
                 difficultyLevels[0].id,
@@ -118,23 +161,41 @@ const clearDatabase = async () => {
                 sportId,
                 difficultyLevelId
             });
-            const {data: [template]} = await insertExerciseTemplate(newTemplate);
-            return template;
+            const {data: templates, error} = await insertExerciseTemplate(newTemplate);
+            if (error) {
+                writeError(error);
+            }
+
+            barUpdate(1, {action: 'Create exercise templates'});
+            return templates[0];
         }, {concurrency: 1});
     }, {concurrency: 1});
     const exerciseTemplates: IExerciseTemplateModel[] = [].concat.apply([], exerciseTemplatesNotFlatten as any);
-    log(`Exercise templates: ${exerciseTemplates.length}`);
 
     // Exercise
     const exercisesNotFlatten = await pMap(exerciseTemplates, async (template) => {
-        return await pMap(new Array(intervalRandom(2, 5)).fill(true), async () => {
+        return await pMap(new Array(EXERCISE_PER_TEMPLATE_COUNT).fill(true), async () => {
             const newExercise = generateExercise(template.id!);
-            const {data: [exercise]} = await insertExercise(newExercise);
-            return exercise;
+            const {data: exercises, error} = await insertExercise(newExercise);
+            if (error) {
+                writeError(error);
+            }
+
+            barUpdate(1, {action: 'Create exercises'});
+            return exercises[0];
         }, {concurrency: 1});
     }, {concurrency: 1});
-    const exercises: IExerciseModel[] = [].concat.apply([], exercisesNotFlatten as any);
-    log(`Exercises: ${exercises.length}`);
+    const exercises: IExerciseModel[] = [].concat.apply([], exercisesNotFlatten as any);  // tslint:disable-line
 
-    process.exit();
+    bar.stop();
+};
+
+(async () => {
+    try {
+        await run();
+    } catch (e) {
+        writeError(e);
+    } finally {
+        process.exit();
+    }
 })();

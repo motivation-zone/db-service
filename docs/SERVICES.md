@@ -4,4 +4,5 @@
 
 | URL | Using target |
 |---|---|
-| https://api.elephantsql.com | for database service |
+| https://www.elephantsql.com | for database service |
+| https://overload.yandex.net | for stress via tank |

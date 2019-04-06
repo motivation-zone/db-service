@@ -63,37 +63,90 @@ server.run:
 	$(NODE) $(OUT_DIR)/src/app.js
 
 # Tests
-.PHONY: test.func.fill
-test.func.fill:
+.PHONY: func-test.fill
+func-test.fill:
 	make build && \
-	export MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY} && \
-	export MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN} && \
-	export DEBUG=dbservice:tests && \
-	export NODE_PATH=$(OUT_DIR) && \
-	export TZ=$(TZ) && \
-	$(NODE) $(OUT_DIR)/tests/func/fill/index.js && \
+	export TEST_TYPE="functional" && \
+	make test.fill && \
 	make clean
 
-.PHONY: test.func
-test.func:
+.PHONY: func-test
+func-test:
 	make build && \
 	export MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY} && \
 	export MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN} && \
 	export DEBUG=dbservice:tests && \
 	export NODE_PATH=$(OUT_DIR) && \
 	export TZ=$(TZ) && \
-	$(NODE) $(OUT_DIR)/tests/func/fill/index.js && \
+	$(NODE) $(OUT_DIR)/tests/fill/index.js && \
 	$(MOCHA) $(OUT_DIR)/tests/**/*.test.js --exit && \
 	make clean
 
+.PHONY: test.fill
+test.fill:
+	export MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY} && \
+	export MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN} && \
+	export DEBUG=dbservice:tests && \
+	export NODE_PATH=$(OUT_DIR) && \
+	export TZ=$(TZ) && \
+	$(NODE) $(OUT_DIR)/tests/fill/index.js
+
+.PHONY: stress-test.fill
+stress-test.fill:
+	make build && \
+	export TEST_TYPE="stress" && \
+	make test.fill && \
+	make clean
+
+.PHONY: stress-test.docker.build
+stress-test.docker.build:
+	docker build -f Dockerfile.stress .
+
+.PHONY: stress-test.docker.fill
+stress-test.docker.fill:
+	export TEST_TYPE="stress" && \
+	make test.fill
+
+.PHONY: stress-test.tank.run
+stress-test.tank.run:
+	docker run \
+    	-v $(PWD):/var/loadtest \
+    	-v $(SSH_AUTH_SOCK):/ssh-agent \
+		-e SSH_AUTH_SOCK=/ssh-agent \
+    	--net host \
+    	-it \
+    	--entrypoint /bin/bash \
+    	direvius/yandex-tank
+
+.PHONY: stress-test.generate.ammo
+stress-test.generate.ammo:
+	$(TSNODE) -r tsconfig-paths/register tests/stress/ammo-generator.ts
+
+.PHONY: stress-test.get.ammo
+stress-test.get.ammo:
+	rm -rf tests/stress/ammo.txt
+	curl "localhost:5000/ammo.txt" >> tests/stress/ammo.txt
+
+.PHONY: stress-test.fire
+stress-test.fire:
+	yandex-tank -c tests/stress/config.yaml tests/stress/ammo.txt
+
+.PHONY: remote.fill
+remote.fill:
+	export IS_REMOTE=true && make test.func.fill
+
 # Tools
 .PHONY: api.doc
-make api.doc:
+api.doc:
 	$(TSNODE) -r tsconfig-paths/register tools/api-generator/generate.ts
 
 .PHONY: generate.token
-make generate.token:
+generate.token:
 	$(TSNODE) -r tsconfig-paths/register tools/generate-token.ts
+
+.PHONY: migration.concat
+migration.concat:
+	$(NODE) tools/database/pgsql-concat.js
 
 # Deployment
 PWD = $(shell pwd)
@@ -117,16 +170,28 @@ docker.push:
 docker.pull:
 	docker pull $(DOCKER_TAG)
 
-.PHONY: docker.run.local
-docker.run.local:
-	docker run -d -e "NODEJS_ENV=testing" \
-		--name $(DOCKER_NAME) \
+.PHONY: docker.run.dev
+docker.run.dev:
+	docker run -it \
+		-e "NODEJS_ENV=testing" \
+		-e "MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY}" \
+		-e "MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN}" \
 		-v $(PWD)/configs/db/db.yaml:/usr/local/app/configs/db/db.yaml \
 		-p 5000:80 $(image_id)
 
 .PHONY: docker.run.testing
 docker.run.testing:
-	docker run -d -e "NODEJS_ENV=testing" -e "MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY}" \
+	export NODEJS_ENV=testing && make docker.run
+
+.PHONY: docker.run.production
+docker.run.production:
+	export NODEJS_ENV=production && make docker.run
+
+.PHONY: docker.run
+docker.run:
+	docker run -d \
+		-e "NODEJS_ENV=$(NODEJS_ENV)" \
+		-e "MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY}" \
 		--name $(DOCKER_NAME) \
 		-v /usr/share/motivation-zone/db/db.yaml:/usr/local/app/configs/db/db.yaml \
 		-p 5000:80 $(image_id)

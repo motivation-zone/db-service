@@ -2,7 +2,7 @@
 
 export NGINX_PORT=80
 export NODEJS_PORT=8080
-export NODEJS_APP=${NODEJS_APP:-/usr/local/www/server/app.js}
+export NODEJS_APP=${NODEJS_APP:-/usr/local/app/build/src/app.js}
 export NODEJS_ENV=${NODEJS_ENV:-"development"}
 
 envsubst \

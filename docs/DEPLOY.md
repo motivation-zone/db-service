@@ -41,12 +41,27 @@ Push tagged image to the docker hub repository.
 Pull tagged image.
 ```
 
-### make docker.run.local
+### make docker.run.dev (NOT IN BACKGROUND)
 ```
-Command for running docker container on local machine.
+Command for running docker container in current terminal.
 ```
 
-### make docker.run.testing
+### make docker.run.testing (IN BACKGROUND)
 ```
-Command for running docker container on remote server in testing environment.
+Command for running docker container in detached mode with testing environment.
+```
+
+### make docker.run.production (IN BACKGROUND)
+```
+Command for running docker container in detached mode with  production environment.
+```
+
+### make deploy.testing
+```
+Deploy project on testing server
+```
+
+### make deploy.production
+```
+Deploy project on production server
 ```

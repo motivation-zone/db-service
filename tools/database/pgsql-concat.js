@@ -1,6 +1,7 @@
 const fs = require('fs');
 
-const RESULT_FILE = `${__dirname}/result.pgsql`;
+const ROOT_PATH = `${process.cwd()}/migration`;
+const RESULT_FILE = `${ROOT_PATH}/result.pgsql`;
 try {
     fs.unlinkSync(RESULT_FILE);
 } catch (e) {}
@@ -13,7 +14,8 @@ const fileNames = [
 ];
 
 fileNames.forEach((name) => {
-    const data = fs.readFileSync(`${__dirname}/${name}.pgsql`);
+    const data = fs.readFileSync(`${ROOT_PATH}/${name}.pgsql`);
     fs.appendFileSync(RESULT_FILE, data);
 });
 
+console.log(`\x1b[32m%s\x1b[0m`, 'Successfully concat');

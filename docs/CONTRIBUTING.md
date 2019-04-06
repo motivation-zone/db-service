@@ -41,9 +41,21 @@ make generate.token - generate token by key from env ${MZ_DB_SERVICE_PRIVATE_KEY
 # Test
 ## Functional
 ```
-make test.func - common command (fill && func)
-make test.func.fill - clear all public schemas and create it again -> fill db by faker data
+make func-test - common command (fill && func)
+make func-test.fill - clear all public schemas and create it again -> fill db by faker data
 ```
 
-## Load
+## Stress
+### Steps
+1. Build container: ```make docker.test.stress.build```
+2. Run container: ```make docker.run.dev```
+3. Get generated ammo: ```make stress-test.get.ammo```
+4. Run tanker: ```make stress-test.tank.run```
+5. Fire: ```make stress-test.fire```
 
+```
+make stress-test.fill - fill database in stress mode
+make stress-test.docker.build - command for build docker container for stress
+make stress-test.docker.fill - command for filling database in docker container for stress
+make stress-test - launch stress test
+```
