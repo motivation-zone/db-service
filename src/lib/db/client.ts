@@ -4,6 +4,7 @@ import yaml from 'yaml';
 import Boom from 'boom';
 
 import logger from 'src/lib/logger';
+import env from 'src/lib/env';
 import {getAbsolutePath} from 'src/utils/fs';
 import HttpResponse from 'src/utils/http/response';
 
@@ -40,6 +41,9 @@ export const query = async (queryData: IQuery): Promise<any[]> => {
     try {
         client = await pool.connect();
         data = await client.query(queryData);
+        if (env === 'stress') {
+            logger('info', 'db', JSON.stringify(data));
+        }
     } catch (e) {
         logger('error', 'db', e.message);
         HttpResponse.throwError(Boom.conflict, `${e.detail} ${e.message}`);

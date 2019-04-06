@@ -48,7 +48,7 @@ make func-test.fill - clear all public schemas and create it again -> fill db by
 ## Stress
 ### Steps
 1. Build container: ```make docker.test.stress.build```
-2. Run container: ```make docker.run.dev```
+2. Run container: ```make docker.run.stress```
 3. Get generated ammo: ```make stress-test.get.ammo```
 4. Run tanker: ```make stress-test.tank.run```
 5. Fire: ```make stress-test.fire```

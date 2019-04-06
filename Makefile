@@ -173,7 +173,7 @@ docker.pull:
 .PHONY: docker.run.dev
 docker.run.dev:
 	docker run -it \
-		-e "NODEJS_ENV=testing" \
+		-e "NODEJS_ENV=${NODEJS_ENV}" \
 		-e "MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY}" \
 		-e "MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN}" \
 		-v $(PWD)/configs/db/db.yaml:/usr/local/app/configs/db/db.yaml \
@@ -186,6 +186,10 @@ docker.run.testing:
 .PHONY: docker.run.production
 docker.run.production:
 	export NODEJS_ENV=production && make docker.run
+
+.PHONY: docker.run.stress
+docker.run.stress:
+	export NODEJS_ENV=stress && make docker.run.dev
 
 .PHONY: docker.run
 docker.run:

@@ -14,5 +14,5 @@ ammo.stpd
 ammo.stpd_si.json
 validation_error.yaml
 jobno_file.txt
-tank_errors.logs
-tank.logs
+tank_errors.log
+tank.log
