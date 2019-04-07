@@ -53,7 +53,7 @@ const writeError = (err: any) => {
     if (!(err instanceof Error)) {
         err = JSON.stringify(err);
     }
-    console.log(`\nERROR=${err}`); // tslint:disable-line
+    console.log(`\nERROR=${err}, ${err.stack}`); // tslint:disable-line
 };
 
 const concatMigrations = async () => {
@@ -167,10 +167,12 @@ const run = async () => {
             }
 
             barUpdate(1, {action: 'Create exercise templates'});
-            return templates[0];
+            return templates && templates[0];
         }, {concurrency: 1});
     }, {concurrency: 1});
-    const exerciseTemplates: IExerciseTemplateModel[] = [].concat.apply([], exerciseTemplatesNotFlatten as any);
+    const exerciseTemplates: IExerciseTemplateModel[] = []
+        .concat.apply([], exerciseTemplatesNotFlatten as any)
+        .filter(Boolean);
 
     // Exercise
     const exercisesNotFlatten = await pMap(exerciseTemplates, async (template) => {
@@ -182,10 +184,10 @@ const run = async () => {
             }
 
             barUpdate(1, {action: 'Create exercises'});
-            return exercises[0];
+            return exercises && exercises[0];
         }, {concurrency: 1});
     }, {concurrency: 1});
-    const exercises: IExerciseModel[] = [].concat.apply([], exercisesNotFlatten as any);  // tslint:disable-line
+    const exercises: IExerciseModel[] = [].concat.apply([], exercisesNotFlatten as any).filter(Boolean);  // tslint:disable-line
 
     bar.stop();
 };

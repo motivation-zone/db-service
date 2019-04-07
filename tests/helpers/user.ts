@@ -83,7 +83,7 @@ export const generateUser = (overrites: IUserModel = {}): IUserModel => {
         login: `${internet.userName()}_${finance.account()}`,
         name: name.findName(),
         password: internet.password(),
-        email: internet.email(),
+        email: `${finance.account()}-${internet.email()}`,
         selfInfo: lorem.text(),
         gender: random.boolean(),
         countryId: overrites.countryId,

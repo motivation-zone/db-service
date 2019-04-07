@@ -110,13 +110,15 @@ stress-test.docker.fill:
 .PHONY: stress-test.tank.run
 stress-test.tank.run:
 	docker run \
+		--memory=4G \
     	-v $(PWD):/var/loadtest \
     	-v $(SSH_AUTH_SOCK):/ssh-agent \
 		-e SSH_AUTH_SOCK=/ssh-agent \
     	--net host \
     	-it \
     	--entrypoint /bin/bash \
-    	direvius/yandex-tank
+    	direvius/yandex-tank \
+
 
 .PHONY: stress-test.generate.ammo
 stress-test.generate.ammo:
@@ -173,6 +175,8 @@ docker.pull:
 .PHONY: docker.run.dev
 docker.run.dev:
 	docker run -it \
+		--memory=${DOCKER_MEMORY} \
+		--cpus=${DOCKER_CPU} \
 		-e "NODEJS_ENV=${NODEJS_ENV}" \
 		-e "MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY}" \
 		-e "MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN}" \
@@ -189,7 +193,10 @@ docker.run.production:
 
 .PHONY: docker.run.stress
 docker.run.stress:
-	export NODEJS_ENV=stress && make docker.run.dev
+	export NODEJS_ENV=stress && \
+	export DOCKER_MEMORY=4G && \
+	export DOCKER_CPU=2 && \
+	make docker.run.dev
 
 .PHONY: docker.run
 docker.run:
