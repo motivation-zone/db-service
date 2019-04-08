@@ -33,6 +33,22 @@ const config = {
 const pool = new Pool(config);
 pool.on('error', dbErrorHandler);
 
+const queryMap = new Map<string, number>();
+const queryLog = ({text}: IQuery) => {
+    if (queryMap.get(text)) {
+        queryMap.set(text, queryMap.get(text)! + 1);
+        return;
+    }
+
+    queryMap.set(text, 1);
+};
+
+setInterval(() => {
+    const logPath = getAbsolutePath('./logs');
+    const data = `[${(new Date()).toISOString()}] ${JSON.stringify([...queryMap])}`;
+    fs.appendFile(`${logPath}/query.log`, data, () => {});
+}, 60 * 1000);
+
 export const query = async (queryData: IQuery): Promise<any[]> => {
     let client;
     let data: pg.QueryResult;
@@ -40,6 +56,7 @@ export const query = async (queryData: IQuery): Promise<any[]> => {
     try {
         client = await pool.connect();
         data = await client.query(queryData);
+        queryLog(queryData);
     } catch (e) {
         logger('error', 'db', e.message);
         HttpResponse.throwError(Boom.conflict, `${e.detail} ${e.message}`);
