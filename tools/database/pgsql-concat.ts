@@ -1,21 +1,25 @@
-const fs = require('fs');
+import fs from 'fs';
 
-const ROOT_PATH = `${process.cwd()}/migration`;
+import {getAbsolutePath} from '../../src/utils/fs';
+import consoleLogger from '../../src/lib/logger/console-logger';
+
+const ROOT_PATH = getAbsolutePath(`./migration`);
 const RESULT_FILE = `${ROOT_PATH}/result.pgsql`;
+
 try {
     fs.unlinkSync(RESULT_FILE);
 } catch (e) {}
 
-const fileNames = [
+const files = [
     'extensions',
     'training-type', 'country', 'sport', 'difficulty-level',
     'user', 'user-sport', 'exercise',
     'program', 'training', 'bought-program', 'user-program-saved'
 ];
 
-fileNames.forEach((name) => {
-    const data = fs.readFileSync(`${ROOT_PATH}/${name}.pgsql`);
+files.forEach((file) => {
+    const data = fs.readFileSync(`${ROOT_PATH}/${file}.pgsql`);
     fs.appendFileSync(RESULT_FILE, data);
 });
 
-console.log(`\x1b[32m%s\x1b[0m`, 'Successfully concat');
+consoleLogger.ok('Successfully concat');

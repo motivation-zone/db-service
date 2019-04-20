@@ -1,16 +1,14 @@
-import consoleLogger, {LevelType} from 'src/lib/logger/console-logger';
+import consoleLogger from 'src/lib/logger/console-logger';
 import fileLogger from 'src/lib/logger/file-logger';
 import env from 'src/lib/env';
-
-type LoggerType = 'app' | 'db';
 
 const formMessage = (type: LoggerType, msg: string) => {
     return `[${type}]: ${msg}`;
 };
 
-export default (level: LevelType, type: LoggerType, msg: string) => {
+export default (level: keyof ILogger, type: LoggerType, msg: string) => {
     const msgResult = formMessage(type, msg);
 
-    const f = env === 'development' ? consoleLogger : fileLogger;
+    const f = env === 'production' ? fileLogger : consoleLogger;
     (f as any)[level](msgResult);
 };

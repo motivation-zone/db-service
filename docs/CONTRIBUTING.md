@@ -53,6 +53,8 @@ make func-test.fill - clear all public schemas and create it again -> fill db by
 4. Run tanker: ```make stress-test.tank.run```
 5. Fire: ```make stress-test.fire```
 
+Get query-error log ```make stress-test.get.query-error```
+
 ```
 make stress-test.fill - fill database in stress mode
 make stress-test.docker.build - command for build docker container for stress

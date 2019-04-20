@@ -27,27 +27,23 @@ const config = {
     database: dbConfig.database,
     port: dbConfig.port,
     idleTimeoutMillis: 1000 * 60 * 2,
-    connectionTimeoutMillis: 2000
+    connectionTimeoutMillis: 3000
 };
 
 const pool = new Pool(config);
 pool.on('error', dbErrorHandler);
 
-const queryMap = new Map<string, number>();
-const queryLog = ({text}: IQuery) => {
-    if (queryMap.get(text)) {
-        queryMap.set(text, queryMap.get(text)! + 1);
-        return;
-    }
-
-    queryMap.set(text, 1);
-};
-
-setInterval(() => {
+const queryLog = (type: string, resultCount: number, {text, values}: IQuery) => {
     const logPath = getAbsolutePath('./logs');
-    const data = `[${(new Date()).toISOString()}] ${JSON.stringify([...queryMap])}`;
-    fs.appendFile(`${logPath}/query.log`, data, () => {});
-}, 60 * 1000);
+    const data = {
+        query: text.replace(/\s+/gmi, ' '),
+        values: values.join(', '),
+        type,
+        resultCount
+    };
+    const result = `${JSON.stringify(data)}\n`;
+    fs.appendFile(`${logPath}/db-query.log`, result, () => {});
+};
 
 export const query = async (queryData: IQuery): Promise<any[]> => {
     let client;
@@ -56,8 +52,9 @@ export const query = async (queryData: IQuery): Promise<any[]> => {
     try {
         client = await pool.connect();
         data = await client.query(queryData);
-        queryLog(queryData);
+        queryLog('ok', data && data.rows && data.rows.length, queryData);
     } catch (e) {
+        queryLog('error', 0, queryData);
         logger('error', 'db', e.message);
         HttpResponse.throwError(Boom.conflict, `${e.detail} ${e.message}`);
     } finally {

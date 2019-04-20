@@ -3,16 +3,12 @@ import {getAbsolutePath} from 'src/utils/fs';
 
 const {combine, timestamp, splat} = format;
 
-/**
- * File writing logger
- */
 const createLogger = (): winston.Logger => {
     const logFormat = format.printf((info) => {
         return `${info.timestamp} [${info.level}] ${info.message}`;
     });
 
     const logPath = getAbsolutePath('./logs');
-    const name = 'dbservice';
     return winston.createLogger({
         format: combine(
             splat(),
@@ -20,18 +16,12 @@ const createLogger = (): winston.Logger => {
             logFormat
         ),
         transports: [
-            new winston.transports.File({filename: `${logPath}/${name}.error.log`, level: 'error'}),
-            new winston.transports.File({filename: `${logPath}/${name}.tests.log`, level: 'info'}),
-            new winston.transports.File({filename: `${logPath}/${name}.log`, level: 'debug'})
+            new winston.transports.File({filename: `${logPath}/error.log`, level: 'error'}),
+            new winston.transports.File({filename: `${logPath}/warn.log`, level: 'warn'}),
+            new winston.transports.File({filename: `${logPath}/info.log`, level: 'info'})
         ]
     });
 };
-
-export interface ILogger {
-    error: (msg: string) => void;
-    info: (msg: string) => void;
-    tests: (msg: string) => void;
-}
 
 class FileLogger implements ILogger {
     private _logger: winston.Logger;
@@ -48,9 +38,11 @@ class FileLogger implements ILogger {
         this._logger.info(msg);
     }
 
-    tests(msg: string): void {
-        this._logger.debug(msg);
+    warn(msg: string): void {
+        this._logger.warn(msg);
     }
+
+    ok(): void {}
 }
 
 export default new FileLogger();

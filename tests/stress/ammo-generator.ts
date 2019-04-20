@@ -4,6 +4,7 @@ import {getAbsolutePath} from 'src/utils/fs';
 import {apiUrls} from 'src/urls';
 import {intervalRandom, formQueryString} from 'src/utils';
 import {IExerciseTemplateModel} from 'src/models/exercise-template';
+import consoleLogger from 'src/lib/logger/console-logger';
 
 import {dbActions as userDbActions} from 'tests/helpers/user';
 import {dbActions as sportDbActions} from 'tests/helpers/sport';
@@ -15,7 +16,7 @@ import {
     CREATED_USERS_COUNT,
     EXERCISE_TEMPLATES_PER_USER_COUNT,
     EXERCISE_PER_TEMPLATE_COUNT
-} from 'tests/const';
+} from 'tests/fill/const';
 
 const {getUsers} = userDbActions;
 const {getAllSports} = sportDbActions;
@@ -248,9 +249,9 @@ const generateExerciseSelect = async (): Promise<string[]> => {
             ...await generateExerciseSelect()
         ].join('\n'));
 
-        console.log('\x1b[32m%s\x1b[0m', 'Successfully generated'); // tslint:disable-line
+        consoleLogger.ok('Successfully generated');
     } catch (err) {
-        console.log(err); // tslint:disable-line
+        consoleLogger.error(err.message);
     } finally {
         process.exit();
     }

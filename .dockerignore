@@ -3,3 +3,7 @@
 /node_modules
 /configs/db/db.yaml
 /migration/result.pgsql
+
+/tests/stress/ammo.txt
+/tests/stress/tank-token.txt
+/tests/stress/query-errors.log

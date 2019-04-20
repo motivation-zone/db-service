@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 
 import {dbActions as difficultyLevelDbActions} from 'tests/helpers/difficulty-level';
-import {DIFFICULTY_LEVEL_COUNT} from 'tests/const';
+import {DIFFICULTY_LEVEL_COUNT} from 'tests/fill/const';
 
 const {getAllDifficultyLevels} = difficultyLevelDbActions;
 

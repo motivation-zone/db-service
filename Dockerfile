@@ -1,5 +1,5 @@
 FROM ubuntu:16.04
-LABEL maintainer="Denis Stepanov dondiego4697@mail.ru"
+LABEL maintainer="Denis Stepanov dondiego4697@yandex.ru"
 
 WORKDIR /usr/local/app
 ENV WORKDIR /usr/local/app
@@ -15,7 +15,7 @@ RUN apt-get install -fy nodejs
 RUN apt-get install -fy supervisor
 RUN apt-get install -fy sudo
 
-COPY package.json package-lock.json Makefile tsconfig.json ./
+COPY package.json package-lock.json Makefile Makefile.ts tsconfig.json ./
 RUN make deps
 COPY src ./src
 COPY configs ./configs

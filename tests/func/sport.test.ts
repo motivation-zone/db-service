@@ -2,7 +2,7 @@ import {expect} from 'chai';
 
 import {dbActions as sportDbActions} from 'tests/helpers/sport';
 import {dbActions as userDbActions, generateUser} from 'tests/helpers/user';
-import {SPORTS_COUNT} from 'tests/const';
+import {SPORTS_COUNT} from 'tests/fill/const';
 import {checkOrder} from 'tests/utils';
 import LinkUserSportModel from 'src/models/link/user-sport';
 

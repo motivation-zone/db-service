@@ -1,7 +1,6 @@
 import {readFileSync} from 'fs';
 import {exec} from 'child_process';
 import pMap from 'p-map';
-import cliProgress from 'cli-progress';
 
 import {dbActions as userDbActions, generateUser} from 'tests/helpers/user';
 import {dbActions as sportDbActions} from 'tests/helpers/sport';
@@ -16,15 +15,16 @@ import {
     EXERCISE_TEMPLATES_PER_USER_COUNT,
     EXERCISE_PER_TEMPLATE_COUNT,
     SPORTS_COUNT
-} from 'tests/const';
+} from 'tests/fill/const';
 
 import {query} from 'src/lib/db/client';
-import logger from 'src/lib/logger';
 import {getAbsolutePath} from 'src/utils/fs';
 import {intervalRandom} from 'src/utils';
 import {IExerciseModel} from 'src/models/exercise';
 import LinkUserSportModel, {ILinkUserSportModel} from 'src/models/link/user-sport';
 import {IExerciseTemplateModel} from 'src/models/exercise-template';
+import consoleLogger from 'src/lib/logger/console-logger';
+import ProgressBar from 'src/lib/logger/progress-bar';
 
 const {getAllCountries} = countryDbActions;
 const {getAllSports, insertUserSportLink} = sportDbActions;
@@ -33,36 +33,33 @@ const {insertExerciseTemplate} = exerciseTemplateDbActions;
 const {insertExercise} = exerciseDbActions;
 const {getAllDifficultyLevels} = difficultyLevelDbActions;
 
-const log = (msg: string) => logger('tests', 'app', msg);
-
-const bar = new cliProgress.Bar({
-    format: '[{bar}] {percentage}% | ETA: {eta}s | {value}/{total} | Action: {action}'
-}, cliProgress.Presets.shades_classic);
-
+const bar = new ProgressBar();
 const barTotal = CREATED_USERS_COUNT +
     CREATED_USERS_COUNT * EXERCISE_TEMPLATES_PER_USER_COUNT +
     CREATED_USERS_COUNT * EXERCISE_TEMPLATES_PER_USER_COUNT * EXERCISE_PER_TEMPLATE_COUNT +
     SPORTS_COUNT * CREATED_USERS_COUNT;
 let barCurrent = 0;
-const barUpdate = (diff: number, options: any) => {
+const barUpdate = (diff: number, action: string) => {
     barCurrent += diff;
-    bar.update(barCurrent, options);
+    bar.update(barCurrent, action);
 };
 
-const writeError = (err: any) => {
-    if (!(err instanceof Error)) {
-        err = JSON.stringify(err);
+const log = (msg: any) => {
+    if (!msg) {
+        return;
     }
-    console.log(`\nERROR=${err}, ${err.stack}`); // tslint:disable-line
+
+    if (msg instanceof Error) {
+        return consoleLogger.error(msg.message);
+    }
+
+    consoleLogger.info(JSON.stringify(msg));
 };
 
 const concatMigrations = async () => {
-    barUpdate(0, {
-        action: 'Concat migration'
-    });
+    barUpdate(0, 'Concat migration');
     await new Promise((resolve, reject) => {
-        const concatFile = getAbsolutePath('./tools/database/pgsql-concat.js');
-        exec(`node ${concatFile}`, (err) => {
+        exec('make tools-migration-concat', (err) => {
             if (err) {
                 reject(err);
             }
@@ -73,13 +70,7 @@ const concatMigrations = async () => {
 };
 
 const reloadPublicSchema = async () => {
-    if (process.env.IS_REMOTE === 'true') {
-        return;
-    }
-
-    barUpdate(0, {
-        action: 'Reload public schema'
-    });
+    barUpdate(0, 'Reload public schema');
     await query({
         text: 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;',
         values: []
@@ -87,9 +78,7 @@ const reloadPublicSchema = async () => {
 };
 
 const createTables = async () => {
-    barUpdate(0, {
-        action: 'Create tables'
-    });
+    barUpdate(0, 'Create tables');
     const resultFile = readFileSync(getAbsolutePath('./migration/result.pgsql')).toString();
     await query({
         text: resultFile,
@@ -108,7 +97,7 @@ const clearDatabase = async () => {
 };
 
 const run = async () => {
-    bar.start(barTotal, barCurrent);
+    bar.start(barTotal);
     await clearDatabase();
 
     const countsArray: boolean[] = [
@@ -116,20 +105,21 @@ const run = async () => {
         ...new Array(CREATED_USERS_COUNT / 2).fill(false)
     ];
 
-    const {data: countries} = await getAllCountries();
-    const {data: sports} = await getAllSports();
-    const {data: difficultyLevels} = await getAllDifficultyLevels();
+    const {data: countries, error: countriesError} = await getAllCountries();
+    log(countriesError);
+    const {data: sports, error: sportsError} = await getAllSports();
+    log(sportsError);
+    const {data: difficultyLevels, error: difficultyLevelsError} = await getAllDifficultyLevels();
+    log(difficultyLevelsError);
 
     // User
     const users = await pMap(countsArray, async (isCountryExist) => {
         const countryId = intervalRandom(countries[0].id, countries[countries.length - 1].id);
         const newUser = generateUser({countryId: isCountryExist ? countryId : undefined});
         const {data: users, error} = await insertUser(newUser);
-        if (error) {
-            writeError(error);
-        }
+        log(error);
 
-        barUpdate(1, {action: 'Create users'});
+        barUpdate(1, 'Create users');
         return users[0];
     }, {concurrency: 1});
 
@@ -138,11 +128,9 @@ const run = async () => {
         return await pMap(sports, async (sport) => {
             const link = new LinkUserSportModel({userId: user.id, sportId: sport.id});
             const {data: userSportLinks, error} = await insertUserSportLink(link);
-            if (error) {
-                writeError(error);
-            }
+            log(error);
 
-            barUpdate(1, {action: 'Create links between sport and user'});
+            barUpdate(1, 'Create links between sport and user');
             return userSportLinks[0];
         }, {concurrency: 1});
     }, {concurrency: 1});
@@ -162,11 +150,9 @@ const run = async () => {
                 difficultyLevelId
             });
             const {data: templates, error} = await insertExerciseTemplate(newTemplate);
-            if (error) {
-                writeError(error);
-            }
+            log(error);
 
-            barUpdate(1, {action: 'Create exercise templates'});
+            barUpdate(1, 'Create exercise templates');
             return templates && templates[0];
         }, {concurrency: 1});
     }, {concurrency: 1});
@@ -179,11 +165,9 @@ const run = async () => {
         return await pMap(new Array(EXERCISE_PER_TEMPLATE_COUNT).fill(true), async () => {
             const newExercise = generateExercise(template.id!);
             const {data: exercises, error} = await insertExercise(newExercise);
-            if (error) {
-                writeError(error);
-            }
+            log(error);
 
-            barUpdate(1, {action: 'Create exercises'});
+            barUpdate(1, 'Create exercises');
             return exercises && exercises[0];
         }, {concurrency: 1});
     }, {concurrency: 1});
@@ -195,8 +179,8 @@ const run = async () => {
 (async () => {
     try {
         await run();
-    } catch (e) {
-        writeError(e);
+    } catch (error) {
+        log(error);
     } finally {
         process.exit();
     }
