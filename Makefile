@@ -1,5 +1,5 @@
 TSNODE = node_modules/.bin/ts-node
-MAKEFILE = $(TSNODE) -r tsconfig-paths/register --files=true Makefile.ts $(1)
+MAKEFILE = $(TSNODE) -r tsconfig-paths/register --files=true Makefile.ts $(1) $(ARGS)
 
 # Build
 deps:
@@ -54,23 +54,20 @@ test-func:
 # test-stress:
 # 	$(call MAKEFILE,test-func)
 
-# test-stress__docker-build:
-# 	$(call MAKEFILE,test-stress__docker-build)
+test-stress__docker-build:
+	$(call MAKEFILE,test-stress__docker-build)
 
-# test-stress__tank-run:
-# 	$(call MAKEFILE,test-stress__tank-run)
+test-stress__tank-run:
+	$(call MAKEFILE,test-stress__tank-run)
 
-# test-stress__ammo-generate:
-# 	$(call MAKEFILE,test-stress__ammo-generate)
+test-stress__ammo-generate:
+	$(call MAKEFILE,test-stress__ammo-generate)
 
-# test-stress__get-ammo:
-# 	$(call MAKEFILE,test-stress__get-ammo)
+test-stress__dump:
+	$(call MAKEFILE,test-stress__dump)
 
-# test-stress__get-query-errors:
-# 	$(call MAKEFILE,test-stress__get-query-errors)
-
-# test-stress__fire:
-# 	$(call MAKEFILE,test-stress__fire)
+test-stress__get-query-logs:
+	$(call MAKEFILE,test-stress__get-query-logs)
 
 # Tools
 tools-generate-api-doc:
@@ -86,33 +83,33 @@ tools-migration-concat:
 docker-build:
 	$(call MAKEFILE,docker-build)
 
-# docker-login:
-# 	$(call MAKEFILE,docker-login)
+docker-login:
+	$(call MAKEFILE,docker-login)
 
-# docker-push:
-# 	$(call MAKEFILE,docker-push)
+docker-push:
+	$(call MAKEFILE,docker-push)
 
-# docker-pull:
-# 	$(call MAKEFILE,docker-pull)
+docker-pull:
+	$(call MAKEFILE,docker-pull)
 
-# docker-run:
-# 	$(call MAKEFILE,docker-run)
+docker-run:
+	$(call MAKEFILE,docker-run)
 
-# docker-run-dev:
-# 	$(call MAKEFILE,docker-run-dev)
+docker-run-dev:
+	$(call MAKEFILE,docker-run-dev)
 
-# docker-run-testing:
-# 	$(call MAKEFILE,docker-run-testing)
+docker-run-testing:
+	$(call MAKEFILE,docker-run-testing)
 
-# docker-run-production:
-# 	$(call MAKEFILE,docker-run-production)
+docker-run-production:
+	$(call MAKEFILE,docker-run-production)
 
-# docker-run-stress-dev:
-# 	$(call MAKEFILE,docker-run-stress-dev)
+docker-run-stress-dev:
+	$(call MAKEFILE,docker-run-stress-dev)
 
-# # Deployment
-# deploy-testing:
-# 	$(call MAKEFILE,deploy-testing)
+# Deployment
+deploy-testing:
+	$(call MAKEFILE,deploy-testing)
 
-# deploy-production:
-# 	$(call MAKEFILE,deploy-production)
+deploy-production:
+	$(call MAKEFILE,deploy-production)

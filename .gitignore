@@ -4,12 +4,13 @@
 /node_modules
 /build
 /logs
+/stress-logs
 /configs/db/db.yaml
 /migration/result.pgsql
 
 /tests/stress/ammo.txt
 /tests/stress/tank-token.txt
-/tests/stress/query-errors.log
+motivation_zone.bak
 
 # tank
 ammo.stpd

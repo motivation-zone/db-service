@@ -121,7 +121,7 @@ const run = async () => {
 
         barUpdate(1, 'Create users');
         return users[0];
-    }, {concurrency: 1});
+    }, {concurrency: 10});
 
     // Link user-sport
     const linkUserSportNotFlatten = await pMap(users, async (user) => {
@@ -132,7 +132,7 @@ const run = async () => {
 
             barUpdate(1, 'Create links between sport and user');
             return userSportLinks[0];
-        }, {concurrency: 1});
+        }, {concurrency: 10});
     }, {concurrency: 1});
     const linkUserSport: ILinkUserSportModel[] = [].concat.apply([], linkUserSportNotFlatten as any); // tslint:disable-line
 
@@ -154,7 +154,7 @@ const run = async () => {
 
             barUpdate(1, 'Create exercise templates');
             return templates && templates[0];
-        }, {concurrency: 1});
+        }, {concurrency: 10});
     }, {concurrency: 1});
     const exerciseTemplates: IExerciseTemplateModel[] = []
         .concat.apply([], exerciseTemplatesNotFlatten as any)
@@ -169,7 +169,7 @@ const run = async () => {
 
             barUpdate(1, 'Create exercises');
             return exercises && exercises[0];
-        }, {concurrency: 1});
+        }, {concurrency: 10});
     }, {concurrency: 1});
     const exercises: IExerciseModel[] = [].concat.apply([], exercisesNotFlatten as any).filter(Boolean);  // tslint:disable-line
 

@@ -2,7 +2,7 @@
 
 export NGINX_PORT=80
 export NODEJS_PORT=8080
-export NODEJS_APP=${NODEJS_APP:-/usr/local/app/build/src/app.js}
+export NODEJS_APP=/usr/local/app/build/src/app.js
 export NODEJS_ENV=${NODEJS_ENV:-"development"}
 
 envsubst \
@@ -28,7 +28,6 @@ sudo -u postgres psql -c '\x' -c "CREATE DATABASE template1 WITH owner=postgres 
 sudo -u postgres psql -c '\x' -c "UPDATE pg_database SET datistemplate=TRUE WHERE datname='template1'"
 sudo -u postgres psql -c '\x' -c "CREATE DATABASE motivation_zone WITH ENCODING 'UTF8' OWNER admin"
 sudo -u postgres psql -c '\x' -c "SET timezone='UTC';"
-make stress-test.docker.fill
-make stress-test.generate.ammo
+sudo -u postgres psql motivation_zone < /usr/local/app/motivation_zone.bak
 
 /usr/bin/supervisord

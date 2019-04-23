@@ -5,7 +5,7 @@ const {combine, timestamp, splat} = format;
 
 const createLogger = (): winston.Logger => {
     const logFormat = format.printf((info) => {
-        return `${info.timestamp} [${info.level}] ${info.message}`;
+        return `[${info.timestamp}] ${info.message}`;
     });
 
     const logPath = getAbsolutePath('./logs');

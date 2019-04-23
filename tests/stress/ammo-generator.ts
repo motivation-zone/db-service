@@ -50,7 +50,7 @@ const generateUserSelect = async (): Promise<string[]> => {
         const userLogin = Math.random() > 0.5 ?
             userLoginRow.slice(0, intervalRandom(1, userLoginRow.length - 1)) :
             userLoginRow;
-        result.push(`${urls.prefix}/${urls.getUserByLogin.replace(':login', userLogin)}?` +
+        result.push(`${urls.prefix}${urls.getUserByLogin.replace(':login', userLogin)}?` +
             `${Math.random() > 0.5 ? `strict=true` : ''}`
         );
     });

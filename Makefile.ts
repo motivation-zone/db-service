@@ -20,6 +20,7 @@ const TSNODE_ARGS = ['--files=true', '-r', 'tsconfig-paths/register'];
 const DOCKER_IMAGE_VERSION = JSON.parse(fs.readFileSync(getAbsolutePath('./package.json'), 'utf-8')).version;
 const DOCKER_HUB = 'motivationzone/dbservice'
 const DOCKER_TAG = `${DOCKER_HUB}:${DOCKER_IMAGE_VERSION}`;
+const DOCKER_TAG__STRESS = `${DOCKER_HUB}-stress:${DOCKER_IMAGE_VERSION}`
 const DOCKER_NAME = 'mz-db-service';
 
 interface ISimpleObject {
@@ -113,13 +114,22 @@ const MAKE_COMMANDS: ICommand = {
 			TEST_TYPE: 'functional'
 		})
 	},
-	'test-fill__stress': {
-		cmd: 'make',
-		args: ['test-fill'],
-		env: getEnv({
-			TEST_TYPE: 'stress'
-		})
-	},
+	'test-fill__stress': [
+		{
+			cmd: 'make',
+			args: ['test-fill'],
+			env: getEnv({
+				TEST_TYPE: 'stress'
+			})
+		},
+		{
+			cmd: 'make',
+			args: ['test-stress__ammo-generate'],
+			env: getEnv({
+				TEST_TYPE: 'stress'
+			})
+		}
+]	,
 	'test-func': [
 		{
 			cmd: 'make',
@@ -152,8 +162,8 @@ const MAKE_COMMANDS: ICommand = {
 		cmd: 'docker',
 		args: [
 			'build',
-			'-f',
-			getAbsolutePath('./Dockerfile.stress'),
+			'-t', DOCKER_TAG__STRESS,
+			'-f', getAbsolutePath('./Dockerfile.stress'),
 			'.'
 		],
 		env: {}
@@ -163,14 +173,14 @@ const MAKE_COMMANDS: ICommand = {
 		args: [
 			'run',
 			'-v', `${getAbsolutePath('./')}:/var/loadtest`,
-			'-v', `{env{SSH_AUTH_SOCK}}:/ssh-agent`,
+			'-v', `{e{SSH_AUTH_SOCK}}:/ssh-agent`,
 			'-e', 'SSH_AUTH_SOCK=/ssh-agent',
 			'--net', 'host',
 			'-it',
 			'--entrypoint', '/bin/bash',
 			'direvius/yandex-tank'
 		],
-		env: {}
+		env: getEnv()
 	},
 	'test-stress__ammo-generate': {
 		cmd: getBin('ts-node'),
@@ -180,35 +190,9 @@ const MAKE_COMMANDS: ICommand = {
 		],
 		env: {}
 	},
-	'test-stress__get-ammo': {
-		cmd: '',
-		args: [],
-		env: {}
-	},
-	'test-stress__get-query-errors': [
-		{
-			cmd: 'rm',
-			args: [
-				'-rf',
-				getAbsolutePath('./tests/stress/query-errors.log')
-			],
-			env: {}
-		},
-		{
-			cmd: 'curl',
-			args: [
-				`"localhost:5000/query-errors.log" >> ${getAbsolutePath('./tests/stress/query-errors.log')}`
-			],
-			env: {}
-		}
-	],
-	'test-stress__fire': {
-		cmd: 'yandex-tank',
-		args: [
-			'-c',
-			getAbsolutePath('./tests/stress/config.yaml'),
-			getAbsolutePath('./tests/stress/ammo.txt')
-		],
+	'test-stress__dump': {
+		cmd: 'pg_dump',
+		args: ['motivation_zone', '>', 'motivation_zone.bak'],
 		env: {}
 	},
 	'tools-generate-api-doc': {
@@ -241,7 +225,7 @@ const MAKE_COMMANDS: ICommand = {
 			...TSNODE_ARGS,
 			getAbsolutePath('./deploy/deploy-testing.ts')
 		],
-		env: {}
+		env: getEnv()
 	},
 	'deploy-production': {
 		cmd: getBin('ts-node'),
@@ -249,7 +233,7 @@ const MAKE_COMMANDS: ICommand = {
 			...TSNODE_ARGS,
 			getAbsolutePath('./tools/deploy-production.ts')
 		],
-		env: {}
+		env: getEnv()
 	},
 	'docker-build': {
 		cmd: 'docker',
@@ -264,8 +248,8 @@ const MAKE_COMMANDS: ICommand = {
 		cmd: 'docker',
 		args: [
 			'login',
-			'-u', '{env{MZ_DB_SERVICE_DOCKER_USER}}',
-			'-p', '{env{MZ_DB_SERVICE_DOCKER_PASS}}'
+			'-u', '{e{MZ_DB_SERVICE_DOCKER_USER}}',
+			'-p', '{e{MZ_DB_SERVICE_DOCKER_PASS}}'
 		],
 		env: getEnv()
 	},
@@ -279,33 +263,49 @@ const MAKE_COMMANDS: ICommand = {
 		args: ['pull', DOCKER_TAG],
 		env: {}
 	},
-	'docker-run': {
-		cmd: 'docker',
-		args: [
-			'run', '-d',
-			'-e', `"NODEJS_ENV={env{NODEJS_ENV}}"`,
-			'-e', `"MZ_DB_SERVICE_PRIVATE_KEY={env{MZ_DB_SERVICE_PRIVATE_KEY}}"`,
-			'--name', DOCKER_NAME,
-			'-v', '/usr/share/motivation-zone/db/db.yaml:/usr/local/app/configs/db/db.yaml',
-			'-p', '5000:80',
-			'{{image_id}}'
-		],
-		env: getEnv()
-	},
+	'docker-run': [
+		{
+			cmd: 'docker',
+			args: [
+				'rm', '-f',
+				`$(docker ps --filter "name=${DOCKER_NAME}" -q -a)`,
+				'||', 'true'
+			],
+			env: getEnv()
+		},
+		{
+			cmd: 'docker',
+			args: [
+				'run', '-d',
+				'-e', `"NODEJS_ENV={e{NODEJS_ENV}}"`,
+				'-e', `"MZ_DB_SERVICE_PRIVATE_KEY={e{MZ_DB_SERVICE_PRIVATE_KEY}}"`,
+				'--name', DOCKER_NAME,
+				'-v', '/usr/share/motivation-zone/db/db.yaml:/usr/local/app/configs/db/db.yaml',
+				'-p', '5000:80',
+				'{{image}}'
+			],
+			env: getEnv()
+		}
+	],
 	'docker-run-dev': {
 		cmd: 'docker',
 		args: [
 			'run', '-it',
-			'--memory={env{DOCKER_MEMORY}}',
-			'--cpus={env{DOCKER_CPU}}',
-			'-e', `"NODEJS_ENV={env{NODEJS_ENV}}"`,
-			'-e', `"MZ_DB_SERVICE_PRIVATE_KEY={env{MZ_DB_SERVICE_PRIVATE_KEY}}"`,
-			'-e', `"MZ_DB_SERVICE_TOKEN={env{MZ_DB_SERVICE_TOKEN}}"`,
+			'--memory={e{DOCKER_MEMORY}}',
+			'--cpus={e{DOCKER_CPU}}',
+			'-e', `"NODEJS_ENV={e{NODEJS_ENV}}"`,
+			'-e', `"MZ_DB_SERVICE_PRIVATE_KEY={e{MZ_DB_SERVICE_PRIVATE_KEY}}"`,
+			'-e', `"MZ_DB_SERVICE_TOKEN={e{MZ_DB_SERVICE_TOKEN}}"`,
 			'-v', `${getAbsolutePath('./configs/db/db.yaml')}:/usr/local/app/configs/db/db.yaml`,
+			'-v', `${getAbsolutePath('./stress-logs')}:/usr/local/app/logs`,
 			'-p', '5000:80',
-			'{{image_id}}'
+			'{{image}}'
 		],
-		env: getEnv()
+		env: getEnv({
+			NODEJS_ENV: 'development',
+			DOCKER_MEMORY: '4G',
+			DOCKER_CPU: '2'
+		})
 	},
 	'docker-run-testing': {
 		cmd: 'make',
@@ -326,8 +326,6 @@ const MAKE_COMMANDS: ICommand = {
 		args: ['docker-run-dev'],
 		env: getEnv({
 			NODEJS_ENV: 'stress',
-			DOCKER_MEMORY: '4G',
-			DOCKER_CPU: '2'
 		})
 	}
 };
@@ -354,7 +352,9 @@ const run = async (command: ICommandProperties): Promise<void> => {
 	});
 };
 
-const getCommands = (commandName: string, env: ISimpleObject): ICommandProperties[] => {
+const getCommands = (
+	commandName: string, commandArgs: Record<string, string>, env: ISimpleObject
+): ICommandProperties[] => {
 	const commandProps = MAKE_COMMANDS[commandName];
 	if (!commandProps) {
 		throw Error('Command wasn\'t found');
@@ -366,16 +366,42 @@ const getCommands = (commandName: string, env: ISimpleObject): ICommandPropertie
 		commandProps.env = Object.assign({}, commandProps.env, env);
 
 		if (commandProps.cmd === 'make') {
-			const commands = getCommands(commandProps.args[0], commandProps.env);
+			const commands = getCommands(commandProps.args[0], commandArgs, commandProps.env);
 			res.push(...commands);
 		} else {
 			res.push(commandProps);
 		}
 		return res;
-	}, [] as ICommandProperties[]);
+	}, [] as ICommandProperties[]).map((command) => {
+		command.args = command.args.map((arg) => {
+			// Take args from ARGS
+			Object.keys(commandArgs).forEach((key) => {
+				arg = arg.replace(`{{${key}}}`, commandArgs[key]);
+			});
 
-	// TODO в цикле заменить в каждой команде нужные поля из args и env
+			// Take env args from environment
+			Object.keys(command.env).forEach((key) => {
+				arg = arg.replace(`{e{${key}}}`, command.env[key]);
+			});
+			return arg;
+		});
+		return command;
+	});
+
 	return commands;
+};
+
+const parseCommandArgs = (args: string): Record<string, string> => {
+	if (!args) {
+		return {};
+	}
+
+	const pairs = args.split(',');
+	return pairs.reduce((res, pair) => {
+		const [key, value] = pair.split('=');
+		res[key] = value;
+		return res;
+	}, {} as Record<string, string>);
 };
 
 (async () => {
@@ -383,9 +409,10 @@ const getCommands = (commandName: string, env: ISimpleObject): ICommandPropertie
 
 	const args = process.argv.slice(2);
 	const commandName = args[0];
+	const commandArgs = parseCommandArgs(args[1]);
 
 	try {
-		const commands = getCommands(commandName, {});
+		const commands = getCommands(commandName, commandArgs, {});
 		for (let i = 0; i < commands.length; i++) {
 			const command = commands[i];
 			await run(command);

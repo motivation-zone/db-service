@@ -1,7 +1,5 @@
 import {terminal} from 'terminal-kit';
 
-import consoleLogger from 'src/lib/logger/console-logger';
-
 export default class ProgressBar {
     private _total: number;
     private _current: number;
@@ -60,12 +58,16 @@ export default class ProgressBar {
     }
 
     private _do() {
-        consoleLogger.info([
-            `${ProgressBar.getProgressBarTitle(` ${this._title!}`)}`,
+        const msg = [
+            `${ProgressBar.getProgressBarTitle(this._title!)}`,
             `[${ProgressBar.fillProgressBarLine(this._total, this._current)}]`,
             `${Math.trunc(this._current / this._total * 100)}%`,
             `${this._current}/${this._total}`
-        ].join(' '));
+        ].join(' ');
+
+        terminal.white(msg);
+        terminal.nextLine(1);
         terminal.previousLine(1);
+        terminal.hideCursor();
     }
 }

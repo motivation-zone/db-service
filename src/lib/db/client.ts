@@ -4,13 +4,9 @@ import yaml from 'yaml';
 import Boom from 'boom';
 
 import logger from 'src/lib/logger';
+import queryLogger from 'src/lib/logger/query-logger';
 import {getAbsolutePath} from 'src/utils/fs';
 import HttpResponse from 'src/utils/http/response';
-
-interface IQuery {
-    text: string;
-    values: any[];
-}
 
 const dbErrorHandler = (err: Error, _client: pg.PoolClient) => {
     logger('error', 'db', err.stack || '');
@@ -33,18 +29,6 @@ const config = {
 const pool = new Pool(config);
 pool.on('error', dbErrorHandler);
 
-const queryLog = (type: string, resultCount: number, {text, values}: IQuery) => {
-    const logPath = getAbsolutePath('./logs');
-    const data = {
-        query: text.replace(/\s+/gmi, ' '),
-        values: values.join(', '),
-        type,
-        resultCount
-    };
-    const result = `${JSON.stringify(data)}\n`;
-    fs.appendFile(`${logPath}/db-query.log`, result, () => {});
-};
-
 export const query = async (queryData: IQuery): Promise<any[]> => {
     let client;
     let data: pg.QueryResult;
@@ -52,9 +36,9 @@ export const query = async (queryData: IQuery): Promise<any[]> => {
     try {
         client = await pool.connect();
         data = await client.query(queryData);
-        queryLog('ok', data && data.rows && data.rows.length, queryData);
+        queryLogger.ok(data && data.rows && data.rows.length, queryData);
     } catch (e) {
-        queryLog('error', 0, queryData);
+        queryLogger.error(-1, queryData, e.message);
         logger('error', 'db', e.message);
         HttpResponse.throwError(Boom.conflict, `${e.detail} ${e.message}`);
     } finally {
