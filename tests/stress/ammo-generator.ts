@@ -36,7 +36,7 @@ const generateUserSelect = async (): Promise<string[]> => {
     const urls = apiUrls.user;
     const {data: users} = await getUsers({limit: CREATED_USERS_COUNT, skip: 0});
 
-    new Array(20).fill(true).forEach(() => {
+    new Array(100).fill(true).forEach(() => {
         result.push(`${urls.prefix}${urls.getUsers}?${formQueryString({
             limit: intervalRandom(Math.floor(CREATED_USERS_COUNT / 2), CREATED_USERS_COUNT),
             skip: intervalRandom(0, Math.round(CREATED_USERS_COUNT / 2)),
@@ -66,7 +66,7 @@ const generateSportSelect = async (): Promise<string[]> => {
 
     result.push(`${urls.prefix}${urls.getSports}`);
 
-    new Array(20).fill(true).forEach(() => {
+    new Array(100).fill(true).forEach(() => {
         const sportId = sports[intervalRandom(0, sports.length - 1)].id!;
         result.push(`${urls.prefix}${urls.getUsersBySport.replace(':sportId', String(sportId))}?` +
             `${formQueryString({
@@ -90,7 +90,7 @@ const generateCountrySelect = async (): Promise<string[]> => {
 
     result.push(`${urls.prefix}${urls.getCountries}`);
 
-    new Array(20).fill(true).forEach(() => {
+    new Array(100).fill(true).forEach(() => {
         const countryId = countries[intervalRandom(0, countries.length - 1)].id!;
         result.push(`${urls.prefix}${urls.getUsersByCountry.replace(':countryId', String(countryId))}?` +
             `${formQueryString({
@@ -227,7 +227,7 @@ const generateExerciseSelect = async (): Promise<string[]> => {
             })}`
         );
 
-        new Array(2).fill(true).forEach(() => {
+        new Array(10).fill(true).forEach(() => {
             const exerciseId = exercises[intervalRandom(0, exercises.length - 1)].id!;
             result.push(`${urls.prefix}${urls.getExerciseById.replace(':exerciseId', exerciseId)}`);
         });

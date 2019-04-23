@@ -2,5 +2,7 @@
 	"src/**/*.ts": "make lint-src",
 	"tools/**/*.ts": "make lint-tools",
 	"tests/**/*.ts": "make lint-tests",
+	"Makefile.ts": "make lint-src",
+	"deploy/**/*.ts": "make lint-src",
 	"*": "make test-func"
 }
