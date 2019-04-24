@@ -1,4 +1,4 @@
-import {spawn} from 'child_process';
+import {spawn, ChildProcess} from 'child_process';
 import fs from 'fs';
 import {terminal} from 'terminal-kit';
 
@@ -31,6 +31,7 @@ interface ICommandProperties {
 	cmd: string;
 	args: string[];
 	env: ISimpleObject;
+	background?: boolean;
 }
 
 interface ICommand {
@@ -117,24 +118,29 @@ const MAKE_COMMANDS: ICommand = {
 	'test-fill__stress': [
 		{
 			cmd: 'make',
+			args: ['server-dev'],
+			env: {},
+			background: true
+		},
+		{
+			cmd: 'make',
 			args: ['test-fill'],
 			env: getEnv({
 				TEST_TYPE: 'stress'
 			})
-		},
-		{
-			cmd: 'make',
-			args: ['test-stress__ammo-generate'],
-			env: getEnv({
-				TEST_TYPE: 'stress'
-			})
 		}
-]	,
+	],
 	'test-func': [
 		{
 			cmd: 'make',
 			args: ['build'],
 			env: {}
+		},
+		{
+			cmd: 'make',
+			args: ['server-run'],
+			env: {},
+			background: true
 		},
 		{
 			cmd: 'make',
@@ -182,14 +188,22 @@ const MAKE_COMMANDS: ICommand = {
 		],
 		env: getEnv()
 	},
-	'test-stress__ammo-generate': {
-		cmd: getBin('ts-node'),
-		args: [
-			...TSNODE_ARGS,
-			getAbsolutePath('./tests/stress/ammo-generator.ts')
-		],
-		env: {}
-	},
+	'test-stress__ammo-generate': [
+		{
+			cmd: 'make',
+			args: ['server-dev'],
+			env: {},
+			background: true
+		},
+		{
+			cmd: getBin('ts-node'),
+			args: [
+				...TSNODE_ARGS,
+				getAbsolutePath('./tests/stress/ammo-generator.ts')
+			],
+			env: {}
+		}
+	],
 	'test-stress__dump': {
 		cmd: 'pg_dump',
 		args: ['motivation_zone', '>', 'motivation_zone.bak'],
@@ -330,7 +344,7 @@ const MAKE_COMMANDS: ICommand = {
 	}
 };
 
-const run = async (command: ICommandProperties): Promise<void> => {
+const run = async (command: ICommandProperties, isBackground?: boolean): Promise<void> => {
 	const cmdName = `${command.cmd} ${command.args.join(' ').trim()}`;
 	consoleLogger.ok('Command start:');
 	consoleLogger.info(cmdName);
@@ -342,6 +356,10 @@ const run = async (command: ICommandProperties): Promise<void> => {
 			stdio: 'inherit'
 		});
 
+		if (isBackground) {
+			backgroundProcess.push(child);
+		}
+
 		child.on('close', (code) => {
 			const message = `Command end [${code}]:`;
 			const write = code !== 0 ? consoleLogger.error : consoleLogger.ok;
@@ -352,9 +370,15 @@ const run = async (command: ICommandProperties): Promise<void> => {
 	});
 };
 
-const getCommands = (
-	commandName: string, commandArgs: Record<string, string>, env: ISimpleObject
-): ICommandProperties[] => {
+interface IGetCommandsParams {
+	commandName: string;
+	commandArgs: Record<string, string>;
+	env: ISimpleObject;
+	background?: boolean;
+}
+
+const getCommands = (params: IGetCommandsParams): ICommandProperties[] => {
+	const {commandName, commandArgs, env, background} = params;
 	const commandProps = MAKE_COMMANDS[commandName];
 	if (!commandProps) {
 		throw Error('Command wasn\'t found');
@@ -364,9 +388,15 @@ const getCommands = (
 
 	const commands = commandsProps.reduce((res, commandProps) => {
 		commandProps.env = Object.assign({}, commandProps.env, env);
+		commandProps.background = background || commandProps.background;
 
 		if (commandProps.cmd === 'make') {
-			const commands = getCommands(commandProps.args[0], commandArgs, commandProps.env);
+			const commands = getCommands({
+				commandName: commandProps.args[0],
+				commandArgs,
+				env: commandProps.env,
+				background: commandProps.background
+			});
 			res.push(...commands);
 		} else {
 			res.push(commandProps);
@@ -404,6 +434,7 @@ const parseCommandArgs = (args: string): Record<string, string> => {
 	}, {} as Record<string, string>);
 };
 
+const backgroundProcess: ChildProcess[] = [];
 (async () => {
 	terminal.clear();
 
@@ -412,15 +443,17 @@ const parseCommandArgs = (args: string): Record<string, string> => {
 	const commandArgs = parseCommandArgs(args[1]);
 
 	try {
-		const commands = getCommands(commandName, commandArgs, {});
+		const commands = getCommands({commandName, commandArgs, env: {}});
 		for (let i = 0; i < commands.length; i++) {
 			const command = commands[i];
-			await run(command);
+			command.background ? run(command, true) : await run(command);
 		}
 	} catch (err) {
 		consoleLogger.error(err);
 	}
 
 	consoleLogger.info('\n\n')
+
+	backgroundProcess.forEach((child) => child.kill('SIGINT'));
 	process.exit();
 })();

@@ -50,7 +50,7 @@ const log = (msg: any) => {
     }
 
     if (msg instanceof Error) {
-        return consoleLogger.error(msg.message);
+        return consoleLogger.error(`Name: ${msg.message}\n${msg.stack}`);
     }
 
     consoleLogger.info(JSON.stringify(msg));
@@ -96,6 +96,8 @@ const clearDatabase = async () => {
     }
 };
 
+const CONCURRENCY = 5;
+
 const run = async () => {
     bar.start(barTotal);
     await clearDatabase();
@@ -113,28 +115,29 @@ const run = async () => {
     log(difficultyLevelsError);
 
     // User
-    const users = await pMap(countsArray, async (isCountryExist) => {
+    const usersRow = await pMap(countsArray, async (isCountryExist) => {
         const countryId = intervalRandom(countries[0].id, countries[countries.length - 1].id);
         const newUser = generateUser({countryId: isCountryExist ? countryId : undefined});
         const {data: users, error} = await insertUser(newUser);
         log(error);
 
         barUpdate(1, 'Create users');
-        return users[0];
-    }, {concurrency: 10});
+        return users && users[0];
+    }, {concurrency: CONCURRENCY});
+    const users = usersRow.filter(Boolean);
 
     // Link user-sport
     const linkUserSportNotFlatten = await pMap(users, async (user) => {
         return await pMap(sports, async (sport) => {
-            const link = new LinkUserSportModel({userId: user.id, sportId: sport.id});
+            const link = new LinkUserSportModel({userId: user!.id, sportId: sport.id});
             const {data: userSportLinks, error} = await insertUserSportLink(link);
             log(error);
-
             barUpdate(1, 'Create links between sport and user');
-            return userSportLinks[0];
-        }, {concurrency: 10});
+            return userSportLinks && userSportLinks[0];
+        }, {concurrency: CONCURRENCY});
     }, {concurrency: 1});
-    const linkUserSport: ILinkUserSportModel[] = [].concat.apply([], linkUserSportNotFlatten as any); // tslint:disable-line
+    const linkUserSport: ILinkUserSportModel[] = // tslint:disable-line
+        [].concat.apply([], linkUserSportNotFlatten as any).filter(Boolean);
 
     // Exercise-template
     const exerciseTemplatesNotFlatten = await pMap(users, async (user) => {
@@ -145,7 +148,7 @@ const run = async () => {
                 difficultyLevels[difficultyLevels.length - 1].id
             );
             const newTemplate = generateExerciseTemplate({
-                userId: user.id!,
+                userId: user!.id!,
                 sportId,
                 difficultyLevelId
             });
@@ -154,7 +157,7 @@ const run = async () => {
 
             barUpdate(1, 'Create exercise templates');
             return templates && templates[0];
-        }, {concurrency: 10});
+        }, {concurrency: CONCURRENCY});
     }, {concurrency: 1});
     const exerciseTemplates: IExerciseTemplateModel[] = []
         .concat.apply([], exerciseTemplatesNotFlatten as any)
@@ -169,9 +172,11 @@ const run = async () => {
 
             barUpdate(1, 'Create exercises');
             return exercises && exercises[0];
-        }, {concurrency: 10});
+        }, {concurrency: CONCURRENCY});
     }, {concurrency: 1});
-    const exercises: IExerciseModel[] = [].concat.apply([], exercisesNotFlatten as any).filter(Boolean);  // tslint:disable-line
+    const exercises: IExerciseModel[] =[] // tslint:disable-line
+        .concat.apply([], exercisesNotFlatten as any)
+        .filter(Boolean);
 
     bar.stop();
 };

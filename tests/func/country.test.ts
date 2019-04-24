@@ -63,6 +63,7 @@ describe('Country:', () => {
                 countryId: checkUser.countryId!,
                 limitParams: {}
             });
+
             expect(status).to.equal(400);
         });
     });

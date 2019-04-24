@@ -53,10 +53,11 @@ For launch stress testing you should execute next commands one by one
 
 ### Steps
 #### Preparing
-1. Fill local database & create ammo file for tank: ```make test-fill__stress```
-2. Make dump of database: ```make test-stress__dump```
-3. You must get tank token from yandex.tank service [SERVICES.md](./SERVICES.md) >> */tests/stress/tank-token.txt*
-4. For configuring tank you can edit */tests/stress/config.yaml* config
+1. Fill local database: ```make test-fill__stress```
+2. Create ammo file for tank: ```make test-stress__ammo-generate```
+3. Make dump of database: ```make test-stress__dump```
+4. You must get tank token from yandex.tank service [SERVICES.md](./SERVICES.md) >> */tests/stress/tank-token.txt*
+5. For configuring tank you can edit */tests/stress/config.yaml* config
 
 #### Launching
 1. Build container: ```make test-stress__docker-build```

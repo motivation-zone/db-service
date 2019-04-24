@@ -32,7 +32,6 @@
             "node",
             "chai",
             "mocha",
-            "supertest",
             "express"
         ],
         "typeRoots": [
