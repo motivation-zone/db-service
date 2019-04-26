@@ -32,7 +32,6 @@
             "node",
             "chai",
             "mocha",
-            "supertest",
             "express"
         ],
         "typeRoots": [
@@ -45,5 +44,6 @@
         "@types/**/*",
         "tests/**/*",
         "tools/**/*",
+        "Makefile.ts"
     ]
 }

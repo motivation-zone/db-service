@@ -7,11 +7,6 @@ import logger from 'src/lib/logger';
 import {getAbsolutePath} from 'src/utils/fs';
 import HttpResponse from 'src/utils/http/response';
 
-interface IQuery {
-    text: string;
-    values: any[];
-}
-
 const dbErrorHandler = (err: Error, _client: pg.PoolClient) => {
     logger('error', 'db', err.stack || '');
 };
@@ -35,7 +30,7 @@ pool.on('error', dbErrorHandler);
 
 export const query = async (queryData: IQuery): Promise<any[]> => {
     let client;
-    let data;
+    let data: pg.QueryResult;
 
     try {
         client = await pool.connect();
@@ -48,7 +43,8 @@ export const query = async (queryData: IQuery): Promise<any[]> => {
             client.release();
         }
     }
-    return data && data.rows || [];
+
+    return data! && data!.rows || [];
 };
 
 export const forceCloseConnection = async () => {

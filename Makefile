@@ -1,140 +1,115 @@
-OUT_DIR := build
-NODE ?= node
-NPM ?= npm
-
-BUILD = node_modules/.bin/tsc $(1)
-MOCHA = node_modules/.bin/mocha
-TSLINT = node_modules/.bin/tslint
-LINT_STAGED = node_modules/.bin/lint-staged
-NODEMON = node_modules/.bin/nodemon
 TSNODE = node_modules/.bin/ts-node
-
-DEBUG = dbservice:*
-TZ = UTC
+MAKEFILE = $(TSNODE) -r tsconfig-paths/register --files=true Makefile.ts $(1) $(ARGS)
 
 # Build
-.PHONY: deps
 deps:
-	$(NPM) install
+	npm install
 
-.PHONY: prune
 prune:
-	$(NPM) prune --production
+	$(call MAKEFILE,prune)
 
 .PHONY: build
 build:
-	$(call BUILD)
+	$(call MAKEFILE,build)
 
-.PHONY: build.watch
-build.watch:
-	$(call BUILD,--watch)
+build-watch:
+	$(call MAKEFILE,build-watch)
 
-.PHONY: clean
-clean:
-	rm -rf $(OUT_DIR)
+clean-build:
+	$(call MAKEFILE,clean-build)
 
 # Linting
-.PHONY: lint.staged
-lint.staged:
-	$(LINT_STAGED) -c .lintstagedrc.json
+lint-staged:
+	$(call MAKEFILE,lint-staged)
 
-.PHONY: lint.src
-lint.src:
-	$(TSLINT) -c tslint.json 'src/**/*.ts'
+lint-src:
+	$(call MAKEFILE,lint-src)
 
-.PHONY: lint.tools
-lint.tools:
-	$(TSLINT) -c tslint.json 'tools/**/*.ts'
+lint-tools:
+	$(call MAKEFILE,lint-tools)
 
-.PHONY: lint.tests
-lint.tests:
-	$(TSLINT) -c tslint.tests.json 'tests/**/*.ts'
+lint-tests:
+	$(call MAKEFILE,lint-tests)
 
 # Server
-.PHONY: server.dev
-server.dev:
-	$(NODEMON) --exec "export DEBUG=$(DEBUG) && $(TSNODE) -r tsconfig-paths/register src/app.ts" -w src -w configs -e "ts"
+server-dev:
+	$(call MAKEFILE,server-dev)
 
-.PHONY: server.run
-server.run:
-	DEBUG=$(DEBUG) \
-	NODE_PATH=$(OUT_DIR) \
-	TZ=$(TZ) \
-	$(NODE) $(OUT_DIR)/src/app.js
+server-run:
+	$(call MAKEFILE,server-run)
 
 # Tests
-.PHONY: test.func.fill
-test.func.fill:
-	make build && \
-	export MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY} && \
-	export MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN} && \
-	export DEBUG=dbservice:tests && \
-	export NODE_PATH=$(OUT_DIR) && \
-	export TZ=$(TZ) && \
-	$(NODE) $(OUT_DIR)/tests/func/fill/index.js && \
-	make clean
+test-fill:
+	$(call MAKEFILE,test-fill)
 
-.PHONY: test.func
-test.func:
-	make build && \
-	export MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY} && \
-	export MZ_DB_SERVICE_TOKEN=${MZ_DB_SERVICE_TOKEN} && \
-	export DEBUG=dbservice:tests && \
-	export NODE_PATH=$(OUT_DIR) && \
-	export TZ=$(TZ) && \
-	$(NODE) $(OUT_DIR)/tests/func/fill/index.js && \
-	$(MOCHA) $(OUT_DIR)/tests/**/*.test.js --exit && \
-	make clean
+test-fill__func:
+	$(call MAKEFILE,test-fill__func)
+
+test-fill__stress:
+	$(call MAKEFILE,test-fill__stress)
+
+test-func:
+	$(call MAKEFILE,test-func)
+
+# test-stress:
+# 	$(call MAKEFILE,test-func)
+
+test-stress__docker-build:
+	$(call MAKEFILE,test-stress__docker-build)
+
+test-stress__tank-run:
+	$(call MAKEFILE,test-stress__tank-run)
+
+test-stress__ammo-generate:
+	$(call MAKEFILE,test-stress__ammo-generate)
+
+test-stress__dump:
+	$(call MAKEFILE,test-stress__dump)
+
+test-stress__get-query-logs:
+	$(call MAKEFILE,test-stress__get-query-logs)
 
 # Tools
-.PHONY: api.doc
-make api.doc:
-	$(TSNODE) -r tsconfig-paths/register tools/api-generator/generate.ts
+tools-generate-api-doc:
+	$(call MAKEFILE,tools-generate-api-doc)
 
-.PHONY: generate.token
-make generate.token:
-	$(TSNODE) -r tsconfig-paths/register tools/generate-token.ts
+tools-generate-token:
+	$(call MAKEFILE,tools-generate-token)
+
+tools-migration-concat:
+	$(call MAKEFILE,tools-migration-concat)
+
+# Docker
+docker-build:
+	$(call MAKEFILE,docker-build)
+
+docker-login:
+	$(call MAKEFILE,docker-login)
+
+docker-push:
+	$(call MAKEFILE,docker-push)
+
+docker-pull:
+	$(call MAKEFILE,docker-pull)
+
+docker-run:
+	$(call MAKEFILE,docker-run)
+
+docker-run-dev:
+	$(call MAKEFILE,docker-run-dev)
+
+docker-run-testing:
+	$(call MAKEFILE,docker-run-testing)
+
+docker-run-production:
+	$(call MAKEFILE,docker-run-production)
+
+docker-run-stress-dev:
+	$(call MAKEFILE,docker-run-stress-dev)
 
 # Deployment
-PWD = $(shell pwd)
-VERSION := $(shell cat ./package.json | python -c "import json,sys;obj=json.load(sys.stdin);print obj['version'];")
-DOCKER_HUB := motivationzone/dbservice
-DOCKER_TAG := $(DOCKER_HUB):$(VERSION)
-DOCKER_NAME := mz-db-service
-.PHONY: docker.build
-docker.build:
-	docker build -t $(DOCKER_TAG) .
+deploy-testing:
+	$(call MAKEFILE,deploy-testing)
 
-.PHONY: docker.login
-docker.login:
-	docker login -u $(MZ_DB_SERVICE_DOCKER_USER) -p $(MZ_DB_SERVICE_DOCKER_PASS)
-
-.PHONY: docker.push
-docker.push:
-	docker push $(DOCKER_TAG)
-
-.PHONY: docker.pull
-docker.pull:
-	docker pull $(DOCKER_TAG)
-
-.PHONY: docker.run.local
-docker.run.local:
-	docker run -d -e "NODEJS_ENV=testing" \
-		--name $(DOCKER_NAME) \
-		-v $(PWD)/configs/db/db.yaml:/usr/local/app/configs/db/db.yaml \
-		-p 5000:80 $(image_id)
-
-.PHONY: docker.run.testing
-docker.run.testing:
-	docker run -d -e "NODEJS_ENV=testing" -e "MZ_DB_SERVICE_PRIVATE_KEY=${MZ_DB_SERVICE_PRIVATE_KEY}" \
-		--name $(DOCKER_NAME) \
-		-v /usr/share/motivation-zone/db/db.yaml:/usr/local/app/configs/db/db.yaml \
-		-p 5000:80 $(image_id)
-
-.PHONY: deploy.testing
-deploy.testing:
-	$(NODE) deploy/deploy-testing.js
-
-.PHONY: deploy.production
-deploy.production:
-	$(NODE) deploy/deploy-production.js
+deploy-production:
+	$(call MAKEFILE,deploy-production)

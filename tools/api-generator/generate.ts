@@ -3,6 +3,7 @@ import json2yaml from 'json2yaml';
 
 import {getAbsolutePath} from 'src/utils/fs';
 import jsdocParser, {IController, IModel} from 'tools/api-generator/jsdoc-parser';
+import consoleLogger from 'src/lib/logger/console-logger';
 
 const APP_VERSION = JSON.parse(fs.readFileSync(getAbsolutePath('./package.json'), 'utf-8')).version;
 const filePath = getAbsolutePath(`./docs/swagger`);
@@ -97,4 +98,6 @@ const build = (controllers: IController[], models: IModel[]): any => {
 
     const yaml = json2yaml.stringify(result);
     fs.appendFileSync(ymlPath, yaml);
+
+    consoleLogger.ok('Successfully generated');
 })();

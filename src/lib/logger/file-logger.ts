@@ -1,37 +1,49 @@
 import winston, {format} from 'winston';
+import WinstonDailyRotateFile from 'winston-daily-rotate-file';
 import {getAbsolutePath} from 'src/utils/fs';
 
 const {combine, timestamp, splat} = format;
 
-/**
- * File writing logger
- */
 const createLogger = (): winston.Logger => {
+    const levels = {
+        error: 0,
+        warn: 1,
+        info: 2,
+        verbose: 3,
+        debug: 4,
+        silly: 5
+    };
     const logFormat = format.printf((info) => {
-        return `${info.timestamp} [${info.level}] ${info.message}`;
+        return `[${info.timestamp}] ${info.message}`;
     });
 
     const logPath = getAbsolutePath('./logs');
-    const name = 'dbservice';
     return winston.createLogger({
+        levels,
         format: combine(
             splat(),
             timestamp(),
             logFormat
         ),
         transports: [
-            new winston.transports.File({filename: `${logPath}/${name}.error.log`, level: 'error'}),
-            new winston.transports.File({filename: `${logPath}/${name}.tests.log`, level: 'info'}),
-            new winston.transports.File({filename: `${logPath}/${name}.log`, level: 'emerg'})
+            new WinstonDailyRotateFile({
+                datePattern: 'YYYY-MM-DD-HH',
+                filename: `${logPath}/error.log`,
+                level: 'error'
+            }),
+            new WinstonDailyRotateFile({
+                datePattern: 'YYYY-MM-DD-HH',
+                filename: `${logPath}/info.log`,
+                level: 'info'
+            }),
+            new WinstonDailyRotateFile({
+                datePattern: 'YYYY-MM-DD-HH',
+                filename: `${logPath}/warn.log`,
+                level: 'warn'
+            })
         ]
     });
 };
-
-export interface ILogger {
-    error: (msg: string) => void;
-    info: (msg: string) => void;
-    tests: (msg: string) => void;
-}
 
 class FileLogger implements ILogger {
     private _logger: winston.Logger;
@@ -48,9 +60,11 @@ class FileLogger implements ILogger {
         this._logger.info(msg);
     }
 
-    tests(msg: string): void {
-        this._logger.emerg(msg);
+    warn(msg: string): void {
+        this._logger.warn(msg);
     }
+
+    ok(): void {}
 }
 
 export default new FileLogger();

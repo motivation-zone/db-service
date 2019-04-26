@@ -1,20 +1,26 @@
-import debug from 'debug';
+import {terminal} from 'terminal-kit';
 
-export type LevelType = 'error' | 'info' | 'tests';
-
-export interface IDebugTarget {
-    error: (msg: string) => void;
-    info: (msg: string) => void;
-    tests: (msg: string) => void;
-}
-
-/**
- * Console debug logger
- */
-const proxy = new Proxy<IDebugTarget>({} as IDebugTarget, {
-    get(target: IDebugTarget, prop: LevelType): Function {
-        return prop in target ? target[prop] : target[prop] = debug(`dbservice:${prop}`);
+const proxy: ILogger = {
+    info: (msg: string) => {
+        terminal.nextLine(1);
+        terminal.white(msg);
+        terminal.nextLine(1);
+    },
+    warn: (msg: string) => {
+        terminal.nextLine(1);
+        terminal.yellow(msg);
+        terminal.nextLine(1);
+    },
+    error: (msg: string) => {
+        terminal.nextLine(1);
+        terminal.red(msg);
+        terminal.nextLine(1);
+    },
+    ok: (msg: string) => {
+        terminal.nextLine(1);
+        terminal.green(msg);
+        terminal.nextLine(1);
     }
-});
+};
 
 export default proxy;

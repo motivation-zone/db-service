@@ -4,5 +4,18 @@
 /node_modules
 /build
 /logs
+/dev-logs
 /configs/db/db.yaml
 /migration/result.pgsql
+
+/tests/stress/ammo.txt
+/tests/stress/tank-token.txt
+motivation_zone.bak
+
+# tank
+ammo.stpd
+ammo.stpd_si.json
+validation_error.yaml
+jobno_file.txt
+tank_errors.log
+tank.log

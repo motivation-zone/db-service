@@ -16,3 +16,5 @@ CREATE TABLE IF NOT EXISTS users (
   phone TEXT,
   registered_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
+
+CREATE INDEX index_user__login ON users (login);

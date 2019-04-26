@@ -80,7 +80,11 @@ export const generateExercise = (templateId: string): IExerciseModel => {
 
     return new ExerciseModel({
         exerciseTemplateId: templateId,
-        value: random.number(),
+        value: Number(String(
+            (random.number() + random.number()) *
+            random.number() *
+            random.number() - random.number()
+        ).slice(0, 8)),
         type: types[intervalRandom(0, types.length - 1)]
     });
 };

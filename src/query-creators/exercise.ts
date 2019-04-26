@@ -28,18 +28,18 @@ export const updateExercise = (fields: string[]) => updateQuery(fields, 'exercis
 export const getExerciseById = () => {
     return `
         SELECT ${EXERCISE_RETURNING_FIELDS} FROM exercise
-        INNER JOIN exercise_template ON exercise.exercise_template_id = exercise_template.id
-        WHERE exercise.exercise_template_id = exercise_template.id AND exercise.id = $1
+        INNER JOIN exercise_template ON exercise.exercise_template_id=exercise_template.id
+        WHERE exercise.exercise_template_id=exercise_template.id AND exercise.id=$1
     `;
 };
 
 export const getUserExercises = (order: OrderType, whereText: string | null) => {
     return `
         SELECT ${EXERCISE_RETURNING_FIELDS} FROM exercise
-        INNER JOIN exercise_template ON exercise.exercise_template_id = exercise_template.id
-        WHERE exercise_template.user_id = $1 ${whereText && `AND ${whereText}` || ''}
+        INNER JOIN exercise_template ON exercise.exercise_template_id=exercise_template.id
+        WHERE exercise_template.user_id=$1 ${whereText && `AND ${whereText}` || ''}
         ORDER BY exercise.created_date ${order} LIMIT $2 OFFSET $3
     `;
 };
 
-export const deleteExercise = () => 'DELETE FROM exercise WHERE id = $1 RETURNING *';
+export const deleteExercise = () => 'DELETE FROM exercise WHERE id=$1 RETURNING *';

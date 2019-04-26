@@ -2,7 +2,7 @@ import {expect} from 'chai';
 
 import {dbActions as countryDbActions} from 'tests/helpers/country';
 import {dbActions as userDbActions} from 'tests/helpers/user';
-import {COUNTRIES_COUNT} from 'tests/const';
+import {COUNTRIES_COUNT} from 'tests/fill/const';
 import {checkOrder} from 'tests/utils';
 
 const {getAllCountries, getUsersByCountry} = countryDbActions;
@@ -63,6 +63,7 @@ describe('Country:', () => {
                 countryId: checkUser.countryId!,
                 limitParams: {}
             });
+
             expect(status).to.equal(400);
         });
     });

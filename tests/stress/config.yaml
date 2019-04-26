@@ -1,0 +1,25 @@
+overload:
+  enabled: true
+  package: yandextank.plugins.DataUploader
+  token_file: './tests/stress/tank-token.txt'
+phantom:
+  address: 127.0.0.1:5000
+  load_profile:
+    load_type: rps
+    schedule: line(1, 1000, 5m) # const(400, 3m)
+  ammo_type: uri
+console:
+  enabled: true
+telegraf:
+  enabled: false
+autostop:
+  autostop:
+    # - quantile(80,200,5s)
+    - http(4xx,20%,5)
+    # - http(5xx,3%,4)
+    # - net(1xx,10,3)
+    # - net(104,10,5)
+    # - net(43,10,5)
+    # - net(110,10,5)
+rcheck:
+  mem_limit: 100
