@@ -305,19 +305,20 @@ const MAKE_COMMANDS: ICommand = {
 		cmd: 'docker',
 		args: [
 			'run', '-it',
-			'--memory={e{DOCKER_MEMORY}}',
-			'--cpus={e{DOCKER_CPU}}',
+			'-m {e{DOCKER_MEMORY}}',
+			'--cpus="{e{DOCKER_CPU}}"',
 			'-e', `"NODEJS_ENV={e{NODEJS_ENV}}"`,
 			'-e', `"MZ_DB_SERVICE_PRIVATE_KEY={e{MZ_DB_SERVICE_PRIVATE_KEY}}"`,
 			'-e', `"MZ_DB_SERVICE_TOKEN={e{MZ_DB_SERVICE_TOKEN}}"`,
 			'-v', `${getAbsolutePath('./configs/db/db.yaml')}:/usr/local/app/configs/db/db.yaml`,
-			'-v', `${getAbsolutePath('./stress-logs')}:/usr/local/app/logs`,
+			'-v', `${getAbsolutePath('./dev-logs')}:/usr/local/app/logs`,
+			'-v', `${getAbsolutePath('./dev-logs/pg_log')}:/var/lib/postgresql/9.5/main/pg_log`,
 			'-p', '5000:80',
 			'{{image}}'
 		],
 		env: getEnv({
 			NODEJS_ENV: 'development',
-			DOCKER_MEMORY: '4G',
+			DOCKER_MEMORY: '2g',
 			DOCKER_CPU: '2'
 		})
 	},

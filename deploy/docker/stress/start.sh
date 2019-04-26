@@ -19,8 +19,13 @@ envsubst \
     < /config-templates/supervisord.template.conf \
     > /etc/supervisor/conf.d/supervisord.conf
 
-echo "#local   replication     all                                     trust" >> /etc/postgresql/9.5/main/pg_hba.conf
+echo "local   replication     all                                     trust" >> /etc/postgresql/9.5/main/pg_hba.conf
 /etc/init.d/postgresql start
+echo "log_directory = 'pg_log'" >> /etc/postgresql/9.5/main/postgresql.conf
+echo "log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'" >> /etc/postgresql/9.5/main/postgresql.conf
+echo "log_statement = 'all'" >> /etc/postgresql/9.5/main/postgresql.conf
+echo "logging_collector = on" >> /etc/postgresql/9.5/main/postgresql.conf
+/etc/init.d/postgresql restart
 sudo -u postgres psql -c '\x' -c "CREATE USER admin WITH SUPERUSER CREATEDB CREATEROLE REPLICATION BYPASSRLS PASSWORD 'znkzslvj4g'"
 sudo -u postgres psql -c '\x' -c "UPDATE pg_database SET datistemplate=FALSE WHERE datname='template1'"
 sudo -u postgres psql -c '\x' -c "DROP DATABASE template1"

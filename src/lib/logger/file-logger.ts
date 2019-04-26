@@ -1,24 +1,46 @@
 import winston, {format} from 'winston';
+import WinstonDailyRotateFile from 'winston-daily-rotate-file';
 import {getAbsolutePath} from 'src/utils/fs';
 
 const {combine, timestamp, splat} = format;
 
 const createLogger = (): winston.Logger => {
+    const levels = {
+        error: 0,
+        warn: 1,
+        info: 2,
+        verbose: 3,
+        debug: 4,
+        silly: 5
+    };
     const logFormat = format.printf((info) => {
         return `[${info.timestamp}] ${info.message}`;
     });
 
     const logPath = getAbsolutePath('./logs');
     return winston.createLogger({
+        levels,
         format: combine(
             splat(),
             timestamp(),
             logFormat
         ),
         transports: [
-            new winston.transports.File({filename: `${logPath}/error.log`, level: 'error'}),
-            new winston.transports.File({filename: `${logPath}/warn.log`, level: 'warn'}),
-            new winston.transports.File({filename: `${logPath}/info.log`, level: 'info'})
+            new WinstonDailyRotateFile({
+                datePattern: 'YYYY-MM-DD-HH',
+                filename: `${logPath}/error.log`,
+                level: 'error'
+            }),
+            new WinstonDailyRotateFile({
+                datePattern: 'YYYY-MM-DD-HH',
+                filename: `${logPath}/info.log`,
+                level: 'info'
+            }),
+            new WinstonDailyRotateFile({
+                datePattern: 'YYYY-MM-DD-HH',
+                filename: `${logPath}/warn.log`,
+                level: 'warn'
+            })
         ]
     });
 };

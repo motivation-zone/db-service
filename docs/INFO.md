@@ -64,6 +64,13 @@ vim /etc/postgresql/10/main/pg_hba.conf
     host    all             all              ::/0                            md5
 "
 /etc/init.d/postgresql restart
+
+echo "local replication all trust" >> /etc/postgresql/10/main/pg_hba.conf
+echo "log_directory = 'pg_log'" >> /etc/postgresql/10/main/postgresql.conf
+echo "log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'" >> /etc/postgresql/10/main/postgresql.conf
+echo "log_statement = 'all'" >> /etc/postgresql/10/main/postgresql.conf
+echo "logging_collector = on" >> /etc/postgresql/10/main/postgresql.conf
+/etc/init.d/postgresql restart
 ```
 
 ### NGINX installation

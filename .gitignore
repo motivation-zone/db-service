@@ -4,7 +4,7 @@
 /node_modules
 /build
 /logs
-/stress-logs
+/dev-logs
 /configs/db/db.yaml
 /migration/result.pgsql
 

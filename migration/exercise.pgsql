@@ -9,13 +9,7 @@ CREATE TABLE IF NOT EXISTS exercise_template (
   UNIQUE(title, description, user_id, sport_id)
 );
 
-CREATE INDEX index_exercise_template__sport_id ON exercise_template (sport_id);
-CREATE INDEX index_exercise_template__user_id ON exercise_template (user_id);
-CREATE INDEX index_exercise_template__difficulty_level_id ON exercise_template (difficulty_level_id);
-CREATE INDEX index_exercise_template__sport_id__user_id ON exercise_template (user_id, sport_id);
-CREATE INDEX index_exercise_template__user_id__difficulty_level_id ON exercise_template (user_id, difficulty_level_id);
-CREATE INDEX index_exercise_template__sport_id__difficulty_level_id ON exercise_template (sport_id, difficulty_level_id);
-CREATE INDEX index_exercise_template__user_id__sport_id__difficulty_level_id ON exercise_template (user_id, sport_id, difficulty_level_id);
+CREATE INDEX index_exercise_template ON exercise_template (user_id, sport_id, difficulty_level_id);
 
 CREATE TABLE IF NOT EXISTS exercise (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,

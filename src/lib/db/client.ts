@@ -4,7 +4,6 @@ import yaml from 'yaml';
 import Boom from 'boom';
 
 import logger from 'src/lib/logger';
-import queryLogger from 'src/lib/logger/query-logger';
 import {getAbsolutePath} from 'src/utils/fs';
 import HttpResponse from 'src/utils/http/response';
 
@@ -23,7 +22,7 @@ const config = {
     database: dbConfig.database,
     port: dbConfig.port,
     idleTimeoutMillis: 1000 * 60 * 2,
-    connectionTimeoutMillis: 3000
+    connectionTimeoutMillis: 2000
 };
 
 const pool = new Pool(config);
@@ -36,9 +35,7 @@ export const query = async (queryData: IQuery): Promise<any[]> => {
     try {
         client = await pool.connect();
         data = await client.query(queryData);
-        queryLogger.ok(data && data.rows && data.rows.length, queryData);
     } catch (e) {
-        queryLogger.error(-1, queryData, e.message);
         logger('error', 'db', e.message);
         HttpResponse.throwError(Boom.conflict, `${e.detail} ${e.message}`);
     } finally {

@@ -8,10 +8,10 @@ It checks code styles for /src and /tests folder and run functional tests.
 
 # Environments
 ```typescript
-    interface env {
-        NODEJS_PORT: string;
-        NODEJS_ENV: 'development' | 'testing' | 'stress' | 'production'
-    }
+interface env {
+    NODEJS_PORT: string;
+    NODEJS_ENV: 'development' | 'testing' | 'stress' | 'production'
+}
 ```
 
 # Build

@@ -4,6 +4,7 @@
 /configs/db/db.yaml
 /migration/result.pgsql
 /logs
+/dev-logs
 
 /tests/stress/ammo.txt
 /tests/stress/tank-token.txt

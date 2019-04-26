@@ -9,6 +9,6 @@ const formMessage = (type: LoggerType, msg: string) => {
 export default (level: keyof ILogger, type: LoggerType, msg: string) => {
     const msgResult = formMessage(type, msg);
 
-    const f = env === 'production' ? fileLogger : consoleLogger;
+    const f = ['production', 'stress'].includes(env) ? fileLogger : consoleLogger;
     (f as any)[level](msgResult);
 };
