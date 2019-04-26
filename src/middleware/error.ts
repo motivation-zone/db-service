@@ -5,10 +5,10 @@ import logger from 'src/lib/logger';
 import HttpResponse from 'src/utils/http/response';
 
 export default (err: any, _req: Request, res: Response, _next: NextFunction): void => {
+    logger('error', 'app', JSON.stringify(err));
     if (err.isBoom) {
         sendError(res, err);
     } else {
-        logger('error', 'app', JSON.stringify({err: {stack: err.stack, message: err.message}}));
         sendError(res, Boom.internal());
     }
 };

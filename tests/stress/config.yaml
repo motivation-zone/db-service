@@ -6,7 +6,7 @@ phantom:
   address: 127.0.0.1:5000
   load_profile:
     load_type: rps
-    schedule: line(1, 1000, 5m) # const(400, 3m)
+    schedule: line(1, 1000, 2m) # const(400, 3m)
   ammo_type: uri
 console:
   enabled: true
