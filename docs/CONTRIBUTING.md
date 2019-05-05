@@ -71,5 +71,5 @@ For launch stress testing you should execute next commands one by one
 5. Fire: (launch in tank) ```yandex-tank -c ./tests/stress/config.yaml ./tests/stress/ammo.txt```
 
 #### Analising
-1. See logs in ```/stress-logs``` folder
+1. See logs in ```/dev-logs``` folder
 2. See on special tank service results of stress [SERVICES.md](./SERVICES.md)
