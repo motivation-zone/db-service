@@ -11,7 +11,8 @@ const {
     getAllSports,
     insertUserSportLink,
     getUsersBySport,
-    deleteUserSportLink
+    deleteUserSportLink,
+    getUserSports
 } = sportDbActions;
 
 const LIMIT_PARAMS = {limit: 100, skip: 0};
@@ -49,6 +50,19 @@ describe('Sport:', () => {
             expect(status).to.equal(400);
         });
     });
+
+    describe('Get user\'s sports', () => {
+        it('all', async () => {
+            const {data: [sport]} = await getAllSports();
+            const {data: users} = await getUsersBySport(sport.id!, Object.assign({}, LIMIT_PARAMS, {order: 'DESC'}));
+            expect(users.length).be.greaterThan(0);
+
+            const {data: sports, status} = await getUserSports(users[0].id!);
+            expect(sports.length).be.greaterThan(0);
+            expect(status).to.equal(200);
+        });
+    });
+
 
     describe('Update user-sport link', () => {
         it('delete', async () => {

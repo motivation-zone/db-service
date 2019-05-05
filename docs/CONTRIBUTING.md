@@ -14,6 +14,11 @@ interface env {
 }
 ```
 
+# Install dependencies
+```Makefile
+make deps
+```
+
 # Build
 ```Makefile
 make build # build project
